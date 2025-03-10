@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -28,7 +29,6 @@ import {
 } from "lucide-react";
 
 import Link from "next/link";
-import { useState } from "react";
 
 import { ExchangeRateCard } from "@/components/cards/exchange-rate-card";
 
@@ -37,7 +37,6 @@ import { MetaData } from "@/types/meta-data";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 import { toast } from "sonner";
-import useDashboardStats from "@/hooks/useDashboardStats";
 
 interface Overview {
   totalTransactions: number;
@@ -73,14 +72,31 @@ interface StateApiResponse {
 }
 
 export default function DashboardContainer() {
-  const { data: transactions, error: transactionError } = useSWR<TransactionApiResponse>(`/transactions?limit=20&&page=1`, fetcher);
+  const { data: transactions, error: transactionError } =
+    useSWR<TransactionApiResponse>(`/transactions?limit=20&&page=1`, fetcher);
   const recentTransactions: Transaction[] = transactions?.data || [];
 
-  if (transactionError)
-    return toast.error("Failed to load recent transactions");
+  const { data: stats, error: statsError } = useSWR<StateApiResponse>(
+    "/dashboard/stats",
+    fetcher,
+  );
+  const {
+    totalTransactions = 0,
+    totalEarningsUSD = 0,
+    totalProfitUSD = 0,
+    supplierCount = 0,
+    agentCount = 0,
+  } = stats?.data || {};
 
-  const { data: stats, error: statsError } = useSWR<StateApiResponse>("/dashboard/stats", fetcher);
-  const { totalTransactions = 0, totalEarningsUSD = 0, totalProfitUSD = 0, supplierCount = 0, agentCount = 0 } = stats?.data || {};
+  // Handle errors AFTER all hooks have been called
+  useEffect(() => {
+    if (transactionError) {
+      toast.error("Failed to load recent transactions");
+    }
+    if (statsError) {
+      toast.error("Failed to load stats");
+    }
+  }, [transactionError, statsError]);
 
   const profitData = [
     { date: "Feb 1", profit: 150.25 },
@@ -265,8 +281,13 @@ export default function DashboardContainer() {
                 <TableRow>
                   <TableHead className="p-3 text-left">Date</TableHead>
                   <TableHead className="p-3 text-left">Amount (RMB)</TableHead>
-                  <TableHead className="p-3 text-left">Amount USD <span className="text-blue-500">(Buy Rate)</span></TableHead>
-                  <TableHead className="p-3 text-left">Amount USD <span className="text-green-500">(Sell Rate)</span></TableHead>
+                  <TableHead className="p-3 text-left">
+                    Amount USD <span className="text-blue-500">(Buy Rate)</span>
+                  </TableHead>
+                  <TableHead className="p-3 text-left">
+                    Amount USD{" "}
+                    <span className="text-green-500">(Sell Rate)</span>
+                  </TableHead>
                   <TableHead className="p-3 text-left">Profit (USD)</TableHead>
                   <TableHead className="p-3 text-left">
                     Commission (USD)
@@ -288,11 +309,15 @@ export default function DashboardContainer() {
                       ).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="p-3">
-                    &#165; {transaction.amountRMB.toLocaleString()}
+                      &#165; {transaction.amountRMB.toLocaleString()}
                     </TableCell>
-                    <TableCell className="p-3">${transaction.amountUSDBuy.toFixed(2)} ( {transaction.buyRate} )</TableCell>
                     <TableCell className="p-3">
-                    ${transaction.amountUSDSell.toFixed(2)} ( {transaction.sellRate} )
+                      ${transaction.amountUSDBuy.toFixed(2)} ({" "}
+                      {transaction.buyRate} )
+                    </TableCell>
+                    <TableCell className="p-3">
+                      ${transaction.amountUSDSell.toFixed(2)} ({" "}
+                      {transaction.sellRate} )
                     </TableCell>
                     <TableCell className="p-3">
                       ${transaction.profitUSD.toFixed(2)}

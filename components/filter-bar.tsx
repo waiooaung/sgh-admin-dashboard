@@ -176,10 +176,10 @@ const FilterBar: React.FC<FilterBarProps> = ({ fields, onFilterChange }) => {
           fields.length === 1
             ? "grid-cols-1"
             : fields.length === 2
-            ? "grid-cols-1 sm:grid-cols-2"
-            : fields.length === 3
-            ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              ? "grid-cols-1 sm:grid-cols-2"
+              : fields.length === 3
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         }`}
       >
         {fields.map((field) => {
@@ -245,7 +245,9 @@ const FilterBar: React.FC<FilterBarProps> = ({ fields, onFilterChange }) => {
       </div>
 
       <div className="flex justify-end mt-4">
-        <Button onClick={handleSearch} className="w-full sm:w-auto bg-blue-600 text-white"
+        <Button
+          onClick={handleSearch}
+          className="w-full sm:w-auto bg-blue-600 text-white"
         >
           Search
         </Button>
@@ -255,4 +257,3 @@ const FilterBar: React.FC<FilterBarProps> = ({ fields, onFilterChange }) => {
 };
 
 export default FilterBar;
-

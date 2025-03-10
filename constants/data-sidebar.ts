@@ -4,6 +4,8 @@ import {
   FileCogIcon,
   GalleryVerticalEnd,
   Settings2,
+  Handshake,
+  Users,
 } from "lucide-react";
 
 export const data = {
@@ -32,6 +34,18 @@ export const data = {
       title: "Transactions",
       url: "/dashboard/transactions",
       icon: ArrowLeftRight,
+      items: [],
+    },
+    {
+      title: "Suppliers",
+      url: "/dashboard/suppliers",
+      icon: Handshake,
+      items: [],
+    },
+    {
+      title: "Agents",
+      url: "/dashboard/agents",
+      icon: Users,
       items: [],
     },
     {

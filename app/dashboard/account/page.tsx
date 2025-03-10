@@ -15,8 +15,8 @@ export default function AccountDetails() {
 
     try {
       alert("Account updated successfully");
-    } catch (error) {
-      alert("Error updating account");
+    } catch (error: unknown) {
+      alert(JSON.stringify(error));
     }
   };
 

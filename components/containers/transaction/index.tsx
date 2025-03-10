@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -23,6 +23,7 @@ import {
   JapaneseYen,
   DollarSign,
   CircleDollarSign,
+  View,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -57,27 +58,22 @@ interface ApiResponse {
 }
 
 const TransactionContainer = () => {
-  const searchParams = useSearchParams();
-
+  const router = useRouter();
   // Get yesterday's date
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  // const yesterday = new Date();
+  // yesterday.setDate(yesterday.getDate() - 1);
 
   // Get today's date
-  const today = new Date();
+  // const today = new Date();
 
   // Initialize dateRange with yesterday and today
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: yesterday,
-    to: today,
+    from: undefined,
+    to: undefined,
   });
 
-  const [currentPage, setCurrentPage] = useState(
-    Number(searchParams.get("page")) || 1,
-  );
-  const [itemsPerPage, setItemsPerPage] = useState(
-    Number(searchParams.get("limit")) || 10,
-  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [agentFilter, setAgentFilter] = useState<string | undefined>(undefined);
   const [supplierFilter, setSupplierFilter] = useState<string | undefined>(
     undefined,
@@ -113,7 +109,7 @@ const TransactionContainer = () => {
   const transactions = data?.data || [];
   const meta = data?.meta || {
     totalItems: 0,
-    totalPages: 1,
+    totalPages: 0,
     currentPage: 1,
     itemsPerPage,
   };
@@ -140,8 +136,9 @@ const TransactionContainer = () => {
     setOpen(true);
   };
 
-  const handleSave = () => {
+  const handleUpdate = () => {
     setOpen(false);
+    mutate();
   };
 
   const { trigger: deleteTransaction } = useDeleteTransaction();
@@ -151,8 +148,10 @@ const TransactionContainer = () => {
       await deleteTransaction(id);
       toast.success("Transaction deleted successfully!");
       mutate();
-    } catch (error) {
-      toast.error("Failed to delete transaction.")
+    } catch (deleteError) {
+      toast.error(
+        `Failed to delete transaction: ${JSON.stringify(deleteError)}`,
+      );
     }
   };
 
@@ -260,8 +259,13 @@ const TransactionContainer = () => {
                 <TableRow>
                   <TableHead className="p-3 text-left">Date</TableHead>
                   <TableHead className="p-3 text-left">Amount (RMB)</TableHead>
-                  <TableHead className="p-3 text-left">Amount USD <span className="text-blue-500">(Buy Rate)</span></TableHead>
-                  <TableHead className="p-3 text-left">Amount USD <span className="text-green-500">(Sell Rate)</span></TableHead>
+                  <TableHead className="p-3 text-left">
+                    Amount USD <span className="text-blue-500">(Buy Rate)</span>
+                  </TableHead>
+                  <TableHead className="p-3 text-left">
+                    Amount USD{" "}
+                    <span className="text-green-500">(Sell Rate)</span>
+                  </TableHead>
                   <TableHead className="p-3 text-left">Profit (USD)</TableHead>
                   <TableHead className="p-3 text-left">
                     Commission (USD)
@@ -284,11 +288,15 @@ const TransactionContainer = () => {
                       ).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="p-3">
-                    &#165; {transaction.amountRMB.toLocaleString()}
+                      &#165; {transaction.amountRMB.toLocaleString()}
                     </TableCell>
-                    <TableCell className="p-3">${transaction.amountUSDBuy.toFixed(2)} ( {transaction.buyRate} )</TableCell>
                     <TableCell className="p-3">
-                    ${transaction.amountUSDSell.toFixed(2)} ( {transaction.sellRate} )
+                      ${transaction.amountUSDBuy.toFixed(2)}
+                      <span>({transaction.buyRate})</span>
+                    </TableCell>
+                    <TableCell className="p-3">
+                      ${transaction.amountUSDSell.toFixed(2)}
+                      <span>({transaction.sellRate})</span>
                     </TableCell>
                     <TableCell className="p-3">
                       ${transaction.profitUSD.toFixed(2)}
@@ -308,6 +316,15 @@ const TransactionContainer = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            onClick={() => {
+                              router.push(
+                                `/dashboard/transactions/${transaction.id}`,
+                              );
+                            }}
+                          >
+                            <View className="w-4 h-4 mr-2" /> Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
                             onClick={() => handleEdit(transaction)}
                           >
                             <Pencil className="w-4 h-4 mr-2" /> Edit
@@ -325,12 +342,14 @@ const TransactionContainer = () => {
                 ))}
               </TableBody>
             </Table>
-            <EditTransaction
-              open={open}
-              onClose={() => setOpen(false)}
-              transaction={selectedTransaction}
-              onSave={handleSave}
-            />
+            {selectedTransaction && (
+              <EditTransaction
+                open={open}
+                onClose={() => setOpen(false)}
+                transaction={selectedTransaction}
+                onSave={handleUpdate}
+              />
+            )}
 
             <div className="flex justify-between items-center mt-4">
               <Button

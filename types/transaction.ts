@@ -1,3 +1,5 @@
+import { Supplier } from "./supplier";
+import { Agent } from "./agent";
 export type Transaction = {
   id: number;
   transactionDate: string;
@@ -16,7 +18,7 @@ export type Transaction = {
   updatedAt: string;
 };
 
-export type CreateTransaction = {
+export type TransactionFormData = {
   transactionDate: Date;
   amountRMB: number;
   buyRate: number;
@@ -24,4 +26,20 @@ export type CreateTransaction = {
   commissionRate: number;
   agentId: number;
   supplierId: number;
+};
+
+export type UpdateTransaction = TransactionFormData & {
+  id: number;
+  transactionDate: Date;
+  amountRMB: number;
+  buyRate: number;
+  sellRate: number;
+  commissionRate: number;
+  agentId: number;
+  supplierId: number;
+};
+
+export type TransactionDetail = Transaction & {
+  supplier: Supplier;
+  agent: Agent;
 };

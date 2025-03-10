@@ -4,7 +4,7 @@ import { useState } from "react";
 import { columns } from "./columns";
 import { AddNewUser } from "@/components/dialogs/add-new-user";
 import { DataTable } from "./data-table";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface User {
   id: number;
@@ -31,32 +31,6 @@ export default function UserManagementPage() {
       lastLogin: new Date("2024-02-20"),
     },
   ]);
-
-  const [newEmail, setNewEmail] = useState("");
-
-  // Function to format date
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    }).format(date);
-
-  // Function to add a new user
-  const addUser = () => {
-    if (newEmail.trim() === "") return;
-    setUsers([
-      ...users,
-      {
-        id: users.length + 1,
-        email: newEmail,
-        active: true,
-        createdAt: new Date(),
-        lastLogin: new Date(),
-      },
-    ]);
-    setNewEmail("");
-  };
 
   // Toggle user active/inactive status
   const toggleUserStatus = (id: number) => {
