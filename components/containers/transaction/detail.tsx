@@ -29,7 +29,7 @@ const TransactionDetailContainer = ({
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
         <p className="text-lg font-semibold tracking-tight">
-          Transaction #TNX-{transactionId}
+          Transaction Detail
         </p>
       </div>
 
@@ -37,7 +37,8 @@ const TransactionDetailContainer = ({
         <Card className="w-full mx-auto shadow-lg rounded-lg border py-0">
           <CardHeader className="border-b p-6 rounded-t-lg">
             <CardTitle className="text-2xl font-semibold">
-              Transaction #TNX-{transaction.id}
+              Transaction No.{" "}
+              <span className="text-blue-500">#TNX-{transaction.id}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">

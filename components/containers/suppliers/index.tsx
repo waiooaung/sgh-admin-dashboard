@@ -3,6 +3,8 @@
 import { useState } from "react";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { Supplier } from "@/types/supplier";
 import { MetaData } from "@/types/meta-data";
@@ -30,14 +32,13 @@ import {
   Trash,
   ArrowLeft,
   ArrowRight,
+  View,
 } from "lucide-react";
-
-import { toast } from "sonner";
 
 import { AddNewSupplier } from "@/components/dialogs/add-new-supplier";
 import EditSupplier from "@/components/dialogs/edit-supplier";
-
 import useDelete from "@/hooks/useDelete";
+import useDataContext from "@/hooks/useDataContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -48,6 +49,8 @@ interface ApiResponse {
 }
 
 const SupplierContainer = () => {
+  const router = useRouter();
+  const { setSupplier } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
@@ -88,6 +91,11 @@ const SupplierContainer = () => {
     } catch (deleteError) {
       toast.error(`Failed to delete supplier: ${JSON.stringify(deleteError)}`);
     }
+  };
+
+  const handleRedirect = (supplier: Supplier) => {
+    setSupplier(supplier);
+    router.push("suppliers/detail");
   };
 
   return (
@@ -141,6 +149,13 @@ const SupplierContainer = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleRedirect(supplier);
+                            }}
+                          >
+                            <View className="w-4 h-4 mr-2" /> Detail
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEdit(supplier)}
                           >

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -77,17 +77,38 @@ const formSchema = z.object({
 export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const { data: exchangeRateData, error: exchangeRateError } = useSWR(
+    "/exchange-rates/latest",
+    fetcher,
+  );
+
+  if (exchangeRateError) toast.error(exchangeRateError);
+
+  const exchangeRates = useMemo(() => {
+    return (
+      exchangeRateData?.data || {
+        baseCurrency: "USD",
+        quoteCurrency: "RMB",
+        buyRate: 0,
+        sellRate: 0,
+      }
+    );
+  }, [exchangeRateData]);
+
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      transactionDate: new Date(),
-      amountRMB: 0,
-      buyRate: 0,
-      sellRate: 0,
-      commissionRate: 0.03,
-      agentId: undefined,
-      supplierId: undefined,
-    },
+    defaultValues: useMemo(
+      () => ({
+        transactionDate: new Date(),
+        amountRMB: 0,
+        buyRate: exchangeRates.buyRate,
+        sellRate: exchangeRates.sellRate,
+        commissionRate: 0.03,
+        agentId: undefined,
+        supplierId: undefined,
+      }),
+      [exchangeRates],
+    ),
   });
 
   const { amountRMB, buyRate, sellRate, commissionRate } = form.watch();
@@ -146,6 +167,11 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
       toast.error("Failed to create transaction!");
     }
   };
+
+  useEffect(() => {
+    form.setValue("buyRate", exchangeRates.buyRate);
+    form.setValue("sellRate", exchangeRates.sellRate);
+  }, [exchangeRates, form]); // Now properly memoized
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

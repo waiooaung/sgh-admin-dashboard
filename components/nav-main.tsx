@@ -39,7 +39,8 @@ export function NavMain({
   const pathname = usePathname();
 
   const isActive = (url: string) => {
-    const baseUrl = pathname.replace(/\/\d+$/, "").replace(/\/$/, "");
+    const baseUrl = pathname.split("/").slice(0, 3).join("/");
+
     return baseUrl === url;
   };
 

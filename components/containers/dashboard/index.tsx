@@ -2,14 +2,6 @@
 import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import {
   LineChart,
   BarChart,
   Line,
@@ -21,38 +13,15 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  ArrowLeftRight,
-  CircleDollarSign,
-  DollarSign,
-  JapaneseYen,
-} from "lucide-react";
+import { ArrowLeftRight, DollarSign, Users, Handshake } from "lucide-react";
 
 import Link from "next/link";
 
 import { ExchangeRateCard } from "@/components/cards/exchange-rate-card";
-
-import { Transaction } from "@/types/transaction";
-import { MetaData } from "@/types/meta-data";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 import { toast } from "sonner";
-
-interface Overview {
-  totalTransactions: number;
-  totalEarningsUSD: number;
-  totalProfitUSD: number;
-  totalAmountRMB: number;
-}
-
-interface TransactionApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Transaction[];
-  meta: MetaData;
-  overview: Overview;
-}
+import TransactionTable from "@/components/tables/transaction-table";
 
 interface Stats {
   totalTransactions: number;
@@ -72,10 +41,6 @@ interface StateApiResponse {
 }
 
 export default function DashboardContainer() {
-  const { data: transactions, error: transactionError } =
-    useSWR<TransactionApiResponse>(`/transactions?limit=20&&page=1`, fetcher);
-  const recentTransactions: Transaction[] = transactions?.data || [];
-
   const { data: stats, error: statsError } = useSWR<StateApiResponse>(
     "/dashboard/stats",
     fetcher,
@@ -90,13 +55,10 @@ export default function DashboardContainer() {
 
   // Handle errors AFTER all hooks have been called
   useEffect(() => {
-    if (transactionError) {
-      toast.error("Failed to load recent transactions");
-    }
     if (statsError) {
       toast.error("Failed to load stats");
     }
-  }, [transactionError, statsError]);
+  }, [statsError]);
 
   const profitData = [
     { date: "Feb 1", profit: 150.25 },
@@ -150,7 +112,7 @@ export default function DashboardContainer() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium truncate">
@@ -170,14 +132,14 @@ export default function DashboardContainer() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium truncate">
-              Total Revenue
+              Total Profit
             </CardTitle>
-            <JapaneseYen className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <Link href="/transactions">
               <div className="text-2xl font-bold text-blue-600 truncate">
-                {new Intl.NumberFormat("en-US").format(totalEarningsUSD)}
+                $ {new Intl.NumberFormat("en-US").format(totalEarningsUSD)}
               </div>
             </Link>
           </CardContent>
@@ -193,23 +155,25 @@ export default function DashboardContainer() {
           <CardContent>
             <Link href="/transactions">
               <div className="text-2xl font-bold text-blue-600 truncate">
-                ${new Intl.NumberFormat("en-US").format(totalProfitUSD)}
+                $ {new Intl.NumberFormat("en-US").format(totalProfitUSD)}
               </div>
             </Link>
           </CardContent>
         </Card>
+      </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium truncate">
               Suppliers
             </CardTitle>
-            <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+            <Handshake className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <Link href="/transactions?status=partially_paid">
               <div className="text-2xl font-bold text-red-600 truncate">
-                ${new Intl.NumberFormat("en-US").format(supplierCount)}
+                {new Intl.NumberFormat("en-US").format(supplierCount)}
               </div>
             </Link>
           </CardContent>
@@ -220,19 +184,20 @@ export default function DashboardContainer() {
             <CardTitle className="text-sm font-medium truncate">
               Agents
             </CardTitle>
-            <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <Link href="/transactions?status=partially_paid">
               <div className="text-2xl font-bold text-red-600 truncate">
-                ${new Intl.NumberFormat("en-US").format(agentCount)}
+                {new Intl.NumberFormat("en-US").format(agentCount)}
               </div>
             </Link>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ExchangeRateCard />
         <ExchangeRateCard />
         <Card>
           <CardHeader>
@@ -273,65 +238,12 @@ export default function DashboardContainer() {
       <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
+            <CardTitle>
+              Transactions <span>( Today )</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-              <TableHeader className="text-sm font-semibold">
-                <TableRow>
-                  <TableHead className="p-3 text-left">Date</TableHead>
-                  <TableHead className="p-3 text-left">Amount (RMB)</TableHead>
-                  <TableHead className="p-3 text-left">
-                    Amount USD <span className="text-blue-500">(Buy Rate)</span>
-                  </TableHead>
-                  <TableHead className="p-3 text-left">
-                    Amount USD{" "}
-                    <span className="text-green-500">(Sell Rate)</span>
-                  </TableHead>
-                  <TableHead className="p-3 text-left">Profit (USD)</TableHead>
-                  <TableHead className="p-3 text-left">
-                    Commission (USD)
-                  </TableHead>
-                  <TableHead className="p-3 text-left">
-                    Total Earnings (USD)
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentTransactions.map((transaction) => (
-                  <TableRow
-                    key={transaction.id}
-                    className="hover:bg-blend-color transition-colors"
-                  >
-                    <TableCell className="p-3">
-                      {new Date(
-                        transaction.transactionDate,
-                      ).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="p-3">
-                      &#165; {transaction.amountRMB.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="p-3">
-                      ${transaction.amountUSDBuy.toFixed(2)} ({" "}
-                      {transaction.buyRate} )
-                    </TableCell>
-                    <TableCell className="p-3">
-                      ${transaction.amountUSDSell.toFixed(2)} ({" "}
-                      {transaction.sellRate} )
-                    </TableCell>
-                    <TableCell className="p-3">
-                      ${transaction.profitUSD.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="p-3">
-                      ${transaction.commissionUSD.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="p-3">
-                      ${transaction.totalEarningsUSD.toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <TransactionTable from={new Date()} to={new Date()} />
           </CardContent>
         </Card>
       </div>

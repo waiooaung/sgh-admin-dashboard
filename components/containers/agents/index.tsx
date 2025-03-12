@@ -3,11 +3,11 @@
 import { useState } from "react";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { Agent } from "@/types/agent";
 import { MetaData } from "@/types/meta-data";
-
-import { AddNewAgent } from "@/components/dialogs/add-new-agent";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -33,10 +33,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Filter,
+  View,
 } from "lucide-react";
-import { toast } from "sonner";
+
 import useDelete from "@/hooks/useDelete";
 import EditAgent from "@/components/dialogs/edit-agent";
+import { AddNewAgent } from "@/components/dialogs/add-new-agent";
+import useDataContext from "@/hooks/useDataContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -47,9 +50,11 @@ interface ApiResponse {
 }
 
 const AgentContainer = () => {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  const { setAgent } = useDataContext();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [open, setOpen] = useState(false);
   const { data, mutate } = useSWR<ApiResponse>(
@@ -91,6 +96,11 @@ const AgentContainer = () => {
     } catch (deleteError) {
       toast.error(`Failed to delete agent: ${JSON.stringify(deleteError)}`);
     }
+  };
+
+  const handleRedirect = (agent: Agent) => {
+    setAgent(agent);
+    router.push("agents/detail");
   };
 
   return (
@@ -163,6 +173,13 @@ const AgentContainer = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleRedirect(agent);
+                            }}
+                          >
+                            <View className="w-4 h-4 mr-2" /> Detail
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEdit(agent)}>
                             <Pencil className="w-4 h-4 mr-2" /> Edit
                           </DropdownMenuItem>
