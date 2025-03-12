@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
+import { Phone, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import useDataContext from "@/hooks/useDataContext";
 import AgentOverview from "@/components/overviews/agent-overview";
@@ -67,28 +69,54 @@ const AgentDetailContainer = () => {
             <CardTitle>Agent Information</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
-            <p>
+            <p className="truncate">
               <strong>Name:</strong> {agent.contactName || "N/A"}
             </p>
-            <p>
+            <p className="truncate">
               <strong>Email:</strong> {agent.contactEmail || "N/A"}
             </p>
-            <p>
-              <strong>Phone:</strong> {agent.contactPhone || "N/A"}
+            <p className="truncate">
+              <strong>Phone:</strong>
+              <span>{agent.contactPhone || "N/A"}</span>
+              <div className="flex items-center space-x-2 mt-2">
+                {/* Phone Button */}
+                <Button
+                  variant="outline"
+                  className="flex items-center space-x-2"
+                  onClick={() =>
+                    (window.location.href = `tel:${agent.contactPhone}`)
+                  }
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Call</span>
+                </Button>
+
+                {/* WhatsApp Button */}
+                <Button
+                  variant="outline"
+                  className="flex items-center space-x-2"
+                  onClick={() =>
+                    window.open(`https://wa.me/${agent.contactPhone}`, "_blank")
+                  }
+                >
+                  <MessageCircle className="w-4 h-4 text-green-500" />
+                  <span>WhatsApp</span>
+                </Button>
+              </div>
             </p>
-            <p>
+            <p className="truncate">
               <strong>Bank Account:</strong> {agent.bankAccount || "N/A"}
             </p>
-            <p>
+            <p className="truncate">
               <strong>Address:</strong> {agent.address || "N/A"}
             </p>
-            <p>
+            <p className="truncate">
               <strong>Created At:</strong> {formattedCreatedAt}
             </p>
-            <p>
+            <p className="truncate">
               <strong>Updated At:</strong> {formattedUpdatedAt}
             </p>
-            <p>
+            <p className="truncate">
               <strong>Last Login:</strong> {formattedLastLogin}
             </p>
           </CardContent>
