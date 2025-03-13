@@ -53,7 +53,6 @@ export default function DashboardContainer() {
     agentCount = 0,
   } = stats?.data || {};
 
-  // Handle errors AFTER all hooks have been called
   useEffect(() => {
     if (statsError) {
       toast.error("Failed to load stats");

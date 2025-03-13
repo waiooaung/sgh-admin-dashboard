@@ -39,8 +39,10 @@ export default async function RootLayout({
           disableTransitionOnChange
           storageKey="theme"
         >
-          <DataContextProvider>{children}</DataContextProvider>
-          <Toaster position="top-right" richColors />
+          <DataContextProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </DataContextProvider>
         </ThemeProvider>
       </body>
     </html>

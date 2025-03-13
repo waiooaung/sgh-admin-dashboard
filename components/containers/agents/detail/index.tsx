@@ -6,12 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
-import { Phone, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 import useDataContext from "@/hooks/useDataContext";
 import AgentOverview from "@/components/overviews/agent-overview";
 import TransactionTable from "@/components/tables/transaction-table";
+import ContactButton from "@/components/contact-button";
 
 const AgentDetailContainer = () => {
   const { agent } = useDataContext();
@@ -75,35 +74,10 @@ const AgentDetailContainer = () => {
             <p className="truncate">
               <strong>Email:</strong> {agent.contactEmail || "N/A"}
             </p>
-            <p className="truncate">
-              <strong>Phone:</strong>
-              <span>{agent.contactPhone || "N/A"}</span>
-              <div className="flex items-center space-x-2 mt-2">
-                {/* Phone Button */}
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                  onClick={() =>
-                    (window.location.href = `tel:${agent.contactPhone}`)
-                  }
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Call</span>
-                </Button>
-
-                {/* WhatsApp Button */}
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                  onClick={() =>
-                    window.open(`https://wa.me/${agent.contactPhone}`, "_blank")
-                  }
-                >
-                  <MessageCircle className="w-4 h-4 text-green-500" />
-                  <span>WhatsApp</span>
-                </Button>
-              </div>
-            </p>
+            <span className="truncate">
+              <strong>Phone:</strong>{" "}
+              <ContactButton phoneNumber={agent.contactPhone} />
+            </span>
             <p className="truncate">
               <strong>Bank Account:</strong> {agent.bankAccount || "N/A"}
             </p>
