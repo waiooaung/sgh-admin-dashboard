@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import TransactionTable from "@/components/tables/transaction-table";
 
 interface Stats {
-  totalTransactions: number;
+  totalTransactionsCount: number;
   totalEarningsUSD: number;
   totalProfitUSD: number;
   supplierCount: number;
@@ -46,7 +46,7 @@ export default function DashboardContainer() {
     fetcher,
   );
   const {
-    totalTransactions = 0,
+    totalTransactionsCount = 0,
     totalEarningsUSD = 0,
     totalProfitUSD = 0,
     supplierCount = 0,
@@ -122,7 +122,7 @@ export default function DashboardContainer() {
           <CardContent>
             <Link href="/transactions?date=25-02-2025">
               <div className="text-2xl font-bold text-blue-600 truncate">
-                {totalTransactions}
+                {totalTransactionsCount}
               </div>
             </Link>
           </CardContent>
