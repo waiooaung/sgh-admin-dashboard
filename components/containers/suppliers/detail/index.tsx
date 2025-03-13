@@ -10,6 +10,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import useDataContext from "@/hooks/useDataContext";
 import SupplierOverview from "@/components/overviews/supplier-overview";
 import TransactionTable from "@/components/tables/transaction-table";
+import ContactButton from "@/components/contact-button";
 
 const SupplierDetailContainer = () => {
   const { supplier } = useDataContext();
@@ -76,7 +77,7 @@ const SupplierDetailContainer = () => {
               <strong>Email:</strong> {supplier.contactEmail || "N/A"}
             </p>
             <p>
-              <strong>Phone:</strong> {supplier.contactPhone || "N/A"}
+              <strong>Phone:</strong> <ContactButton phoneNumber={supplier.contactPhone} />
             </p>
             <p>
               <strong>Bank Account:</strong> {supplier.bankAccount || "N/A"}
