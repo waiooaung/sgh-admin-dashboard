@@ -12,7 +12,6 @@ export default function ContactButton({
 }) {
   const whatsappLink = `https://wa.me/${phoneNumber}`;
   const callLink = `tel:${phoneNumber}`;
-  const messageLink = `sms:${phoneNumber}`;
 
   return (
     <DropdownMenu>
@@ -52,7 +51,7 @@ export default function ContactButton({
             Call
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        {/* <DropdownMenuItem>
           <a
             href={messageLink}
             target="_blank"
@@ -65,7 +64,7 @@ export default function ContactButton({
             </span>
             Message
           </a>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

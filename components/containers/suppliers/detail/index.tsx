@@ -77,7 +77,8 @@ const SupplierDetailContainer = () => {
               <strong>Email:</strong> {supplier.contactEmail || "N/A"}
             </p>
             <p>
-              <strong>Phone:</strong> <ContactButton phoneNumber={supplier.contactPhone} />
+              <strong>Phone:</strong>{" "}
+              <ContactButton phoneNumber={supplier.contactPhone} />
             </p>
             <p>
               <strong>Bank Account:</strong> {supplier.bankAccount || "N/A"}

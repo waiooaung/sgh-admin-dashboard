@@ -6,6 +6,7 @@ import {
   Settings2,
   Handshake,
   Users,
+  Banknote,
 } from "lucide-react";
 
 export const data = {
@@ -34,6 +35,12 @@ export const data = {
       title: "Transactions",
       url: "/dashboard/transactions",
       icon: ArrowLeftRight,
+      items: [],
+    },
+    {
+      title: "Payments",
+      url: "/dashboard/payments",
+      icon: Banknote,
       items: [],
     },
     {

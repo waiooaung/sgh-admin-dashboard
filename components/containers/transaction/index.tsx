@@ -73,7 +73,7 @@ const TransactionContainer = () => {
             icon: DollarSign,
           },
           {
-            label: "Total Amount Exchanged",
+            label: "Exchanged Amount (RMB)",
             value: overview.totalAmountRMB,
             icon: CircleDollarSign,
           },
