@@ -1,6 +1,6 @@
 import React from "react";
-import AgentDetailContainer from "@/components/containers/agents/detail";
+import PaymentContainer from "@/components/containers/payments";
 
 export default function page() {
-  return <AgentDetailContainer />;
+  return <PaymentContainer />;
 }
