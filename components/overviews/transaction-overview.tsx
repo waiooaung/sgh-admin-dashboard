@@ -33,7 +33,7 @@ interface ApiResponse {
   data: Data;
 }
 
-const DashboardTransactionOverview = () => {
+const TransactionOverview = () => {
   const { data, error } = useSWR<ApiResponse>(
     "/dashboard/transaction-statistics",
     fetcher,
@@ -134,4 +134,4 @@ const DashboardTransactionOverview = () => {
   );
 };
 
-export default DashboardTransactionOverview;
+export default TransactionOverview;

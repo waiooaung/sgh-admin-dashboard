@@ -169,9 +169,14 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
   };
 
   useEffect(() => {
-    form.setValue("buyRate", exchangeRates.buyRate);
-    form.setValue("sellRate", exchangeRates.sellRate);
-  }, [exchangeRates, form]); // Now properly memoized
+    if (isOpen) {
+      form.reset({
+        ...form.getValues(),
+        buyRate: exchangeRates.buyRate,
+        sellRate: exchangeRates.sellRate,
+      });
+    }
+  }, [exchangeRates, isOpen, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

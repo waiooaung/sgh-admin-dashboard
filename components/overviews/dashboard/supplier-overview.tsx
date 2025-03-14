@@ -22,7 +22,10 @@ interface ApiResponse {
 }
 
 const DashboardSupplierOverview = () => {
-  const { data, error } = useSWR<ApiResponse>("/dashboard/transaction-statistics", fetcher);
+  const { data, error } = useSWR<ApiResponse>(
+    "/dashboard/transaction-statistics",
+    fetcher,
+  );
   const { totalSupplierCount = 0, amountToPayUSD = 0 } = data?.data || {};
 
   useEffect(() => {
