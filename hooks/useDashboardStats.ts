@@ -9,7 +9,7 @@ interface ApiResponse {
   agentCount: number;
 }
 const useDashboardStats = () => {
-  return useSWR<ApiResponse>("/dashboard/stats", fetcher);
+  return useSWR<ApiResponse>("/dashboard/transaction-statistics", fetcher);
 };
 
 export default useDashboardStats;

@@ -159,7 +159,7 @@ const AgentContainer = () => {
                   >
                     <TableCell className="p-3">
                       <a
-                        className="text-blue-600 cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => {
                           handleRedirect(agent);
                         }}

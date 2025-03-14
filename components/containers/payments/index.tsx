@@ -7,8 +7,7 @@ const PaymentContainer = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-      </div>
+      <div className="grid grid-cols-1 gap-4"></div>
     </div>
   );
 };

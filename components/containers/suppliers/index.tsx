@@ -129,7 +129,16 @@ const SupplierContainer = () => {
                     key={supplier.id}
                     className="hover:bg-blend-color transition-colors"
                   >
-                    <TableCell className="p-3">{supplier.name}</TableCell>
+                    <TableCell className="p-3">
+                      <a
+                        className="cursor-pointer"
+                        onClick={() => {
+                          handleRedirect(supplier);
+                        }}
+                      >
+                        {supplier.name}
+                      </a>
+                    </TableCell>
                     <TableCell className="p-3">
                       {supplier.contactEmail}
                     </TableCell>

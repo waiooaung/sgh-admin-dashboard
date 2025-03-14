@@ -1,5 +1,4 @@
 "use client";
-import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   LineChart,
@@ -13,52 +12,14 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { ArrowLeftRight, DollarSign, Users, Handshake } from "lucide-react";
-
-import Link from "next/link";
 
 import { ExchangeRateCard } from "@/components/cards/exchange-rate-card";
-import useSWR from "swr";
-import fetcher from "@/lib/fetcher";
-import { toast } from "sonner";
 import TransactionTable from "@/components/tables/transaction-table";
-
-interface Stats {
-  totalTransactionsCount: number;
-  totalEarningsUSD: number;
-  totalProfitUSD: number;
-  supplierCount: number;
-  agentCount: number;
-}
-
-interface StateApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Stats;
-  meta: null;
-  overview: null;
-}
+import DashboardTransactionOverview from "@/components/overviews/dashboard/transaction-overview";
+import DashboardAgentOverview from "@/components/overviews/dashboard/agent-overview";
+import DashboardSupplierOverview from "@/components/overviews/dashboard/supplier-overview";
 
 export default function DashboardContainer() {
-  const { data: stats, error: statsError } = useSWR<StateApiResponse>(
-    "/dashboard/stats",
-    fetcher,
-  );
-  const {
-    totalTransactionsCount = 0,
-    totalEarningsUSD = 0,
-    totalProfitUSD = 0,
-    supplierCount = 0,
-    agentCount = 0,
-  } = stats?.data || {};
-
-  useEffect(() => {
-    if (statsError) {
-      toast.error("Failed to load stats");
-    }
-  }, [statsError]);
-
   const profitData = [
     { date: "Feb 1", profit: 150.25 },
     { date: "Feb 2", profit: 300.75 },
@@ -111,88 +72,13 @@ export default function DashboardContainer() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium truncate">
-              Total Transactions
-            </CardTitle>
-            <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/transactions?date=25-02-2025">
-              <div className="text-2xl font-bold text-blue-600 truncate">
-                {totalTransactionsCount}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium truncate">
-              Total Profit
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/transactions">
-              <div className="text-2xl font-bold text-blue-600 truncate">
-                $ {new Intl.NumberFormat("en-US").format(totalEarningsUSD)}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium truncate">
-              Total Profit
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/transactions">
-              <div className="text-2xl font-bold text-blue-600 truncate">
-                $ {new Intl.NumberFormat("en-US").format(totalProfitUSD)}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+        <DashboardTransactionOverview />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium truncate">
-              Suppliers
-            </CardTitle>
-            <Handshake className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/transactions?status=partially_paid">
-              <div className="text-2xl font-bold text-red-600 truncate">
-                {new Intl.NumberFormat("en-US").format(supplierCount)}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium truncate">
-              Agents
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Link href="/transactions?status=partially_paid">
-              <div className="text-2xl font-bold text-red-600 truncate">
-                {new Intl.NumberFormat("en-US").format(agentCount)}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <DashboardAgentOverview />
+        <DashboardSupplierOverview />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
