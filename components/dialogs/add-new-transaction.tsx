@@ -103,7 +103,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
         amountRMB: 0,
         buyRate: exchangeRates.buyRate,
         sellRate: exchangeRates.sellRate,
-        commissionRate: 0.003,
+        commissionRate: 0.3,
         agentId: undefined,
         supplierId: undefined,
       }),
