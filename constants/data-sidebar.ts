@@ -39,6 +39,7 @@ export const data = {
     },
     {
       title: "Payments",
+      url: "/dashboard/payment",
       icon: Banknote,
       items: [
         {
