@@ -120,7 +120,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     useMemo(() => {
       const buyUSD = buyRate > 0 ? amountRMB / buyRate : 0;
       const sellUSD = sellRate > 0 ? amountRMB / sellRate : 0;
-      const commissionValue = sellUSD * commissionRate;
+      const commissionValue = sellUSD * (commissionRate / 100);
       const profitValue = sellUSD > 0 && buyUSD > 0 ? sellUSD - buyUSD : 0;
       const totalEarnings = profitValue + commissionValue;
 
@@ -303,7 +303,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
                 name="commissionRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Commission Rate</FormLabel>
+                    <FormLabel>Commission Rate (%)</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
