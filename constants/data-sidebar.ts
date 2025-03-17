@@ -40,6 +40,7 @@ export const data = {
     {
       title: "Payments",
       icon: Banknote,
+      url: "/dashboard/payment",
       isActive: false,
       items: [
         {

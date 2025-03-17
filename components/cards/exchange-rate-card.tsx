@@ -36,7 +36,7 @@ export function ExchangeRateCard() {
     mutate,
   } = useSWR("/exchange-rates/latest", fetcher);
 
-  if (exchangeRateError) toast.error(exchangeRateError);
+  if (exchangeRateError) toast.error("Fail to fetch exchange rates.");
 
   const initialValues = exchangeRateData?.data || {
     baseCurrency: "USD",
@@ -83,7 +83,7 @@ export function ExchangeRateCard() {
       setPrevValues(values);
       form.reset(values);
     } catch (error) {
-      toast.error("Failed to save exchange rates, error: " + error);
+      toast.error("Failed to save exchange rates." + JSON.stringify(error));
     }
   };
 
