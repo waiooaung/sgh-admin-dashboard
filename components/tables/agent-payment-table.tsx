@@ -130,7 +130,7 @@ const AgentPaymentTable = ({
           <AgentPaymentSkeletonTable />
         ) : (
           <TableBody>
-            {agentPayments.map((data) => (
+            {agentPayments.length > 0 && agentPayments.map((data) => (
               <TableRow
                 key={data.id}
                 className="hover:bg-blend-color transition-colors"
