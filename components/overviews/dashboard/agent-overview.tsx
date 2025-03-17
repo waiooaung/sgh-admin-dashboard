@@ -9,9 +9,8 @@ import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 
 interface Data {
-  totalAgentCount: number;
-  receivedAmountUSD: number;
-  amountToReceiveUSD: number;
+  agentsCount: number;
+  totalAmountRemaining: number;
 }
 
 interface ApiResponse {
@@ -23,14 +22,14 @@ interface ApiResponse {
 
 const DashboardAgentOverview = () => {
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/transaction-statistics",
+    "/dashboard/agent-statistics",
     fetcher,
   );
-  const { totalAgentCount = 0, amountToReceiveUSD = 0 } = data?.data || {};
+  const { agentsCount = 0, totalAmountRemaining = 0 } = data?.data || {};
 
   useEffect(() => {
     if (error) {
-      toast.error("Failed to load transaction statistics");
+      toast.error("Failed to load agent statistics");
     }
   }, [error]);
   return (
@@ -43,7 +42,7 @@ const DashboardAgentOverview = () => {
         <CardContent>
           <Link href="/dashboard/agents">
             <div className="text-xl font-bold text-blue-600 truncate">
-              {new Intl.NumberFormat("en-US").format(totalAgentCount)}
+              {new Intl.NumberFormat("en-US").format(agentsCount)}
             </div>
           </Link>
         </CardContent>
@@ -58,7 +57,7 @@ const DashboardAgentOverview = () => {
         <CardContent>
           <Link href="/dashboard/agents">
             <div className="text-xl font-bold text-blue-600 truncate">
-              {new Intl.NumberFormat("en-US").format(amountToReceiveUSD)}
+              ${new Intl.NumberFormat("en-US").format(totalAmountRemaining)}
             </div>
           </Link>
         </CardContent>
