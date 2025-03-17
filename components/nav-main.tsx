@@ -40,7 +40,6 @@ export function NavMain({
 
   const isActive = (url: string) => {
     const baseUrl = pathname.split("/").slice(0, 3).join("/");
-
     return baseUrl === url;
   };
 
@@ -53,7 +52,7 @@ export function NavMain({
             <Collapsible key={item.title} asChild className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title} isActive>
+                  <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
