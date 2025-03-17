@@ -39,9 +39,17 @@ export const data = {
     },
     {
       title: "Payments",
-      url: "/dashboard/payments",
       icon: Banknote,
-      items: [],
+      items: [
+        {
+          title: "Agents",
+          url: "/dashboard/agent-payments",
+        },
+        {
+          title: "Suppliers",
+          url: "/dashboard/supplier-payments",
+        },
+      ],
     },
     {
       title: "Suppliers",

@@ -1,9 +1,9 @@
-const PaymentContainer = () => {
+const SupplierPaymentsContainer = () => {
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
         <p className="text-lg font-semibold tracking-tight">
-          Payment Managements
+          Supplier Payments
         </p>
       </div>
 
@@ -12,4 +12,4 @@ const PaymentContainer = () => {
   );
 };
 
-export default PaymentContainer;
+export default SupplierPaymentsContainer;

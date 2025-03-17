@@ -1,3 +1,4 @@
+"use client";
 import useSWR from "swr";
 import { useState } from "react";
 import fetcher from "@/lib/fetcher";
@@ -16,44 +17,45 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import { View, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { View, Trash, MoreHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
 import { PaginationControls } from "./pagination-controls";
-import { Transaction } from "@/types/transaction";
+import { AgentPayment } from "@/types/agentPayment";
 import { MetaData } from "@/types/meta-data";
-import TransactionSkeletonTable from "./transaction-skeleton-table";
-import EditTransaction from "../dialogs/edit-transaction";
+import AgentPaymentSkeletonTable from "./agent-payment-skeleton-table";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
+import useDataContext from "@/hooks/useDataContext";
 
 interface ApiResponse {
   statusCode: number;
   success: boolean;
   message: string;
-  data: Transaction[];
+  data: AgentPayment[];
   meta: MetaData;
 }
 
-interface TransactionTableProps {
-  supplierId?: number;
+interface AgentPaymentTableProps {
+  paymentDate?: Date;
+  status?: string;
   agentId?: number;
   from?: Date;
   to?: Date;
 }
 
-const TransactionTable = ({
-  supplierId,
+const AgentPaymentTable = ({
   agentId,
   from,
   to,
-}: TransactionTableProps) => {
+}: AgentPaymentTableProps) => {
   const router = useRouter();
+  const { setAgent, setAgentPayment } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const [open, setOpen] = useState<boolean>(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  // const [open, setOpen] = useState<boolean>(false);
+  // const [selectedAgentPayment, setSelectedAgentPayment] =
+  //   useState<AgentPayment | null>(null);
 
   const queryParams = new URLSearchParams({
     page: currentPage.toString(),
@@ -62,7 +64,6 @@ const TransactionTable = ({
 
   const { trigger: deleteTransaction } = useDeleteTransaction();
 
-  if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (agentId) queryParams.append("agentId", agentId.toString());
   if (from) {
     from.setHours(0, 0, 0, 0);
@@ -74,14 +75,14 @@ const TransactionTable = ({
   }
 
   const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
-    `/transactions?${queryParams.toString()}`,
+    `/agent-payments?${queryParams.toString()}`,
     fetcher,
   );
 
   if (error)
     return <p className="text-red-500">Failed to load transactions.</p>;
 
-  const transactions = data?.data || [];
+  const agentPayments = data?.data || [];
   const meta = data?.meta || { totalItems: 0, totalPages: 0, currentPage: 1 };
 
   const handlePageChange = (newPage: number) => {
@@ -89,20 +90,20 @@ const TransactionTable = ({
     mutate();
   };
 
-  const handleEdit = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setOpen(true);
-  };
+  // const handleEdit = (agentPayment: AgentPayment) => {
+  //   setSelectedAgentPayment(agentPayment);
+  //   setOpen(true);
+  // };
 
-  const handleUpdate = () => {
-    setOpen(false);
-    mutate();
-  };
+  // const handleUpdate = () => {
+  //   setOpen(false);
+  //   mutate();
+  // };
 
   const handleDelete = async (id: number) => {
     try {
       await deleteTransaction(id);
-      toast.success("Transaction deleted successfully!");
+      toast.success("Data deleted successfully!");
       mutate();
     } catch (deleteError) {
       toast.error(
@@ -116,55 +117,41 @@ const TransactionTable = ({
       <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
         <TableHeader className="text-sm font-semibold">
           <TableRow>
-            <TableHead className="text-left truncate">Date</TableHead>
-            <TableHead className="text-left truncate">Amount (RMB)</TableHead>
+            <TableHead className="text-left truncate">Agent</TableHead>
             <TableHead className="text-left truncate">
-              Amount USD <span className="text-blue-500">(Buy Rate)</span>
+              Amount Paid (USD)
             </TableHead>
-            <TableHead className="text-left truncate">
-              Amount USD <span className="text-green-500">(Sell Rate)</span>
-            </TableHead>
-            <TableHead className="text-left truncate">Profit (USD)</TableHead>
-            <TableHead className="text-left truncate">
-              Commission (USD)
-            </TableHead>
-            <TableHead className="text-left truncate">
-              Total Earnings (USD)
-            </TableHead>
+            <TableHead className="text-left truncate">Payment Type</TableHead>
+            <TableHead className="text-left truncate">Payment Date</TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
-          <TransactionSkeletonTable />
+          <AgentPaymentSkeletonTable />
         ) : (
           <TableBody>
-            {transactions.map((transaction) => (
+            {agentPayments.map((data) => (
               <TableRow
-                key={transaction.id}
+                key={data.id}
                 className="hover:bg-blend-color transition-colors"
               >
                 <TableCell className="w-15 truncate">
-                  {new Date(transaction.transactionDate).toLocaleDateString()}
+                  <a
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setAgent(data.Agent);
+                      router.push(`/dashboard/agents/detail`);
+                    }}
+                  >
+                    {data.Agent.name}
+                  </a>
                 </TableCell>
                 <TableCell className="truncate">
-                  &#165; {transaction.amountRMB.toLocaleString()}
+                  $ {data.amountPaidUSD.toFixed(2)}
                 </TableCell>
+                <TableCell className="truncate">{data.paymentType}</TableCell>
                 <TableCell className="truncate">
-                  ${transaction.amountUSDBuy.toFixed(2)}
-                  <span>({transaction.buyRate})</span>
-                </TableCell>
-                <TableCell className="truncate">
-                  ${transaction.amountUSDSell.toFixed(2)}
-                  <span>({transaction.sellRate})</span>
-                </TableCell>
-                <TableCell className="truncate">
-                  ${transaction.profitUSD.toFixed(2)}
-                </TableCell>
-                <TableCell className="truncate">
-                  ${transaction.commissionUSD.toFixed(2)}
-                </TableCell>
-                <TableCell className="truncate">
-                  ${transaction.totalEarningsUSD.toFixed(2)}
+                  {new Date(data.createdAt).toLocaleString()}
                 </TableCell>
                 <TableCell className="truncate">
                   <DropdownMenu>
@@ -176,19 +163,18 @@ const TransactionTable = ({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
-                          router.push(
-                            `/dashboard/transactions/${transaction.id}`,
-                          );
+                          setAgentPayment(data);
+                          router.push("/dashboard/agent-payments/detail");
                         }}
                       >
                         <View className="w-4 h-4 mr-2" /> Detail
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(transaction)}>
+                      {/* <DropdownMenuItem onClick={() => handleEdit(data)}>
                         <Pencil className="w-4 h-4 mr-2" /> Edit
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                       <DropdownMenuItem
                         className="text-red-600"
-                        onClick={() => handleDelete(transaction.id)}
+                        onClick={() => handleDelete(data.id)}
                       >
                         <Trash className="w-4 h-4 mr-2" /> Delete
                       </DropdownMenuItem>
@@ -200,18 +186,18 @@ const TransactionTable = ({
           </TableBody>
         )}
       </Table>
-      {selectedTransaction && (
-        <EditTransaction
+      {/* {selectedAgentPayment && (
+        <EditAgentPayment
           open={open}
           onClose={() => setOpen(false)}
-          transaction={selectedTransaction}
+          agentPayment={selectedAgentPayment}
           onSave={handleUpdate}
         />
-      )}
+      )} */}
 
       <div className="flex justify-between items-center mt-4">
         <p className="text-sm">
-          Total Transactions:{" "}
+          Total Payments:{" "}
           <span className="font-semibold">{meta.totalItems}</span>
         </p>
 
@@ -225,4 +211,4 @@ const TransactionTable = ({
   );
 };
 
-export default TransactionTable;
+export default AgentPaymentTable;

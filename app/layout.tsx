@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
-import { DataContextProvider } from "@/context/supplier-context";
+import { DataContextProvider } from "@/context/dataContext";
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 

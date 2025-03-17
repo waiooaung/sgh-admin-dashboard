@@ -5,9 +5,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   ArrowLeftRight,
   JapaneseYen,
-  ArrowUpCircle,
-  ArrowDownCircle,
-  ArrowUpRightFromCircle,
+  DollarSign,
+  Banknote,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -54,11 +54,12 @@ const TransactionOverview = () => {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">
-            Transactions
-          </CardTitle>
-          <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
+            <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">Total Transactions</p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -70,27 +71,12 @@ const TransactionOverview = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">
-            Exchanged Amount (RMB)
-          </CardTitle>
-          <JapaneseYen className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <Link href="/dashboard/transactions">
-            <div className="text-xl font-bold text-green-500 truncate">
-              ¥{new Intl.NumberFormat("en-US").format(totalAmountRMB)}
-            </div>
-          </Link>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">
-            Amount Sell (USD)
-          </CardTitle>
-          <ArrowUpCircle className="h-4 w-4 text-muted-foreground" />
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">Total USD</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">Received from Agents</p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -102,11 +88,12 @@ const TransactionOverview = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">
-            Amount Buy (USD)
-          </CardTitle>
-          <ArrowDownCircle className="h-4 w-4 text-muted-foreground" />
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">Total USD</CardTitle>
+            <Banknote className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">Paid to Suppliers</p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -118,14 +105,36 @@ const TransactionOverview = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">Profit</CardTitle>
-          <ArrowUpRightFromCircle className="h-4 w-4 text-muted-foreground" />
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">
+              Total USD Profit
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">Profit + Commission</p>
         </CardHeader>
         <CardContent>
           <Link href="/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
               ${new Intl.NumberFormat("en-US").format(totalEarningsUSD)}
+            </div>
+          </Link>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">Total RMB</CardTitle>
+            <JapaneseYen className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">Total Exchanged RMB</p>
+        </CardHeader>
+        <CardContent>
+          <Link href="/dashboard/transactions">
+            <div className="text-xl font-bold text-green-500 truncate">
+              ¥{new Intl.NumberFormat("en-US").format(totalAmountRMB)}
             </div>
           </Link>
         </CardContent>
