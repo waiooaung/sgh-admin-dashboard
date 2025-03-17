@@ -5,7 +5,6 @@ import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
 import { mutate } from "swr";
 const AgentPaymentsContainer = () => {
   const handleSubmit = async () => {
-    console.log("Need to refresh");
     await mutate("/agent-payments?page=1&limit=10");
   };
   return (

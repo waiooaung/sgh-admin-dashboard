@@ -4,6 +4,7 @@ import { Transaction } from "@/types/transaction";
 import { Supplier } from "@/types/supplier";
 import { Agent } from "@/types/agent";
 import { AgentPayment } from "@/types/agentPayment";
+import { SupplierPayment } from "@/types/supplierPayment";
 
 // Define the context for Supplier data
 export const DataContext = createContext<{
@@ -15,6 +16,8 @@ export const DataContext = createContext<{
   setAgent: (agent: Agent | null) => void;
   agentPayment: AgentPayment | null;
   setAgentPayment: (agentPayment: AgentPayment | null) => void;
+  supplierPayment: SupplierPayment | null;
+  setSupplierPayment: (supplierPayment: SupplierPayment | null) => void;
 }>({
   transaction: null,
   setTransaction: () => {},
@@ -24,6 +27,8 @@ export const DataContext = createContext<{
   setAgent: () => {},
   agentPayment: null,
   setAgentPayment: () => {},
+  supplierPayment: null,
+  setSupplierPayment: () => {},
 });
 
 export const DataContextProvider = ({ children }: { children: ReactNode }) => {
@@ -31,6 +36,8 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
   const [supplier, setSupplier] = useState<Supplier | null>(null);
   const [agent, setAgent] = useState<Agent | null>(null);
   const [agentPayment, setAgentPayment] = useState<AgentPayment | null>(null);
+  const [supplierPayment, setSupplierPayment] =
+    useState<SupplierPayment | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -38,6 +45,8 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
       const storedSupplier = localStorage.getItem("supplier");
       const storedAgent = localStorage.getItem("agent");
       const storedAgentPayment = localStorage.getItem("agentPayment");
+      const storedSupplierPayment = localStorage.getItem("supplierPayment");
+
       if (storedTransaction) {
         setTransaction(JSON.parse(storedTransaction));
       }
@@ -51,6 +60,10 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
 
       if (storedAgentPayment) {
         setAgentPayment(JSON.parse(storedAgentPayment));
+      }
+
+      if (storedSupplierPayment) {
+        setSupplierPayment(JSON.parse(storedSupplierPayment));
       }
     }
   }, []);
@@ -70,6 +83,10 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== "undefined" && agentPayment) {
       localStorage.setItem("agentPayment", JSON.stringify(agentPayment));
     }
+
+    if (typeof window !== "undefined" && supplierPayment) {
+      localStorage.setItem("supplierPayment", JSON.stringify(supplierPayment));
+    }
   }, [transaction, supplier, agent, agentPayment]);
 
   return (
@@ -83,6 +100,8 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
         setAgent,
         agentPayment,
         setAgentPayment,
+        supplierPayment,
+        setSupplierPayment,
       }}
     >
       {children}

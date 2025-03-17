@@ -20,9 +20,9 @@ import {
 import { View, Trash, MoreHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
 import { PaginationControls } from "./pagination-controls";
-import { AgentPayment } from "@/types/agentPayment";
+import { SupplierPayment } from "@/types/supplierPayment";
 import { MetaData } from "@/types/meta-data";
-import AgentPaymentSkeletonTable from "./agent-payment-skeleton-table";
+import SupplierPaymentSkeletonTable from "./supplier-payment-skeleton-table";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
@@ -31,27 +31,31 @@ interface ApiResponse {
   statusCode: number;
   success: boolean;
   message: string;
-  data: AgentPayment[];
+  data: SupplierPayment[];
   meta: MetaData;
 }
 
-interface AgentPaymentTableProps {
+interface SupplierPaymentTableProps {
   paymentDate?: Date;
   status?: string;
-  agentId?: number;
+  supplierId?: number;
   from?: Date;
   to?: Date;
 }
 
-const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
+const SupplierPaymentTable = ({
+  supplierId,
+  from,
+  to,
+}: SupplierPaymentTableProps) => {
   const router = useRouter();
-  const { setAgent, setAgentPayment } = useDataContext();
+  const { setSupplier, setSupplierPayment } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   // const [open, setOpen] = useState<boolean>(false);
-  // const [selectedAgentPayment, setSelectedAgentPayment] =
-  //   useState<AgentPayment | null>(null);
+  // const [selectedSupplierPayment, setSelectedSupplierPayment] =
+  //   useState<SupplierPayment | null>(null);
 
   const queryParams = new URLSearchParams({
     page: currentPage.toString(),
@@ -60,7 +64,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
 
   const { trigger: deleteTransaction } = useDeleteTransaction();
 
-  if (agentId) queryParams.append("agentId", agentId.toString());
+  if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (from) {
     from.setHours(0, 0, 0, 0);
     queryParams.append("from", from.toISOString());
@@ -71,14 +75,14 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
   }
 
   const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
-    `/agent-payments?${queryParams.toString()}`,
+    `/supplier-payments?${queryParams.toString()}`,
     fetcher,
   );
 
   if (error)
     return <p className="text-red-500">Failed to load transactions.</p>;
 
-  const agentPayments = data?.data || [];
+  const supplierPayments = data?.data || [];
   const meta = data?.meta || { totalItems: 0, totalPages: 0, currentPage: 1 };
 
   const handlePageChange = (newPage: number) => {
@@ -86,8 +90,8 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
     mutate();
   };
 
-  // const handleEdit = (agentPayment: AgentPayment) => {
-  //   setSelectedAgentPayment(agentPayment);
+  // const handleEdit = (supplierPayment: SupplierPayment) => {
+  //   setSelectedSupplierPayment(supplierPayment);
   //   setOpen(true);
   // };
 
@@ -113,7 +117,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
       <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
         <TableHeader className="text-sm font-semibold">
           <TableRow>
-            <TableHead className="text-left truncate">Agent</TableHead>
+            <TableHead className="text-left truncate">Supplier</TableHead>
             <TableHead className="text-left truncate">
               Amount Paid (USD)
             </TableHead>
@@ -123,11 +127,11 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
           </TableRow>
         </TableHeader>
         {isLoading ? (
-          <AgentPaymentSkeletonTable />
+          <SupplierPaymentSkeletonTable />
         ) : (
           <TableBody>
-            {agentPayments.length > 0 &&
-              agentPayments.map((data) => (
+            {supplierPayments.length > 0 &&
+              supplierPayments.map((data) => (
                 <TableRow
                   key={data.id}
                   className="hover:bg-blend-color transition-colors"
@@ -136,11 +140,11 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                     <a
                       className="cursor-pointer"
                       onClick={() => {
-                        setAgent(data.Agent);
-                        router.push(`/dashboard/agents/detail`);
+                        setSupplier(data.Supplier);
+                        router.push(`/dashboard/suppliers/detail`);
                       }}
                     >
-                      {data.Agent.name}
+                      {data.Supplier.name}
                     </a>
                   </TableCell>
                   <TableCell className="truncate">
@@ -160,8 +164,8 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            setAgentPayment(data);
-                            router.push("/dashboard/agent-payments/detail");
+                            setSupplierPayment(data);
+                            router.push("/dashboard/supplier-payments/detail");
                           }}
                         >
                           <View className="w-4 h-4 mr-2" /> Detail
@@ -183,11 +187,11 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
           </TableBody>
         )}
       </Table>
-      {/* {selectedAgentPayment && (
-        <EditAgentPayment
+      {/* {selectedSupplierPayment && (
+        <EditSupplierPayment
           open={open}
           onClose={() => setOpen(false)}
-          agentPayment={selectedAgentPayment}
+          supplierPayment={selectedSupplierPayment}
           onSave={handleUpdate}
         />
       )} */}
@@ -208,4 +212,4 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
   );
 };
 
-export default AgentPaymentTable;
+export default SupplierPaymentTable;
