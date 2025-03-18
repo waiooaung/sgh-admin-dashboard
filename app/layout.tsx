@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/context/authContext";
 import { DataContextProvider } from "@/context/dataContext";
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
@@ -39,10 +40,12 @@ export default async function RootLayout({
           disableTransitionOnChange
           storageKey="theme"
         >
-          <DataContextProvider>
-            {children}
-            <Toaster position="top-right" richColors />
-          </DataContextProvider>
+          <AuthProvider>
+            <DataContextProvider>
+              {children}
+              <Toaster position="top-right" richColors />
+            </DataContextProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
