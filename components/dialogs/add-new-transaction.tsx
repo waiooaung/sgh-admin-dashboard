@@ -95,6 +95,17 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     );
   }, [exchangeRateData]);
 
+  const { data: commissionRateData, error: commissionRateError } = useSWR('/commission-rates/common-rate', fetcher);
+  if (commissionRateError) toast.error(commissionRateError);
+  const commissionRates = useMemo(() => {
+    return (
+      commissionRateData?.data || {
+        supplierId: null,
+        rate: 0,
+      }
+    );
+  }, [commissionRateData]);
+
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: useMemo(
@@ -103,7 +114,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
         amountRMB: 0,
         buyRate: exchangeRates.buyRate,
         sellRate: exchangeRates.sellRate,
-        commissionRate: 0.3,
+        commissionRate: commissionRates.rate,
         agentId: undefined,
         supplierId: undefined,
       }),
@@ -174,9 +185,10 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
         ...form.getValues(),
         buyRate: exchangeRates.buyRate,
         sellRate: exchangeRates.sellRate,
+        commissionRate: commissionRates.rate,
       });
     }
-  }, [exchangeRates, isOpen, form]);
+  }, [exchangeRates, commissionRates, isOpen, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
