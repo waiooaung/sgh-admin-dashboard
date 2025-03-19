@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useState, useEffect, useRef } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
@@ -21,6 +27,16 @@ import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { ExchangeRateFormData } from "@/types/exchangeRate";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import html2canvas from "html2canvas-pro";
+import { Separator } from "../ui/separator";
+import { Eye } from "lucide-react";
 
 const formSchema = z.object({
   baseCurrency: z.string().min(2).max(10),
@@ -46,6 +62,8 @@ export function ExchangeRateCard() {
   };
 
   const [prevValues, setPrevValues] = useState(initialValues);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<ExchangeRateFormData>({
     resolver: zodResolver(formSchema),
@@ -78,7 +96,6 @@ export function ExchangeRateCard() {
     try {
       await trigger(values);
       toast.success("Exchange Rates saved successfully!");
-
       await mutate();
       setPrevValues(values);
       form.reset(values);
@@ -87,14 +104,67 @@ export function ExchangeRateCard() {
     }
   };
 
+  const handleShare = async () => {
+    if (modalRef.current) {
+      const canvas = await html2canvas(modalRef.current, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: null,
+      });
+
+      const image = canvas.toDataURL("image/png");
+
+      // Convert to Blob
+      const blob = await (await fetch(image)).blob();
+      const file = new File([blob], "exchange_rate.png", { type: "image/png" });
+
+      // Create a URL for WhatsApp sharing
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const whatsappMessage = `Check out today's exchange rate! 📊`;
+      const whatsappURL = `https://wa.me/?text=${encodeURIComponent(
+        whatsappMessage,
+      )}`;
+
+      window.open(whatsappURL, "_blank");
+    }
+  };
+
+  const handleScreenshot = async () => {
+    if (modalRef.current) {
+      const canvas = await html2canvas(modalRef.current, {
+        scale: 3, // Increased scale for better resolution
+        useCORS: true,
+        backgroundColor: null, // Keeps transparency
+      });
+
+      const image = canvas.toDataURL("image/png");
+
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "exchange_rate_screenshot.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Exchange Rates{" "}
+        <CardTitle className="flex justify-between items-center">
           <span>
-            ({initialValues.baseCurrency}-{initialValues.quoteCurrency})
+            Exchange Rates ({initialValues.baseCurrency}-
+            {initialValues.quoteCurrency})
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Eye className="w-5 h-5" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -103,7 +173,6 @@ export function ExchangeRateCard() {
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
           >
-            {/* Buy Rate */}
             <FormField
               control={form.control}
               name="buyRate"
@@ -117,8 +186,6 @@ export function ExchangeRateCard() {
                 </FormItem>
               )}
             />
-
-            {/* Sell Rate */}
             <FormField
               control={form.control}
               name="sellRate"
@@ -138,6 +205,78 @@ export function ExchangeRateCard() {
           </form>
         </Form>
       </CardContent>
+
+      {/* Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-full w-full">
+          <DialogHeader>
+            <DialogTitle>Exchange Rate Details</DialogTitle>
+          </DialogHeader>
+          <Card
+            ref={modalRef}
+            className="w-full mx-auto bg-gradient-to-br from-[#0b132b] via-[#1c2541] to-[#3a506b] 
+             text-white p-6 shadow-2xl border border-gray-700 rounded-lg relative overflow-hidden"
+          >
+            {/* Background Design (Optional Overlay) */}
+            <div className="absolute inset-0 bg-[url('/patterns/currency-pattern.svg')] opacity-10 pointer-events-none"></div>
+
+            <CardHeader className="flex justify-between items-center border-b border-gray-600 pb-3">
+              <h2 className="text-2xl font-bold tracking-wide text-cyan-300">
+                SMART GLOBAL HUB
+              </h2>
+              <p className="text-sm text-gray-400">
+                {new Date().toLocaleDateString()}
+              </p>
+            </CardHeader>
+
+            <CardContent className="text-center">
+              <CardTitle className="text-lg font-semibold text-yellow-300">
+                💹 Today&apos;s Exchange Rates
+              </CardTitle>
+              <Separator className="my-3 bg-gray-600" />
+
+              <div className="text-lg space-y-3">
+                <div className="flex justify-between text-gray-400">
+                  <span>💵 {initialValues.baseCurrency}</span>
+                  <span>💱 {initialValues.quoteCurrency}</span>
+                </div>
+
+                <div className="flex justify-between font-bold text-cyan-300">
+                  <span>📌 Today&apos;s Rate</span>
+                  <span className="text-glow">{initialValues.sellRate}</span>
+                </div>
+
+                <div className="flex justify-between font-bold text-green-300">
+                  <span>🏦 Bank Rate</span>
+                  <span className="text-glow">
+                    {initialValues.sellRate + 0.25}
+                  </span>
+                </div>
+
+                <div className="flex justify-between font-bold text-red-300">
+                  <span>💵 Cash Rate</span>
+                  <span className="text-glow">
+                    {initialValues.sellRate + 0.3}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter className="border-t border-gray-600 pt-4 text-center">
+              <p className="italic text-gray-400 text-sm">
+              &ldquo; Your Trusted Partner 💼 &ldquo;
+              </p>
+            </CardFooter>
+          </Card>
+          <DialogFooter className="flex justify-between">
+            <Button onClick={handleScreenshot}>Download</Button>
+            <Button onClick={handleShare}>Share</Button>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

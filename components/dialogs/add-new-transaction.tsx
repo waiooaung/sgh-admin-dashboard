@@ -95,7 +95,10 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     );
   }, [exchangeRateData]);
 
-  const { data: commissionRateData, error: commissionRateError } = useSWR('/commission-rates/common-rate', fetcher);
+  const { data: commissionRateData, error: commissionRateError } = useSWR(
+    "/commission-rates/common-rate",
+    fetcher,
+  );
   if (commissionRateError) toast.error(commissionRateError);
   const commissionRates = useMemo(() => {
     return (
@@ -118,7 +121,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
         agentId: undefined,
         supplierId: undefined,
       }),
-      [exchangeRates],
+      [exchangeRates, commissionRates],
     ),
   });
 
