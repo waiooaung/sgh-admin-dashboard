@@ -25,24 +25,24 @@ interface ApiResponse {
   message: string;
   data: Data;
 }
-const SupplierOverview = ({ supplierId } : { supplierId: number}) => {
+const SupplierOverview = ({ supplierId }: { supplierId: number }) => {
   const { data, error } = useSWR<ApiResponse>(
     `/supplier-transactions/statistics?supplierId=${supplierId}`,
-    fetcher
+    fetcher,
   );
 
-    const {
-      totalAmountRMB = 0,
-      totalAmountUSD = 0,
-      totalPaidAmountUSD = 0,
-      totalAmountToPayUSD = 0,
-    } = data?.data || {};
-  
-    useEffect(() => {
-      if (error) {
-        toast.error("Failed to load transaction statistics");
-      }
-    }, [error]);
+  const {
+    totalAmountRMB = 0,
+    totalAmountUSD = 0,
+    totalPaidAmountUSD = 0,
+    totalAmountToPayUSD = 0,
+  } = data?.data || {};
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load transaction statistics");
+    }
+  }, [error]);
   return (
     <>
       <Card>

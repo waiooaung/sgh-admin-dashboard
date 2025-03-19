@@ -46,7 +46,11 @@ export function BusinessCard({
         {linkedin && (
           <div className="flex items-center gap-2">
             <Link2Icon className="h-4 w-4 text-primary" />
-            <a href={linkedin} target="_blank" className="text-blue-500 hover:underline">
+            <a
+              href={linkedin}
+              target="_blank"
+              className="text-blue-500 hover:underline"
+            >
               LinkedIn
             </a>
           </div>
@@ -54,7 +58,11 @@ export function BusinessCard({
         {website && (
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4 text-primary" />
-            <a href={website} target="_blank" className="text-blue-500 hover:underline">
+            <a
+              href={website}
+              target="_blank"
+              className="text-blue-500 hover:underline"
+            >
               Website
             </a>
           </div>

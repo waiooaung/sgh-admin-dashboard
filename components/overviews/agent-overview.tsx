@@ -25,24 +25,24 @@ interface ApiResponse {
   message: string;
   data: Data;
 }
-const AgentOverview = ({ agentId } : { agentId: number }) => {
+const AgentOverview = ({ agentId }: { agentId: number }) => {
   const { data, error } = useSWR<ApiResponse>(
     `/agent-transactions/statistics?agentId=${agentId}`,
-    fetcher
+    fetcher,
   );
 
-    const {
-      totalAmountRMB = 0,
-      totalAmountUSD = 0,
-      totalReceivedAmountUSD = 0,
-      totalAmountRemainingUSD = 0,
-    } = data?.data || {};
-  
-    useEffect(() => {
-      if (error) {
-        toast.error("Failed to load transaction statistics");
-      }
-    }, [error]);
+  const {
+    totalAmountRMB = 0,
+    totalAmountUSD = 0,
+    totalReceivedAmountUSD = 0,
+    totalAmountRemainingUSD = 0,
+  } = data?.data || {};
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load transaction statistics");
+    }
+  }, [error]);
   return (
     <>
       <Card>

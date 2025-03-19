@@ -14,6 +14,7 @@ import {
 } from "recharts";
 
 import { ExchangeRateCard } from "@/components/cards/exchange-rate-card";
+import { CommissionRateCard } from "@/components/cards/commission-rate-card";
 import TransactionTable from "@/components/tables/transaction-table";
 import DashboardTransactionOverview from "@/components/overviews/dashboard/transaction-overview";
 import DashboardAgentOverview from "@/components/overviews/dashboard/agent-overview";
@@ -83,7 +84,9 @@ export default function DashboardContainer() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ExchangeRateCard />
-        <ExchangeRateCard />
+        <CommissionRateCard />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Profit Overview</CardTitle>
