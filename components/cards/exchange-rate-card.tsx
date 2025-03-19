@@ -159,7 +159,7 @@ export function ExchangeRateCard() {
             {initialValues.quoteCurrency})
           </span>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={() => setIsModalOpen(true)}
           >
