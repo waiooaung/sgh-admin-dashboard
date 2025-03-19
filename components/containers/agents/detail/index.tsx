@@ -97,7 +97,7 @@ const AgentDetailContainer = () => {
         </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <AgentOverview />
+        <AgentOverview agentId={agent.id}/>
       </div>
       <div className="grid grid-cols-1 gap-4">
         <Card>

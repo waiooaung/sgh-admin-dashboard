@@ -44,11 +44,11 @@ export const data = {
       isActive: false,
       items: [
         {
-          title: "Agents",
+          title: "Agent Payments",
           url: "/dashboard/agent-payments",
         },
         {
-          title: "Suppliers",
+          title: "Suppliers Payments",
           url: "/dashboard/supplier-payments",
         },
       ],
