@@ -23,7 +23,7 @@ import { PaginationControls } from "./pagination-controls";
 import { AgentPayment } from "@/types/agentPayment";
 import { MetaData } from "@/types/meta-data";
 import AgentPaymentSkeletonTable from "./agent-payment-skeleton-table";
-import useDeleteTransaction from "@/hooks/useDeleteTransaction";
+import useDeleteAgentPayment from "@/hooks/useDeleteAgentPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
 
@@ -54,7 +54,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
     limit: itemsPerPage.toString(),
   });
 
-  const { trigger: deleteTransaction } = useDeleteTransaction();
+  const { trigger: deletePayment } = useDeleteAgentPayment();
 
   if (agentId) queryParams.append("agentId", agentId.toString());
   if (from) {
@@ -84,7 +84,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteTransaction(id);
+      await deletePayment(id);
       toast.success("Data deleted successfully!");
       mutate();
     } catch (deleteError) {

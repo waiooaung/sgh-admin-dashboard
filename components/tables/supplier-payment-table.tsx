@@ -23,7 +23,7 @@ import { PaginationControls } from "./pagination-controls";
 import { SupplierPayment } from "@/types/supplierPayment";
 import { MetaData } from "@/types/meta-data";
 import SupplierPaymentSkeletonTable from "./supplier-payment-skeleton-table";
-import useDeleteTransaction from "@/hooks/useDeleteTransaction";
+import useDeleteSupplierPayment from "@/hooks/useDeleteSupplierPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
 
@@ -53,16 +53,12 @@ const SupplierPaymentTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // const [open, setOpen] = useState<boolean>(false);
-  // const [selectedSupplierPayment, setSelectedSupplierPayment] =
-  //   useState<SupplierPayment | null>(null);
-
   const queryParams = new URLSearchParams({
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
   });
 
-  const { trigger: deleteTransaction } = useDeleteTransaction();
+  const { trigger: deletePayment } = useDeleteSupplierPayment();
 
   if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (from) {
@@ -102,7 +98,7 @@ const SupplierPaymentTable = ({
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteTransaction(id);
+      await deletePayment(id);
       toast.success("Data deleted successfully!");
       mutate();
     } catch (deleteError) {
