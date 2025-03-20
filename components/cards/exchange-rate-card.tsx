@@ -264,7 +264,7 @@ export function ExchangeRateCard() {
 
             <CardFooter className="border-t border-gray-600 pt-4 text-center">
               <p className="italic text-gray-400 text-sm">
-              &ldquo; Your Trusted Partner 💼 &ldquo;
+                &ldquo; Your Trusted Partner 💼 &ldquo;
               </p>
             </CardFooter>
           </Card>

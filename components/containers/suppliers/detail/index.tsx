@@ -76,8 +76,8 @@ const SupplierDetailContainer = () => {
             <p>
               <strong>Email:</strong> {supplier.contactEmail || "N/A"}
             </p>
-            <p>
-              <strong>Phone:</strong>{" "}
+            <p className="flex items-center gap-1 whitespace-nowrap">
+              <strong>Phone:</strong> {supplier.contactPhone || "N/A"}
               <ContactButton phoneNumber={supplier.contactPhone} />
             </p>
             <p>

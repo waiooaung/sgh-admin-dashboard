@@ -168,7 +168,14 @@ const AgentContainer = () => {
                       </a>
                     </TableCell>
                     <TableCell className="p-3">{agent.contactEmail}</TableCell>
-                    <TableCell className="p-3">{agent.contactPhone}</TableCell>
+                    <TableCell className="p-3">
+                      <a
+                        href={`https://wa.me/${agent.contactPhone}`}
+                        target="_blank"
+                      >
+                        {agent.contactPhone}
+                      </a>
+                    </TableCell>
                     <TableCell className="p-3">
                       {agent.createdAt
                         ? new Date(agent.createdAt).toLocaleString()

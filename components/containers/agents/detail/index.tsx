@@ -74,8 +74,8 @@ const AgentDetailContainer = () => {
             <p className="truncate">
               <strong>Email:</strong> {agent.contactEmail || "N/A"}
             </p>
-            <span className="truncate">
-              <strong>Phone:</strong>{" "}
+            <span className="truncate flex items-center gap-1 whitespace-nowrap">
+              <strong>Phone:</strong> {agent.contactPhone}
               <ContactButton phoneNumber={agent.contactPhone} />
             </span>
             <p className="truncate">

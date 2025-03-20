@@ -143,7 +143,12 @@ const SupplierContainer = () => {
                       {supplier.contactEmail}
                     </TableCell>
                     <TableCell className="p-3">
-                      {supplier.contactPhone}
+                      <a
+                        href={`https://wa.me/${supplier.contactPhone}`}
+                        target="_blank"
+                      >
+                        {supplier.contactPhone}
+                      </a>
                     </TableCell>
                     <TableCell className="p-3">
                       {supplier.createdAt
