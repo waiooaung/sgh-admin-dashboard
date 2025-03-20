@@ -62,6 +62,7 @@ const formSchema = z.object({
 
 export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<AgentPaymentFormData>({
     resolver: zodResolver(formSchema),
@@ -89,7 +90,9 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
   const agents: Agent[] = agentData?.data || [];
 
   const handleSubmit = async (values: AgentPaymentFormData) => {
+    if (loading) return;
     try {
+      setLoading(true);
       await trigger(values);
       toast.success("Payment added successfully!");
       onSuccess();
@@ -98,6 +101,8 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
     } catch (error) {
       console.error(error);
       toast.error("Failed to create payment!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -181,7 +186,10 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
               />
 
               <DialogFooter className="mt-4">
-                <Button type="submit">Save</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Save"}{" "}
+                  {/* Button text based on loading */}
+                </Button>
               </DialogFooter>
             </form>
           </Form>

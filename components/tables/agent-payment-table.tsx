@@ -49,10 +49,6 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // const [open, setOpen] = useState<boolean>(false);
-  // const [selectedAgentPayment, setSelectedAgentPayment] =
-  //   useState<AgentPayment | null>(null);
-
   const queryParams = new URLSearchParams({
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
@@ -85,16 +81,6 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
     setCurrentPage(newPage);
     mutate();
   };
-
-  // const handleEdit = (agentPayment: AgentPayment) => {
-  //   setSelectedAgentPayment(agentPayment);
-  //   setOpen(true);
-  // };
-
-  // const handleUpdate = () => {
-  //   setOpen(false);
-  //   mutate();
-  // };
 
   const handleDelete = async (id: number) => {
     try {
