@@ -40,6 +40,7 @@ import useDelete from "@/hooks/useDelete";
 import EditAgent from "@/components/dialogs/edit-agent";
 import { AddNewAgent } from "@/components/dialogs/add-new-agent";
 import useDataContext from "@/hooks/useDataContext";
+import { useAuth } from "@/context/authContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -51,6 +52,8 @@ interface ApiResponse {
 
 const AgentContainer = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || undefined;
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
@@ -58,7 +61,7 @@ const AgentContainer = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [open, setOpen] = useState(false);
   const { data, mutate } = useSWR<ApiResponse>(
-    `/agents?page=${currentPage}&limit=${itemsPerPage}`,
+    `/agents?page=${currentPage}&limit=${itemsPerPage}&tenantId=${tenantId}`,
     fetcher,
   );
 
@@ -93,8 +96,8 @@ const AgentContainer = () => {
       await deleteAgent(id);
       toast.success("Agent deleted successfully!");
       mutate();
-    } catch (deleteError) {
-      toast.error(`Failed to delete agent: ${JSON.stringify(deleteError)}`);
+    } catch {
+      toast.error(`Failed to delete agent`);
     }
   };
 

@@ -1,4 +1,5 @@
 export type AgentFormData = {
+  tenantId: number;
   name: string;
   contactName: string;
   contactEmail: string;

@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { useAuth } from "@/context/authContext";
 
 interface Data {
   agentsCount: number;
@@ -21,8 +22,10 @@ interface ApiResponse {
 }
 
 const DashboardAgentOverview = () => {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || null;
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/agent-statistics",
+    `/dashboard/agent-statistics?tenantId=${tenantId}`,
     fetcher,
   );
   const { agentsCount = 0, totalAmountRemaining = 0 } = data?.data || {};

@@ -24,6 +24,7 @@ import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { AgentFormData } from "@/types/agent";
 import { toast } from "sonner";
+import { useAuth } from "@/context/authContext";
 
 interface AddNewAgentProps {
   onSuccess: () => void;
@@ -31,6 +32,7 @@ interface AddNewAgentProps {
 
 // Zod Schema
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   name: z.string().min(2).max(20),
   contactName: z.string().min(2).max(20),
   contactEmail: z.string().email(),
@@ -40,11 +42,14 @@ const formSchema = z.object({
 });
 
 export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || undefined;
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<AgentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId,
       name: "",
       contactName: "",
       contactEmail: "",

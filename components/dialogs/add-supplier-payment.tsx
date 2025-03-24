@@ -39,6 +39,7 @@ import { SupplierPaymentFormData } from "@/types/supplierPayment";
 import { toast } from "sonner";
 import { Supplier } from "@/types/supplier";
 import { MetaData } from "@/types/meta-data";
+import { useAuth } from "@/context/authContext";
 
 interface AddSupplierPaymentProps {
   onSuccess: () => void;
@@ -55,6 +56,7 @@ interface SupplierApiResponse {
 
 // Zod Schema
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   supplierId: z.coerce.number(),
   amountPaidUSD: z.coerce.number(),
   paymentType: z.string().min(5),
@@ -62,11 +64,14 @@ const formSchema = z.object({
 
 export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
 
   const form = useForm<SupplierPaymentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId,
       supplierId: undefined,
       amountPaidUSD: 0,
       paymentType: "",
@@ -84,10 +89,12 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
     data: supplierData,
     isLoading: isLoadingSupplierData,
     error: supplierDataError,
-  } = useSWR<SupplierApiResponse>(`/suppliers?limit=100`, fetcher);
+  } = useSWR<SupplierApiResponse>(
+    `/suppliers?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (supplierDataError)
-    toast.error("Error fetching suppliers: " + supplierDataError);
+  if (supplierDataError) toast.error("Error fetching suppliers.");
   const suppliers: Supplier[] = supplierData?.data || [];
 
   const handleSubmit = async (values: SupplierPaymentFormData) => {

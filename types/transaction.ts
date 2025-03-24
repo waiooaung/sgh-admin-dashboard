@@ -2,6 +2,7 @@ import { Supplier } from "./supplier";
 import { Agent } from "./agent";
 export type Transaction = {
   id: number;
+  tenantId: number;
   transactionDate: string;
   amountRMB: number;
   buyRate: number;
@@ -19,6 +20,7 @@ export type Transaction = {
 };
 
 export type TransactionFormData = {
+  tenantId: number;
   transactionDate: Date;
   amountRMB: number;
   buyRate: number;

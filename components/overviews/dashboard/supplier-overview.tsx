@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { useAuth } from "@/context/authContext";
 
 interface Data {
   suppliersCount: number;
@@ -21,8 +22,10 @@ interface ApiResponse {
 }
 
 const DashboardSupplierOverview = () => {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || null;
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/supplier-statistics",
+    `/dashboard/supplier-statistics?tenantId=${tenantId}`,
     fetcher,
   );
   const { suppliersCount = 0, totalAmountToPay = 0 } = data?.data || {};

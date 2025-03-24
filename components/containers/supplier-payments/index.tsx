@@ -5,7 +5,11 @@ import { AddSupplierPayment } from "@/components/dialogs/add-supplier-payment";
 import { mutate } from "swr";
 const SupplierPaymentsContainer = () => {
   const handleSubmit = async () => {
-    await mutate("/supplier-payments?page=1&limit=10");
+    await mutate(
+      (key) => typeof key === "string" && key.startsWith("/supplier-payments"),
+      undefined,
+      { revalidate: true },
+    );
   };
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">

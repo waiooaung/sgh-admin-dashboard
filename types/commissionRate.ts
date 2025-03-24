@@ -1,4 +1,5 @@
 export type CommissionRateFormData = {
+  tenantId: number;
   rate: number;
 };
 

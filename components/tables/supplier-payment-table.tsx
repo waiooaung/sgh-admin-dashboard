@@ -26,6 +26,7 @@ import SupplierPaymentSkeletonTable from "./supplier-payment-skeleton-table";
 import useDeleteSupplierPayment from "@/hooks/useDeleteSupplierPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
+import { useAuth } from "@/context/authContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -52,6 +53,8 @@ const SupplierPaymentTable = ({
   const { setSupplier, setSupplierPayment } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
 
   const queryParams = new URLSearchParams({
     page: currentPage.toString(),
@@ -60,6 +63,7 @@ const SupplierPaymentTable = ({
 
   const { trigger: deletePayment } = useDeleteSupplierPayment();
 
+  if (tenantId) queryParams.append("tenantId", tenantId.toString());
   if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (from) {
     from.setHours(0, 0, 0, 0);
@@ -101,10 +105,8 @@ const SupplierPaymentTable = ({
       await deletePayment(id);
       toast.success("Data deleted successfully!");
       mutate();
-    } catch (deleteError) {
-      toast.error(
-        `Failed to delete transaction: ${JSON.stringify(deleteError)}`,
-      );
+    } catch {
+      toast.error(`Failed to delete transaction.`);
     }
   };
 

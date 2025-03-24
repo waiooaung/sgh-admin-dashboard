@@ -36,6 +36,7 @@ interface EditSupplierProps {
 // Zod Schema
 const formSchema = z.object({
   id: z.number().optional(),
+  tenantId: z.number(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   contactName: z.string().min(2, "Contact name must be at least 2 characters"),
   contactEmail: z.string().email("Invalid email address"),
@@ -55,6 +56,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
   const form = useForm<CreateSupplier>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId: supplier.tenantId,
       name: supplier.name,
       contactName: supplier.contactName,
       contactEmail: supplier.contactEmail,

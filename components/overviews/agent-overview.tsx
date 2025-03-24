@@ -25,9 +25,15 @@ interface ApiResponse {
   message: string;
   data: Data;
 }
-const AgentOverview = ({ agentId }: { agentId: number }) => {
+const AgentOverview = ({
+  tenantId,
+  agentId,
+}: {
+  tenantId: number;
+  agentId: number;
+}) => {
   const { data, error } = useSWR<ApiResponse>(
-    `/agent-transactions/statistics?agentId=${agentId}`,
+    `/agent-transactions/statistics?tenantId=${tenantId}&agentId=${agentId}`,
     fetcher,
   );
 

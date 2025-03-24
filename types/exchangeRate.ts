@@ -1,4 +1,5 @@
 export type ExchangeRateFormData = {
+  tenantId: number;
   baseCurrency: string;
   quoteCurrency: string;
   buyRate: number;

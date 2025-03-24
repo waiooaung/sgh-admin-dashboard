@@ -13,6 +13,7 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { useAuth } from "@/context/authContext";
 
 interface Data {
   totalTransactionsCount: number;
@@ -34,8 +35,10 @@ interface ApiResponse {
 }
 
 const TransactionOverview = () => {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || null;
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/transaction-statistics",
+    "/dashboard/transaction-statistics?tenantId=" + tenantId,
     fetcher,
   );
   const {
@@ -56,10 +59,14 @@ const TransactionOverview = () => {
       <Card>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
+            <CardTitle className="text-sm font-medium truncate">
+              Transactions
+            </CardTitle>
             <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xs text-muted-foreground">Total Transactions</p>
+          <p className="text-xs text-muted-foreground truncate">
+            Total Transactions
+          </p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -73,10 +80,14 @@ const TransactionOverview = () => {
       <Card>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Total USD</CardTitle>
+            <CardTitle className="text-sm font-medium truncate">
+              Total USD
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xs text-muted-foreground">Received from Agents</p>
+          <p className="text-xs text-muted-foreground truncate">
+            Received from Agents
+          </p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -90,10 +101,14 @@ const TransactionOverview = () => {
       <Card>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Total USD</CardTitle>
+            <CardTitle className="text-sm font-medium truncate">
+              Total USD
+            </CardTitle>
             <Banknote className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xs text-muted-foreground">Paid to Suppliers</p>
+          <p className="text-xs text-muted-foreground truncate">
+            Paid to Suppliers
+          </p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">
@@ -107,12 +122,14 @@ const TransactionOverview = () => {
       <Card>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium truncate">
               Total USD Profit
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xs text-muted-foreground">Profit + Commission</p>
+          <p className="text-xs text-muted-foreground truncate">
+            Profit + Commission
+          </p>
         </CardHeader>
         <CardContent>
           <Link href="/transactions">
@@ -126,10 +143,14 @@ const TransactionOverview = () => {
       <Card>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Total RMB</CardTitle>
+            <CardTitle className="text-sm font-medium truncate">
+              Total RMB
+            </CardTitle>
             <JapaneseYen className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xs text-muted-foreground">Total Exchanged RMB</p>
+          <p className="text-xs text-muted-foreground truncate">
+            Total Exchanged RMB
+          </p>
         </CardHeader>
         <CardContent>
           <Link href="/dashboard/transactions">

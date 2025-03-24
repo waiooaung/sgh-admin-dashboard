@@ -12,6 +12,7 @@ export type SupplierPayment = {
 };
 
 export type SupplierPaymentFormData = {
+  tenantId: number;
   supplierId: number;
   amountPaidUSD: number;
   paymentType: string;

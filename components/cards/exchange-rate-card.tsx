@@ -37,8 +37,10 @@ import {
 import html2canvas from "html2canvas-pro";
 import { Separator } from "../ui/separator";
 import { Eye } from "lucide-react";
+import { useAuth } from "@/context/authContext";
 
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   baseCurrency: z.string().min(2).max(10),
   quoteCurrency: z.string().min(2).max(10),
   buyRate: z.coerce.number().min(0),
@@ -46,15 +48,18 @@ const formSchema = z.object({
 });
 
 export function ExchangeRateCard() {
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : null;
   const {
     data: exchangeRateData,
     error: exchangeRateError,
     mutate,
-  } = useSWR("/exchange-rates/latest", fetcher);
+  } = useSWR(`/exchange-rates/latest?tenantId=${tenantId}`, fetcher);
 
   if (exchangeRateError) toast.error("Fail to fetch exchange rates.");
 
   const initialValues = exchangeRateData?.data || {
+    tenantId,
     baseCurrency: "USD",
     quoteCurrency: "RMB",
     buyRate: 0,
@@ -99,8 +104,8 @@ export function ExchangeRateCard() {
       await mutate();
       setPrevValues(values);
       form.reset(values);
-    } catch (error) {
-      toast.error("Failed to save exchange rates." + JSON.stringify(error));
+    } catch {
+      toast.error("Failed to save exchange rates.");
     }
   };
 

@@ -25,6 +25,7 @@ import TransactionSkeletonTable from "./transaction-skeleton-table";
 import EditTransaction from "../dialogs/edit-transaction";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
+import { useAuth } from "@/context/authContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -50,12 +51,15 @@ const TransactionTable = ({
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : 0;
 
   const [open, setOpen] = useState<boolean>(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
   const queryParams = new URLSearchParams({
+    tenantId: tenantId.toString(),
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
   });
@@ -104,10 +108,8 @@ const TransactionTable = ({
       await deleteTransaction(id);
       toast.success("Transaction deleted successfully!");
       mutate();
-    } catch (deleteError) {
-      toast.error(
-        `Failed to delete transaction: ${JSON.stringify(deleteError)}`,
-      );
+    } catch {
+      toast.error(`Failed to delete Transaction.`);
     }
   };
 

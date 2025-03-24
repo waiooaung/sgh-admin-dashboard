@@ -12,6 +12,7 @@ export type AgentPayment = {
 };
 
 export type AgentPaymentFormData = {
+  tenantId: number;
   agentId: number;
   amountPaidUSD: number;
   paymentType: string;

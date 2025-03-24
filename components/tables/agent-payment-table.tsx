@@ -26,6 +26,7 @@ import AgentPaymentSkeletonTable from "./agent-payment-skeleton-table";
 import useDeleteAgentPayment from "@/hooks/useDeleteAgentPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
+import { useAuth } from "@/context/authContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -45,6 +46,8 @@ interface AgentPaymentTableProps {
 
 const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
   const router = useRouter();
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
   const { setAgent, setAgentPayment } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -56,6 +59,11 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
 
   const { trigger: deletePayment } = useDeleteAgentPayment();
 
+  if (tenantId) queryParams.append("tenantId", tenantId.toString());
+  if (from) {
+    from.setHours(0, 0, 0, 0);
+    queryParams.append("from", from.toISOString());
+  }
   if (agentId) queryParams.append("agentId", agentId.toString());
   if (from) {
     from.setHours(0, 0, 0, 0);
@@ -87,10 +95,8 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
       await deletePayment(id);
       toast.success("Data deleted successfully!");
       mutate();
-    } catch (deleteError) {
-      toast.error(
-        `Failed to delete transaction: ${JSON.stringify(deleteError)}`,
-      );
+    } catch {
+      toast.error(`Failed to delete transaction.`);
     }
   };
 

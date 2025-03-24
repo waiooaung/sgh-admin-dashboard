@@ -4,6 +4,7 @@ import CustomBarChart from "./custom-bar-chart";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 import { toast } from "sonner";
+import { useAuth } from "@/context/authContext";
 
 interface Data {
   date: string;
@@ -18,8 +19,10 @@ interface ApiResponse {
 }
 
 export default function DashboardChart() {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || null;
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/profit-statistics",
+    `/dashboard/profit-statistics?tenantId=${tenantId}`,
     fetcher,
   );
   const chartData = data?.data || [];

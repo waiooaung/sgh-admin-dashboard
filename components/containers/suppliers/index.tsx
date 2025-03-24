@@ -39,6 +39,7 @@ import { AddNewSupplier } from "@/components/dialogs/add-new-supplier";
 import EditSupplier from "@/components/dialogs/edit-supplier";
 import useDelete from "@/hooks/useDelete";
 import useDataContext from "@/hooks/useDataContext";
+import { useAuth } from "@/context/authContext";
 
 interface ApiResponse {
   statusCode: number;
@@ -50,6 +51,8 @@ interface ApiResponse {
 
 const SupplierContainer = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || undefined;
   const { setSupplier } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -60,7 +63,7 @@ const SupplierContainer = () => {
   const [open, setOpen] = useState(false);
 
   const { data, mutate } = useSWR<ApiResponse>(
-    `/suppliers?page=${currentPage}&limit=${itemsPerPage}`,
+    `/suppliers?page=${currentPage}&limit=${itemsPerPage}&tenantId=${tenantId}`,
     fetcher,
   );
 
@@ -88,8 +91,8 @@ const SupplierContainer = () => {
       await deleteSupplier(id);
       toast.success("Supplier deleted successfully!");
       mutate();
-    } catch (deleteError) {
-      toast.error(`Failed to delete supplier: ${JSON.stringify(deleteError)}`);
+    } catch {
+      toast.error(`Failed to delete supplier.`);
     }
   };
 

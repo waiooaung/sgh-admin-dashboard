@@ -35,6 +35,7 @@ interface EditAgentProps {
 
 // Zod Schema
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   contactName: z.string().min(2, "Contact name must be at least 2 characters"),
   contactEmail: z.string().email("Invalid email address"),
@@ -54,6 +55,7 @@ const EditAgent: React.FC<EditAgentProps> = ({
   const form = useForm<AgentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId: agent.tenantId,
       name: agent.name,
       contactName: agent.contactName,
       contactEmail: agent.contactEmail,
@@ -79,7 +81,7 @@ const EditAgent: React.FC<EditAgentProps> = ({
   const handleSubmit = async (values: AgentFormData) => {
     const updatedAgentData = {
       ...values,
-      id: agent.id, // Add the existing agent id here
+      id: agent.id,
     };
     try {
       await trigger(updatedAgentData);

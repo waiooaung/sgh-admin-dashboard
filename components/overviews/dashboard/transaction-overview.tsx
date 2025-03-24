@@ -13,6 +13,7 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import { useAuth } from "@/context/authContext";
 
 interface Data {
   totalTransactionsCount: number;
@@ -25,7 +26,6 @@ interface Data {
   supplierCount: number;
   agentCount: number;
 }
-
 interface ApiResponse {
   statusCode: number;
   success: boolean;
@@ -34,8 +34,10 @@ interface ApiResponse {
 }
 
 const DashboardTransactionOverview = () => {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || 0;
   const { data, error } = useSWR<ApiResponse>(
-    "/dashboard/transaction-statistics",
+    `/dashboard/transaction-statistics?tenantId=${tenantId}`,
     fetcher,
   );
   const {

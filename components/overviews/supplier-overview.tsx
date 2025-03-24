@@ -25,9 +25,15 @@ interface ApiResponse {
   message: string;
   data: Data;
 }
-const SupplierOverview = ({ supplierId }: { supplierId: number }) => {
+const SupplierOverview = ({
+  tenantId,
+  supplierId,
+}: {
+  tenantId: number;
+  supplierId: number;
+}) => {
   const { data, error } = useSWR<ApiResponse>(
-    `/supplier-transactions/statistics?supplierId=${supplierId}`,
+    `/supplier-transactions/statistics?supplierId=${supplierId}&tenantId=${tenantId}`,
     fetcher,
   );
 

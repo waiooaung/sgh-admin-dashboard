@@ -5,7 +5,11 @@ import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
 import { mutate } from "swr";
 const AgentPaymentsContainer = () => {
   const handleSubmit = async () => {
-    await mutate("/agent-payments?page=1&limit=10");
+    await mutate(
+      (key) => typeof key === "string" && key.startsWith("/agent-payments"),
+      undefined,
+      { revalidate: true },
+    );
   };
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">

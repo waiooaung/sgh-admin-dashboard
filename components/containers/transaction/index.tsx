@@ -7,9 +7,13 @@ import { mutate } from "swr";
 
 const TransactionContainer = () => {
   const revalidateAll = async () => {
-    await mutate("/dashboard/transaction-statistics", undefined, {
-      revalidate: true,
-    });
+    await mutate(
+      (key) =>
+        typeof key === "string" &&
+        key.startsWith("/dashboard/transaction-statistics"),
+      undefined,
+      { revalidate: true },
+    );
     await mutate(
       (key) => typeof key === "string" && key.startsWith("/transactions"),
       undefined,

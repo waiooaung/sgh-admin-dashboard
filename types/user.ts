@@ -1,7 +1,7 @@
 export type User = {
   id: number;
+  name: string;
   email: string;
-  active: boolean;
-  createdAt: Date;
-  lastLogin: Date;
+  role: boolean;
+  tenantId: number;
 };

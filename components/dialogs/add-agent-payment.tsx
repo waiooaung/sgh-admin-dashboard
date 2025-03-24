@@ -39,6 +39,7 @@ import { AgentPaymentFormData } from "@/types/agentPayment";
 import { toast } from "sonner";
 import { Agent } from "@/types/agent";
 import { MetaData } from "@/types/meta-data";
+import { useAuth } from "@/context/authContext";
 
 interface AddAgentPaymentProps {
   onSuccess: () => void;
@@ -55,18 +56,22 @@ interface AgentApiResponse {
 
 // Zod Schema
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   agentId: z.coerce.number(),
   amountPaidUSD: z.coerce.number(),
   paymentType: z.string().min(5),
 });
 
 export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<AgentPaymentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId,
       agentId: undefined,
       amountPaidUSD: 0,
       paymentType: "",
@@ -84,9 +89,12 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
     data: agentData,
     isLoading: isLoadingAgentData,
     error: agentDataError,
-  } = useSWR<AgentApiResponse>(`/agents?limit=100`, fetcher);
+  } = useSWR<AgentApiResponse>(
+    `/agents?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (agentDataError) toast.error("Error fetching agents: " + agentDataError);
+  if (agentDataError) toast.error("Error fetching agents.");
   const agents: Agent[] = agentData?.data || [];
 
   const handleSubmit = async (values: AgentPaymentFormData) => {

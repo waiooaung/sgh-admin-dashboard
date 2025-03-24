@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
 import { MetaData } from "@/types/meta-data";
+import { useAuth } from "@/context/authContext";
 
 interface AddNewTransactionProps {
   onSuccess: () => void;
@@ -65,6 +66,7 @@ interface SupplierApiResponse {
 
 // Zod Schema
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   transactionDate: z.date(),
   amountRMB: z.coerce.number(),
   buyRate: z.coerce.number(),
@@ -75,14 +77,16 @@ const formSchema = z.object({
 });
 
 export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
   const [isOpen, setIsOpen] = useState(false);
 
   const { data: exchangeRateData, error: exchangeRateError } = useSWR(
-    "/exchange-rates/latest",
+    "/exchange-rates/latest?tenantId=" + tenantId,
     fetcher,
   );
 
-  if (exchangeRateError) toast.error(exchangeRateError);
+  if (exchangeRateError) toast.error("Exchange rate error.");
 
   const exchangeRates = useMemo(() => {
     return (
@@ -96,10 +100,10 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
   }, [exchangeRateData]);
 
   const { data: commissionRateData, error: commissionRateError } = useSWR(
-    "/commission-rates/common-rate",
+    "/commission-rates/common-rate?tenantId=" + tenantId,
     fetcher,
   );
-  if (commissionRateError) toast.error(commissionRateError);
+  if (commissionRateError) toast.error("Commission rate error.");
   const commissionRates = useMemo(() => {
     return (
       commissionRateData?.data || {
@@ -113,6 +117,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     resolver: zodResolver(formSchema),
     defaultValues: useMemo(
       () => ({
+        tenantId,
         transactionDate: new Date(),
         amountRMB: 0,
         buyRate: exchangeRates.buyRate,
@@ -121,7 +126,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
         agentId: undefined,
         supplierId: undefined,
       }),
-      [exchangeRates, commissionRates],
+      [tenantId, exchangeRates, commissionRates],
     ),
   });
 
@@ -154,19 +159,24 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     data: agentData,
     isLoading: isLoadingAgentData,
     error: agentDataError,
-  } = useSWR<AgentApiResponse>(`/agents?limit=100`, fetcher);
+  } = useSWR<AgentApiResponse>(
+    `/agents?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (agentDataError) toast.error("Error fetching agents: " + agentDataError);
+  if (agentDataError) toast.error("Error fetching agents.");
   const agents: Agent[] = agentData?.data || [];
 
   const {
     data: supplierData,
     isLoading: isLoadingSupplierData,
     error: supplierDataError,
-  } = useSWR<SupplierApiResponse>(`/suppliers?limit=100`, fetcher);
+  } = useSWR<SupplierApiResponse>(
+    `/suppliers?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (supplierDataError)
-    toast.error("Error fetching suppliers: " + supplierDataError);
+  if (supplierDataError) toast.error("Error fetching suppliers.");
   const suppliers: Supplier[] = supplierData?.data || [];
 
   const handleSubmit = async (values: TransactionFormData) => {

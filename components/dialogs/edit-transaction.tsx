@@ -48,6 +48,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
+import { useAuth } from "@/context/authContext";
 
 interface AgentApiResponse {
   statusCode: number;
@@ -68,6 +69,7 @@ interface SupplierApiResponse {
 }
 
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   transactionDate: z.date(),
   amountRMB: z.coerce.number(),
   buyRate: z.coerce.number(),
@@ -90,6 +92,8 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
   transaction,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : undefined;
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(
     transaction,
   );
@@ -103,6 +107,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      tenantId: editTransaction?.tenantId,
       transactionDate: editTransaction?.transactionDate
         ? new Date(editTransaction.transactionDate)
         : undefined,
@@ -144,19 +149,24 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     data: agentData,
     isLoading: isLoadingAgentData,
     error: agentDataError,
-  } = useSWR<AgentApiResponse>(`/agents?limit=100`, fetcher);
+  } = useSWR<AgentApiResponse>(
+    `/agents?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (agentDataError) toast.error("Error fetching agents: " + agentDataError);
+  if (agentDataError) toast.error("Error fetching agents.");
   const agents: Agent[] = agentData?.data || [];
 
   const {
     data: supplierData,
     isLoading: isLoadingSupplierData,
     error: supplierDataError,
-  } = useSWR<SupplierApiResponse>(`/suppliers?limit=100`, fetcher);
+  } = useSWR<SupplierApiResponse>(
+    `/suppliers?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
 
-  if (supplierDataError)
-    toast.error("Error fetching suppliers: " + supplierDataError);
+  if (supplierDataError) toast.error("Error fetching suppliers.");
   const suppliers: Supplier[] = supplierData?.data || [];
 
   const handleSubmit = async (values: TransactionFormData) => {

@@ -21,20 +21,25 @@ import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { CommissionRateFormData } from "@/types/commissionRate";
 import { toast } from "sonner";
+import { useAuth } from "@/context/authContext";
 
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   rate: z.coerce.number().min(0),
 });
 
 export function CommissionRateCard() {
+  const { user } = useAuth();
+  const tenantId = user ? user.tenantId : null;
   const { data, error, mutate } = useSWR(
-    "/commission-rates/common-rate",
+    "/commission-rates/common-rate?tenantId=" + tenantId,
     fetcher,
   );
 
   if (error) toast.error("Fail to fetch commission rates.");
 
   const initialValues = data?.data || {
+    tenantId: tenantId,
     supplierId: null,
     rate: 0,
   };
@@ -73,8 +78,8 @@ export function CommissionRateCard() {
       await mutate();
       setPrevValues(values);
       form.reset(values);
-    } catch (error) {
-      toast.error("Failed to save commission rate." + JSON.stringify(error));
+    } catch {
+      toast.error("Failed to save commission rate.");
     }
   };
 

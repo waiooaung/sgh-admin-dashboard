@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/authContext";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios-instance";
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
@@ -32,10 +33,10 @@ export function LoginForm({
         email,
         password,
       });
-      login(response.data.accessToken);
+      login(response.data.accessToken, response.data.user);
       router.push("/dashboard");
-    } catch (error: unknown) {
-      alert(JSON.stringify(error));
+    } catch {
+      toast.error("Login fail.");
     }
   };
   return (

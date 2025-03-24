@@ -26,12 +26,14 @@ import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { CreateSupplier } from "@/types/supplier";
 import { toast } from "sonner";
+import { useAuth } from "@/context/authContext";
 
 interface AddNewSupplierProps {
   onSuccess: () => void;
 }
 
 const formSchema = z.object({
+  tenantId: z.coerce.number(),
   name: z.string().min(2).max(20),
   contactName: z.string().min(2).max(20),
   contactEmail: z.string().email(),
@@ -41,11 +43,14 @@ const formSchema = z.object({
 });
 
 export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
+  const { user } = useAuth();
+  const tenantId = user?.tenantId || undefined;
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<CreateSupplier>({
     resolver: zodResolver(formSchema), // Add resolver here
     defaultValues: {
+      tenantId,
       name: "",
       contactName: "",
       contactEmail: "",
