@@ -1,44 +1,52 @@
 import { Supplier } from "./supplier";
 import { Agent } from "./agent";
+import { Currency } from "./currency";
 export type Transaction = {
   id: number;
   tenantId: number;
-  transactionDate: string;
-  amountRMB: number;
-  buyRate: number;
-  sellRate: number;
-  amountUSDBuy: number;
-  amountUSDSell: number;
-  profitUSD: number;
-  commissionRate: number;
-  commissionUSD: number;
-  totalEarningsUSD: number;
+  transactionTypeId: number;
+  baseCurrencyId: number;
+  baseCurrency: Currency;
+  quoteCurrencyId: number;
+  quoteCurrency: Currency;
   supplierId: number;
   agentId: number;
+  transactionDate: string;
+  baseAmount: number;
+  buyRate: number;
+  sellRate: number;
+  quoteAmountBuy: number;
+  quoteAmountSell: number;
+  profit: number;
+  commissionRate: number;
+  commission: number;
+  totalEarnings: number;
+  amountReceivedFromAgent: number;
+  remainingAmountFromAgent: number;
+  agentPaymentStatus: string;
+  amountPaidToSupplier: number;
+  remainingAmountToPayToSupplier: number;
+  supplierPaymentStatus: string;
   createdAt: string;
   updatedAt: string;
 };
 
 export type TransactionFormData = {
   tenantId: number;
+  transactionTypeId: number;
+  baseCurrencyId: number;
+  quoteCurrencyId: number;
+  agentId: number;
+  supplierId: number;
   transactionDate: Date;
-  amountRMB: number;
+  baseAmount: number;
   buyRate: number;
   sellRate: number;
   commissionRate: number;
-  agentId: number;
-  supplierId: number;
 };
 
 export type UpdateTransaction = TransactionFormData & {
   id: number;
-  transactionDate: Date;
-  amountRMB: number;
-  buyRate: number;
-  sellRate: number;
-  commissionRate: number;
-  agentId: number;
-  supplierId: number;
 };
 
 export type TransactionDetail = Transaction & {

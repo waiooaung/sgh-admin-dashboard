@@ -13,6 +13,7 @@ import { TransactionFormData } from "@/types/transaction";
 import { toast } from "sonner";
 import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
+import { Currency } from "@/types/currency";
 import { MetaData } from "@/types/meta-data";
 
 import {
@@ -49,6 +50,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { useAuth } from "@/context/authContext";
+import { TransactionType } from "@/types/transactionType";
 
 interface AgentApiResponse {
   statusCode: number;
@@ -68,13 +70,28 @@ interface SupplierApiResponse {
   overview: null;
 }
 
+interface TransactionTypeApiResponse {
+  statusCode: number;
+  success: boolean;
+  data: TransactionType[];
+}
+
+interface CurrencyApiResponse {
+  statusCode: number;
+  success: boolean;
+  data: Currency[];
+}
+
 const formSchema = z.object({
   tenantId: z.coerce.number(),
+  baseCurrencyId: z.coerce.number(),
+  quoteCurrencyId: z.coerce.number(),
   transactionDate: z.date(),
-  amountRMB: z.coerce.number(),
+  baseAmount: z.coerce.number(),
   buyRate: z.coerce.number(),
   sellRate: z.coerce.number(),
   commissionRate: z.coerce.number(),
+  transactionTypeId: z.coerce.number(),
   agentId: z.coerce.number(),
   supplierId: z.coerce.number(),
 });
@@ -108,10 +125,13 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId: editTransaction?.tenantId,
+      baseCurrencyId: editTransaction?.baseCurrencyId,
+      quoteCurrencyId: editTransaction?.quoteCurrencyId,
+      transactionTypeId: editTransaction?.transactionTypeId || undefined,
       transactionDate: editTransaction?.transactionDate
         ? new Date(editTransaction.transactionDate)
         : undefined,
-      amountRMB: editTransaction?.amountRMB || 0,
+      baseAmount: editTransaction?.baseAmount || 0,
       buyRate: editTransaction?.buyRate || 0,
       sellRate: editTransaction?.sellRate || 0,
       commissionRate: editTransaction?.commissionRate || 0,
@@ -120,23 +140,31 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     },
   });
 
-  const { amountRMB, buyRate, sellRate, commissionRate } = form.watch();
-  const { amountUSDBuy, amountUSDSell, commission, profit, totalEarningsUSD } =
-    useMemo(() => {
-      const buyUSD = buyRate > 0 ? amountRMB / buyRate : 0;
-      const sellUSD = sellRate > 0 ? amountRMB / sellRate : 0;
-      const commissionValue = sellUSD * (commissionRate / 100);
-      const profitValue = sellUSD > 0 && buyUSD > 0 ? sellUSD - buyUSD : 0;
-      const totalEarnings = profitValue + commissionValue;
+  const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
+  const {
+    quoteAmountBuy,
+    quoteAmountSell,
+    commission,
+    profit,
+    totalEarningsUSD,
+  } = useMemo(() => {
+    const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
+    const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
+    const commissionValue = quoteAmountSell * (commissionRate / 100);
+    const profitValue =
+      quoteAmountSell > 0 && quoteAmountBuy > 0
+        ? quoteAmountSell - quoteAmountBuy
+        : 0;
+    const totalEarnings = profitValue + commissionValue;
 
-      return {
-        amountUSDBuy: buyUSD,
-        amountUSDSell: sellUSD,
-        commission: commissionValue,
-        profit: profitValue,
-        totalEarningsUSD: totalEarnings,
-      };
-    }, [amountRMB, buyRate, sellRate, commissionRate]);
+    return {
+      quoteAmountBuy: quoteAmountBuy,
+      quoteAmountSell: quoteAmountSell,
+      commission: commissionValue,
+      profit: profitValue,
+      totalEarningsUSD: totalEarnings,
+    };
+  }, [baseAmount, buyRate, sellRate, commissionRate]);
 
   const { trigger } = useSWRMutation(
     `/transactions/${editTransaction?.id}`,
@@ -169,6 +197,28 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
   if (supplierDataError) toast.error("Error fetching suppliers.");
   const suppliers: Supplier[] = supplierData?.data || [];
 
+  const {
+    data: transactionTypeData,
+    isLoading: isLoadingTransactionTypeData,
+    error: transactionTypeDataError,
+  } = useSWR<TransactionTypeApiResponse>(
+    `/transaction-types?limit=100&tenantId=${tenantId}`,
+    fetcher,
+  );
+
+  if (transactionTypeDataError)
+    toast.error("Error fetching transaction types.");
+  const transactionTypes: TransactionType[] = transactionTypeData?.data || [];
+
+  const {
+    data: currenciesData,
+    isLoading: isLoadingCurrencies,
+    error: currenciesError,
+  } = useSWR<CurrencyApiResponse>(`/currencies?tenantId=${tenantId}`, fetcher);
+
+  if (currenciesError) toast.error("Error fetching transaction types.");
+  const currencies: Currency[] = currenciesData?.data || [];
+
   const handleSubmit = async (values: TransactionFormData) => {
     try {
       await trigger(values);
@@ -198,11 +248,11 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
             <CardContent className="grid gap-2">
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Amount USD (Buy)</span>
-                <span>{amountUSDBuy.toFixed(2)}</span>
+                <span>{quoteAmountBuy.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Amount USD (Sell)</span>
-                <span>{amountUSDSell.toFixed(2)}</span>
+                <span>{quoteAmountSell.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Commission</span>
@@ -223,6 +273,81 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
+              {/* Base Currency */}
+              <FormField
+                control={form.control}
+                name="baseCurrencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency ( From )</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Currency from..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingCurrencies ? (
+                          <h1>Loading...</h1>
+                        ) : currencies.length > 0 ? (
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>Data not found.</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Quote Currency */}
+              <FormField
+                control={form.control}
+                name="quoteCurrencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency (To)</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Currency To..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingCurrencies ? (
+                          <h1>Loading...</h1>
+                        ) : currencies.length > 0 ? (
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>Data not found.</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="transactionDate"
@@ -267,7 +392,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
               {/* Amount RMB */}
               <FormField
                 control={form.control}
-                name="amountRMB"
+                name="baseAmount"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Amount (RMB)</FormLabel>
@@ -317,6 +442,44 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Transaction Type */}
+              <FormField
+                control={form.control}
+                name="transactionTypeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Transaction Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select transaction type..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingTransactionTypeData ? (
+                          <h1>Loading...</h1>
+                        ) : transactionTypes.length > 0 ? (
+                          transactionTypes.map((transactionType) => (
+                            <SelectItem
+                              key={transactionType.id}
+                              value={transactionType.id.toString()}
+                            >
+                              {transactionType.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>No transaction type found</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

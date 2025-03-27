@@ -13,10 +13,10 @@ import { toast } from "sonner";
 
 interface Data {
   totalTransactionsCount: number;
-  totalAmountRMB: number;
-  totalAmountUSD: number;
-  totalReceivedAmountUSD: number;
-  totalAmountRemainingUSD: number;
+  totalBaseAmount: number;
+  totalQuoteAmountSell: number;
+  totalAmountReceivedFromAgent: number;
+  totalRemainingAmountFromAgent: number;
 }
 
 interface ApiResponse {
@@ -33,15 +33,15 @@ const AgentOverview = ({
   agentId: number;
 }) => {
   const { data, error } = useSWR<ApiResponse>(
-    `/agent-transactions/statistics?tenantId=${tenantId}&agentId=${agentId}`,
+    `/transactions/statistics?tenantId=${tenantId}&agentId=${agentId}`,
     fetcher,
   );
 
   const {
-    totalAmountRMB = 0,
-    totalAmountUSD = 0,
-    totalReceivedAmountUSD = 0,
-    totalAmountRemainingUSD = 0,
+    totalBaseAmount = 0,
+    totalQuoteAmountSell = 0,
+    totalAmountReceivedFromAgent = 0,
+    totalRemainingAmountFromAgent = 0,
   } = data?.data || {};
 
   useEffect(() => {
@@ -54,14 +54,14 @@ const AgentOverview = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium truncate">
-            Total Exchanged (RMB)
+            Total Exchanged (From)
           </CardTitle>
           <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <Link href="/transactions?date=25-02-2025">
             <div className="text-2xl font-bold text-green-500 truncate">
-              ¥ {new Intl.NumberFormat("en-US").format(totalAmountRMB)}
+              {new Intl.NumberFormat("en-US").format(totalBaseAmount)}
             </div>
           </Link>
         </CardContent>
@@ -70,14 +70,14 @@ const AgentOverview = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium truncate">
-            Total Exchanged (USD)
+            Total Exchanged (To)
           </CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <Link href="/transactions">
             <div className="text-2xl font-bold text-blue-500 truncate">
-              $ {new Intl.NumberFormat("en-US").format(totalAmountUSD)}
+              {new Intl.NumberFormat("en-US").format(totalQuoteAmountSell)}
             </div>
           </Link>
         </CardContent>
@@ -86,14 +86,16 @@ const AgentOverview = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium truncate">
-            Received Amount (USD)
+            Received Amount
           </CardTitle>
           <ArrowDownCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <Link href="/transactions">
             <div className="text-2xl font-bold text-amber-500 truncate">
-              $ {new Intl.NumberFormat("en-US").format(totalReceivedAmountUSD)}
+              {new Intl.NumberFormat("en-US").format(
+                totalAmountReceivedFromAgent,
+              )}
             </div>
           </Link>
         </CardContent>
@@ -102,14 +104,16 @@ const AgentOverview = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium truncate">
-            Amount to Receive (USD)
+            Amount to Receive
           </CardTitle>
           <ArrowUpCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <Link href="/transactions">
             <div className="text-2xl font-bold text-red-500 truncate">
-              $ {new Intl.NumberFormat("en-US").format(totalAmountRemainingUSD)}
+              {new Intl.NumberFormat("en-US").format(
+                totalRemainingAmountFromAgent,
+              )}
             </div>
           </Link>
         </CardContent>

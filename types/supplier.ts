@@ -1,3 +1,5 @@
+import { MetaData } from "./meta-data";
+
 export type Supplier = {
   id: number;
   tenantId: number;
@@ -23,4 +25,13 @@ export type CreateSupplier = {
 
 export type UpdateSupplier = CreateSupplier & {
   id: number;
+};
+
+export type SupplierApiResponse = {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: Supplier[];
+  meta: MetaData;
+  overview: null;
 };

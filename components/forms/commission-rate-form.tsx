@@ -28,7 +28,7 @@ const formSchema = z.object({
   rate: z.coerce.number().min(0),
 });
 
-export function CommissionRateCard() {
+export function CommissionRateForm() {
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : null;
   const { data, error, mutate } = useSWR(

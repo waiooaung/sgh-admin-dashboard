@@ -16,16 +16,40 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import { View, Pencil, Trash, MoreHorizontal } from "lucide-react";
-import { Button } from "../ui/button";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Search,
+  FileSpreadsheet,
+  Calendar as CalendarIcon,
+  View,
+  Pencil,
+  Trash,
+  MoreHorizontal,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
 import { Transaction } from "@/types/transaction";
 import { MetaData } from "@/types/meta-data";
 import TransactionSkeletonTable from "./transaction-skeleton-table";
-import EditTransaction from "../dialogs/edit-transaction";
+import EditTransaction from "@/components/dialogs/edit-transaction";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
+import * as XLSX from "xlsx";
 
 interface ApiResponse {
   statusCode: number;
@@ -35,36 +59,27 @@ interface ApiResponse {
   meta: MetaData;
 }
 
-interface TransactionTableProps {
-  supplierId?: number;
-  agentId?: number;
-  from?: Date;
-  to?: Date;
-}
-
-const TransactionTable = ({
-  supplierId,
-  agentId,
-  from,
-  to,
-}: TransactionTableProps) => {
+const TransactionTable = () => {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : 0;
+  const { trigger: deleteTransaction } = useDeleteTransaction();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [open, setOpen] = useState<boolean>(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
+  const [supplierId, setSupplierId] = useState<string | undefined>();
+  const [agentId, setAgentId] = useState<string | undefined>();
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
   const queryParams = new URLSearchParams({
     tenantId: tenantId.toString(),
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
   });
-
-  const { trigger: deleteTransaction } = useDeleteTransaction();
 
   if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (agentId) queryParams.append("agentId", agentId.toString());
@@ -93,6 +108,35 @@ const TransactionTable = ({
     mutate();
   };
 
+  const handleSearch = () => {
+    setCurrentPage(1);
+    mutate();
+  };
+
+  const exportToExcel = () => {
+    if (transactions.length === 0) {
+      alert("No transactions to export!");
+      return;
+    }
+
+    const dataToExport = transactions.map((transaction) => ({
+      ID: `#TNX-${transaction.id}`,
+      Date: new Date(transaction.transactionDate).toLocaleDateString(),
+      "Amount (From)": `${transaction.baseCurrency.symbol} ${transaction.baseAmount}`,
+      "Amount (To) (Buy Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountBuy} (${transaction.buyRate})`,
+      "Amount (To) (Sell Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountSell} (${transaction.sellRate})`,
+      Profit: `${transaction.quoteCurrency.symbol} ${transaction.profit}`,
+      Commission: `${transaction.quoteCurrency.symbol} ${transaction.commission}`,
+      "Total Earnings": `${transaction.quoteCurrency.symbol} ${transaction.totalEarnings}`,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+
+    XLSX.writeFile(workbook, "transactions.xlsx");
+  };
+
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setOpen(true);
@@ -115,24 +159,98 @@ const TransactionTable = ({
 
   return (
     <div>
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
+        <Select onValueChange={(value) => setSupplierId(value)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select Supplier" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Supplier 1</SelectItem>
+            <SelectItem value="2">Supplier 2</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select onValueChange={(value) => setAgentId(value)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select Agent" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Agent 1</SelectItem>
+            <SelectItem value="2">Agent 2</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !from && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {from ? format(from, "PPP") : <span>Pick from date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={from}
+              onSelect={setFrom}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !to && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {to ? format(to, "PPP") : <span>Pick to date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={to}
+              onSelect={setTo}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Button onClick={handleSearch} className="">
+          <Search className="w-5 h-5" />
+        </Button>
+        <Button
+          onClick={exportToExcel}
+          className="bg-green-500 hover:bg-green-600"
+        >
+          <FileSpreadsheet className="w-5 h-5" />
+        </Button>
+      </div>
       <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
         <TableHeader className="text-sm font-semibold">
           <TableRow>
+            <TableHead className="text-left truncate">ID</TableHead>
             <TableHead className="text-left truncate">Date</TableHead>
-            <TableHead className="text-left truncate">Amount (RMB)</TableHead>
+            <TableHead className="text-left truncate">Amount (From)</TableHead>
             <TableHead className="text-left truncate">
-              Amount USD <span className="text-blue-500">(Buy Rate)</span>
+              Amount (To)<span className="text-blue-500">(Buy Rate)</span>
             </TableHead>
             <TableHead className="text-left truncate">
-              Amount USD <span className="text-green-500">(Sell Rate)</span>
+              Amount (To) <span className="text-green-500">(Sell Rate)</span>
             </TableHead>
-            <TableHead className="text-left truncate">Profit (USD)</TableHead>
-            <TableHead className="text-left truncate">
-              Commission (USD)
-            </TableHead>
-            <TableHead className="text-left truncate">
-              Total Earnings (USD)
-            </TableHead>
+            <TableHead className="text-left truncate">Profit</TableHead>
+            <TableHead className="text-left truncate">Commission</TableHead>
+            <TableHead className="text-left truncate">Total Earnings</TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -145,28 +263,33 @@ const TransactionTable = ({
                 key={transaction.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell className="w-15 truncate">
+                <TableCell className="truncate">
+                  #TNX-{transaction.id}
+                </TableCell>
+                <TableCell className="truncate">
                   {new Date(transaction.transactionDate).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="truncate">
-                  &#165; {transaction.amountRMB.toLocaleString()}
+                  {transaction.baseCurrency.symbol} {transaction.baseAmount}
                 </TableCell>
                 <TableCell className="truncate">
-                  ${transaction.amountUSDBuy.toFixed(2)}
+                  {transaction.quoteCurrency.symbol}{" "}
+                  {transaction.quoteAmountBuy}
                   <span>({transaction.buyRate})</span>
                 </TableCell>
                 <TableCell className="truncate">
-                  ${transaction.amountUSDSell.toFixed(2)}
+                  {transaction.quoteCurrency.symbol}{" "}
+                  {transaction.quoteAmountSell}
                   <span>({transaction.sellRate})</span>
                 </TableCell>
                 <TableCell className="truncate">
-                  ${transaction.profitUSD.toFixed(2)}
+                  {transaction.quoteCurrency.symbol} {transaction.profit}
                 </TableCell>
                 <TableCell className="truncate">
-                  ${transaction.commissionUSD.toFixed(2)}
+                  {transaction.quoteCurrency.symbol} {transaction.commission}
                 </TableCell>
                 <TableCell className="truncate">
-                  ${transaction.totalEarningsUSD.toFixed(2)}
+                  {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
                 </TableCell>
                 <TableCell className="truncate">
                   <DropdownMenu>

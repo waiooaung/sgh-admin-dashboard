@@ -17,14 +17,12 @@ import { useAuth } from "@/context/authContext";
 
 interface Data {
   totalTransactionsCount: number;
-  totalAmountRMB: number;
-  totalAmountUSDBuy: number;
-  totalAmountUSDSell: number;
-  totalCommissionUSD: number;
-  totalEarningsUSD: number;
-  totalProfitUSD: number;
-  supplierCount: number;
-  agentCount: number;
+  totalBaseAmount: number;
+  totalQuoteAmountBuy: number;
+  totalQuoteAmountSell: number;
+  totalCommission: number;
+  totalEarnings: number;
+  totalProfit: number;
 }
 
 interface ApiResponse {
@@ -43,10 +41,10 @@ const TransactionOverview = () => {
   );
   const {
     totalTransactionsCount = 0,
-    totalAmountRMB = 0,
-    totalAmountUSDBuy = 0,
-    totalAmountUSDSell = 0,
-    totalEarningsUSD = 0,
+    totalBaseAmount = 0,
+    totalQuoteAmountBuy = 0,
+    totalQuoteAmountSell = 0,
+    totalEarnings = 0,
   } = data?.data || {};
 
   useEffect(() => {
@@ -71,7 +69,7 @@ const TransactionOverview = () => {
         <CardContent>
           <Link href="/dashboard/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
-              {new Intl.NumberFormat("en-US").format(totalTransactionsCount)}
+              {totalTransactionsCount}
             </div>
           </Link>
         </CardContent>
@@ -81,7 +79,7 @@ const TransactionOverview = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium truncate">
-              Total USD
+              Total
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -92,7 +90,7 @@ const TransactionOverview = () => {
         <CardContent>
           <Link href="/dashboard/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
-              ${new Intl.NumberFormat("en-US").format(totalAmountUSDSell)}
+              {totalQuoteAmountSell.toFixed(2)}
             </div>
           </Link>
         </CardContent>
@@ -102,7 +100,7 @@ const TransactionOverview = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium truncate">
-              Total USD
+              Total
             </CardTitle>
             <Banknote className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -113,7 +111,7 @@ const TransactionOverview = () => {
         <CardContent>
           <Link href="/dashboard/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
-              ${new Intl.NumberFormat("en-US").format(totalAmountUSDBuy)}
+              {totalQuoteAmountBuy.toFixed(2)}
             </div>
           </Link>
         </CardContent>
@@ -123,7 +121,7 @@ const TransactionOverview = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium truncate">
-              Total USD Profit
+              Total Profit
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -134,7 +132,7 @@ const TransactionOverview = () => {
         <CardContent>
           <Link href="/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
-              ${new Intl.NumberFormat("en-US").format(totalEarningsUSD)}
+              {totalEarnings}
             </div>
           </Link>
         </CardContent>
@@ -144,7 +142,7 @@ const TransactionOverview = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium truncate">
-              Total RMB
+              Total
             </CardTitle>
             <JapaneseYen className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -155,7 +153,7 @@ const TransactionOverview = () => {
         <CardContent>
           <Link href="/dashboard/transactions">
             <div className="text-xl font-bold text-green-500 truncate">
-              ¥{new Intl.NumberFormat("en-US").format(totalAmountRMB)}
+              {totalBaseAmount}
             </div>
           </Link>
         </CardContent>

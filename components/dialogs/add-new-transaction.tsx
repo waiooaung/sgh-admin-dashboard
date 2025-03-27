@@ -39,46 +39,41 @@ import { TransactionFormData } from "@/types/transaction";
 import { toast } from "sonner";
 import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
-import { MetaData } from "@/types/meta-data";
-import { useAuth } from "@/context/authContext";
+import { Currency } from "@/types/currency";
+import { TransactionType } from "@/types/transactionType";
 
 interface AddNewTransactionProps {
   onSuccess: () => void;
-}
-
-interface AgentApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Agent[];
-  meta: MetaData;
-  overview: null;
-}
-
-interface SupplierApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Supplier[];
-  meta: MetaData;
-  overview: null;
+  agents: Agent[];
+  suppliers: Supplier[];
+  transactionTypes: TransactionType[];
+  currencies: Currency[];
+  tenantId: number | undefined;
 }
 
 // Zod Schema
 const formSchema = z.object({
   tenantId: z.coerce.number(),
+  baseCurrencyId: z.coerce.number(),
+  quoteCurrencyId: z.coerce.number(),
   transactionDate: z.date(),
-  amountRMB: z.coerce.number(),
+  baseAmount: z.coerce.number(),
   buyRate: z.coerce.number(),
   sellRate: z.coerce.number(),
   commissionRate: z.coerce.number(),
+  transactionTypeId: z.coerce.number(),
   agentId: z.coerce.number(),
   supplierId: z.coerce.number(),
 });
 
-export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
-  const { user } = useAuth();
-  const tenantId = user ? user.tenantId : undefined;
+export function AddNewTransaction({
+  onSuccess,
+  agents,
+  suppliers,
+  transactionTypes,
+  currencies,
+  tenantId,
+}: AddNewTransactionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data: exchangeRateData, error: exchangeRateError } = useSWR(
@@ -118,11 +113,14 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     defaultValues: useMemo(
       () => ({
         tenantId,
+        baseCurrencyId: undefined,
+        quoteCurrencyId: undefined,
         transactionDate: new Date(),
-        amountRMB: 0,
+        baseAmount: 0,
         buyRate: exchangeRates.buyRate,
         sellRate: exchangeRates.sellRate,
         commissionRate: commissionRates.rate,
+        transactionTypeId: undefined,
         agentId: undefined,
         supplierId: undefined,
       }),
@@ -130,23 +128,26 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
     ),
   });
 
-  const { amountRMB, buyRate, sellRate, commissionRate } = form.watch();
-  const { amountUSDBuy, amountUSDSell, commission, profit, totalEarningsUSD } =
+  const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
+  const { quoteAmountBuy, quoteAmountSell, commission, profit, totalEarnings } =
     useMemo(() => {
-      const buyUSD = buyRate > 0 ? amountRMB / buyRate : 0;
-      const sellUSD = sellRate > 0 ? amountRMB / sellRate : 0;
-      const commissionValue = sellUSD * (commissionRate / 100);
-      const profitValue = sellUSD > 0 && buyUSD > 0 ? sellUSD - buyUSD : 0;
+      const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
+      const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
+      const commissionValue = quoteAmountSell * (commissionRate / 100);
+      const profitValue =
+        quoteAmountSell > 0 && quoteAmountBuy > 0
+          ? quoteAmountSell - quoteAmountBuy
+          : 0;
       const totalEarnings = profitValue + commissionValue;
 
       return {
-        amountUSDBuy: buyUSD,
-        amountUSDSell: sellUSD,
+        quoteAmountBuy: quoteAmountBuy,
+        quoteAmountSell: quoteAmountSell,
         commission: commissionValue,
         profit: profitValue,
-        totalEarningsUSD: totalEarnings,
+        totalEarnings: totalEarnings,
       };
-    }, [amountRMB, buyRate, sellRate, commissionRate]);
+    }, [baseAmount, buyRate, sellRate, commissionRate]);
 
   const { trigger } = useSWRMutation(
     `/transactions`,
@@ -154,30 +155,6 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
       return await axiosInstance.post<TransactionFormData>(url, arg);
     },
   );
-
-  const {
-    data: agentData,
-    isLoading: isLoadingAgentData,
-    error: agentDataError,
-  } = useSWR<AgentApiResponse>(
-    `/agents?limit=100&tenantId=${tenantId}`,
-    fetcher,
-  );
-
-  if (agentDataError) toast.error("Error fetching agents.");
-  const agents: Agent[] = agentData?.data || [];
-
-  const {
-    data: supplierData,
-    isLoading: isLoadingSupplierData,
-    error: supplierDataError,
-  } = useSWR<SupplierApiResponse>(
-    `/suppliers?limit=100&tenantId=${tenantId}`,
-    fetcher,
-  );
-
-  if (supplierDataError) toast.error("Error fetching suppliers.");
-  const suppliers: Supplier[] = supplierData?.data || [];
 
   const handleSubmit = async (values: TransactionFormData) => {
     try {
@@ -219,24 +196,24 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
             </CardHeader>
             <CardContent className="grid gap-2">
               <div className="flex justify-between border-b pb-2">
-                <span className="font-semibold">Amount USD (Buy)</span>
-                <span>$ {amountUSDBuy.toFixed(2)}</span>
+                <span className="font-semibold">Amount To (Buy)</span>
+                <span>{quoteAmountBuy.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
-                <span className="font-semibold">Amount USD (Sell)</span>
-                <span>$ {amountUSDSell.toFixed(2)}</span>
+                <span className="font-semibold">Amount To (Sell)</span>
+                <span>{quoteAmountSell.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Commission</span>
-                <span>$ {commission.toFixed(2)}</span>
+                <span>{commission.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Profit</span>
-                <span>$ {profit.toFixed(2)}</span>
+                <span>{profit.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-xl font-bold">
                 <span>Total Earnings</span>
-                <span>$ {totalEarningsUSD.toFixed(2)}</span>
+                <span>{totalEarnings.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
@@ -245,13 +222,79 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
+              {/* Base Currency */}
+              <FormField
+                control={form.control}
+                name="baseCurrencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency ( From )</FormLabel>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Currency from..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {currencies.length > 0 ? (
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>Data not found.</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Quote Currency */}
+              <FormField
+                control={form.control}
+                name="quoteCurrencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency (To)</FormLabel>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Currency To..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {currencies.length > 0 ? (
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>Data not found.</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Amount RMB */}
               <FormField
                 control={form.control}
-                name="amountRMB"
+                name="baseAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount (RMB)</FormLabel>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -303,6 +346,39 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
                 )}
               />
 
+              {/* Transaction Type */}
+              <FormField
+                control={form.control}
+                name="transactionTypeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Transaction Type</FormLabel>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Transaction Type..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {transactionTypes.length > 0 ? (
+                          transactionTypes.map((transactionType) => (
+                            <SelectItem
+                              key={transactionType.id}
+                              value={transactionType.id.toString()}
+                            >
+                              {transactionType.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <h1>Data not found.</h1>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Agent */}
               <FormField
                 control={form.control}
@@ -317,9 +393,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {isLoadingAgentData ? (
-                          <h1>Loading...</h1>
-                        ) : agents.length > 0 ? (
+                        {agents.length > 0 ? (
                           agents.map((agents) => (
                             <SelectItem
                               key={agents.id}
@@ -352,9 +426,7 @@ export function AddNewTransaction({ onSuccess }: AddNewTransactionProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {isLoadingSupplierData ? (
-                          <h1>Loading...</h1>
-                        ) : suppliers.length > 0 ? (
+                        {suppliers.length > 0 ? (
                           suppliers.map((suppliers) => (
                             <SelectItem
                               key={suppliers.id}

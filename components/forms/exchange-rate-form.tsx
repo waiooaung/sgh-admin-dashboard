@@ -47,7 +47,7 @@ const formSchema = z.object({
   sellRate: z.coerce.number().min(0),
 });
 
-export function ExchangeRateCard() {
+export function ExchangeRateForm() {
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : null;
   const {
