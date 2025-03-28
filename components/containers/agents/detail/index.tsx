@@ -105,7 +105,7 @@ const AgentDetailContainer = () => {
             <CardTitle>Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable agentId={agentId} />
+            <TransactionTable defaultAgentId={agentId} />
           </CardContent>
         </Card>
       </div>

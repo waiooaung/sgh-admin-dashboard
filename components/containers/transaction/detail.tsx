@@ -50,15 +50,15 @@ const TransactionDetailContainer = ({
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="p-4 border rounded-lg shadow-sm">
-                <p className="text-sm">Amount (RMB)</p>
+                <p className="text-sm">Amount</p>
                 <p className="text-lg font-semibold">
-                  ¥{transaction.amountRMB}
+                  ¥{transaction.baseAmount}
                 </p>
               </div>
               <div className="p-4 border rounded-lg shadow-sm">
                 <p className="text-sm">Profit (USD)</p>
                 <p className="text-lg font-semibold text-green-600">
-                  ${transaction.profitUSD.toFixed(2)}
+                  ${transaction.profit.toFixed(2)}
                 </p>
               </div>
               <div className="p-4 border rounded-lg shadow-sm">
@@ -70,7 +70,7 @@ const TransactionDetailContainer = ({
               <div className="p-4 border rounded-lg shadow-sm">
                 <p className="text-sm">Total Earnings (USD)</p>
                 <p className="text-lg font-semibold text-purple-600">
-                  ${transaction.totalEarningsUSD.toFixed(2)}
+                  ${transaction.totalEarnings.toFixed(2)}
                 </p>
               </div>
             </div>

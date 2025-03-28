@@ -110,7 +110,7 @@ const SupplierDetailContainer = () => {
             <CardTitle>Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable supplierId={supplierId} />
+            <TransactionTable defaultSupplierId={supplierId} />
           </CardContent>
         </Card>
       </div>

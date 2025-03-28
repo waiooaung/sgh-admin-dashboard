@@ -59,7 +59,20 @@ interface ApiResponse {
   meta: MetaData;
 }
 
-const TransactionTable = () => {
+interface TransactionTableProps {
+  defaultSupplierId?: number;
+  defaultAgentId?: number;
+  defaultDateFrom?: Date;
+  defaultDateTo?: Date;
+}
+
+
+const TransactionTable = ({
+  defaultSupplierId,
+  defaultAgentId,
+  defaultDateFrom,
+  defaultDateTo,
+}: TransactionTableProps) => {
   const router = useRouter();
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : 0;
@@ -71,10 +84,10 @@ const TransactionTable = () => {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
-  const [supplierId, setSupplierId] = useState<string | undefined>();
-  const [agentId, setAgentId] = useState<string | undefined>();
-  const [from, setFrom] = useState<Date | undefined>();
-  const [to, setTo] = useState<Date | undefined>();
+  const [supplierId, setSupplierId] = useState<string | undefined>(defaultSupplierId ? defaultSupplierId.toString() : undefined);
+  const [agentId, setAgentId] = useState<string | undefined>(defaultAgentId ? defaultAgentId.toString() : undefined);
+  const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
+  const [to, setTo] = useState<Date | undefined>(defaultDateTo);
   const queryParams = new URLSearchParams({
     tenantId: tenantId.toString(),
     page: currentPage.toString(),
