@@ -43,7 +43,10 @@ export default function DashboardContainer() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable defaultDateFrom={new Date()} defaultDateTo={new Date()} />
+            <TransactionTable
+              defaultDateFrom={new Date()}
+              defaultDateTo={new Date()}
+            />
           </CardContent>
         </Card>
       </div>

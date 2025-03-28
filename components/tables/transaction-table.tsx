@@ -50,6 +50,9 @@ import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
 import * as XLSX from "xlsx";
+import { Agent } from "@/types/agent";
+import { Supplier } from "@/types/supplier";
+import { TransactionType } from "@/types/transactionType";
 
 interface ApiResponse {
   statusCode: number;
@@ -60,14 +63,19 @@ interface ApiResponse {
 }
 
 interface TransactionTableProps {
+  agentList?: Agent[];
+  supplierList?: Supplier[];
+  transactionTypeList?: TransactionType[];
   defaultSupplierId?: number;
   defaultAgentId?: number;
   defaultDateFrom?: Date;
   defaultDateTo?: Date;
 }
 
-
 const TransactionTable = ({
+  agentList,
+  supplierList,
+  transactionTypeList,
   defaultSupplierId,
   defaultAgentId,
   defaultDateFrom,
@@ -84,8 +92,12 @@ const TransactionTable = ({
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
-  const [supplierId, setSupplierId] = useState<string | undefined>(defaultSupplierId ? defaultSupplierId.toString() : undefined);
-  const [agentId, setAgentId] = useState<string | undefined>(defaultAgentId ? defaultAgentId.toString() : undefined);
+  const [supplierId, setSupplierId] = useState<string | undefined>(
+    defaultSupplierId ? defaultSupplierId.toString() : undefined,
+  );
+  const [agentId, setAgentId] = useState<string | undefined>(
+    defaultAgentId ? defaultAgentId.toString() : undefined,
+  );
   const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
   const [to, setTo] = useState<Date | undefined>(defaultDateTo);
   const queryParams = new URLSearchParams({
@@ -173,25 +185,65 @@ const TransactionTable = ({
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-4 items-center">
-        <Select onValueChange={(value) => setSupplierId(value)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select Supplier" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">Supplier 1</SelectItem>
-            <SelectItem value="2">Supplier 2</SelectItem>
-          </SelectContent>
-        </Select>
+        {supplierList && (
+          <Select
+            onValueChange={(value) => setSupplierId(value)}
+            defaultValue={supplierId}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Supplier" />
+            </SelectTrigger>
+            <SelectContent>
+              {supplierList?.length > 0 &&
+                supplierList?.map((supplier) => (
+                  <SelectItem key={supplier.id} value={supplier.id.toString()}>
+                    {supplier.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
 
-        <Select onValueChange={(value) => setAgentId(value)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select Agent" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">Agent 1</SelectItem>
-            <SelectItem value="2">Agent 2</SelectItem>
-          </SelectContent>
-        </Select>
+        {agentList && (
+          <Select
+            onValueChange={(value) => setAgentId(value)}
+            defaultValue={agentId}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Agent" />
+            </SelectTrigger>
+            <SelectContent>
+              {agentList?.length > 0 &&
+                agentList?.map((agent) => (
+                  <SelectItem key={agent.id} value={agent.id.toString()}>
+                    {agent.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {transactionTypeList && (
+          <Select
+            onValueChange={(value) => setAgentId(value)}
+            defaultValue={agentId}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Agent" />
+            </SelectTrigger>
+            <SelectContent>
+              {transactionTypeList?.length > 0 &&
+                transactionTypeList?.map((transactionType) => (
+                  <SelectItem
+                    key={transactionType.id}
+                    value={transactionType.id.toString()}
+                  >
+                    {transactionType.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Popover>
           <PopoverTrigger asChild>

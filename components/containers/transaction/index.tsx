@@ -88,7 +88,11 @@ const TransactionContainer = () => {
             <CardTitle>Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable />
+            <TransactionTable
+              agentList={agents}
+              supplierList={suppliers}
+              transactionTypeList={transactionTypes}
+            />
           </CardContent>
         </Card>
       </div>
