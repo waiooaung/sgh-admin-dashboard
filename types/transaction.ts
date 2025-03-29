@@ -29,6 +29,12 @@ export type Transaction = {
   supplierPaymentStatus: string;
   createdAt: string;
   updatedAt: string;
+  profits: profit[];
+};
+
+export type profit = {
+  currencyId: number;
+  rate: number;
 };
 
 export type TransactionFormData = {
@@ -43,6 +49,7 @@ export type TransactionFormData = {
   buyRate: number;
   sellRate: number;
   commissionRate: number;
+  profits: profit[];
 };
 
 export type UpdateTransaction = TransactionFormData & {

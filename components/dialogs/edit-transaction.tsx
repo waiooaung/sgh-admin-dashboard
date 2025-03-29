@@ -82,6 +82,11 @@ interface CurrencyApiResponse {
   data: Currency[];
 }
 
+const profitSchema = z.object({
+  currencyId: z.coerce.number(),
+  rate: z.coerce.number(),
+});
+
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   baseCurrencyId: z.coerce.number(),
@@ -94,6 +99,7 @@ const formSchema = z.object({
   transactionTypeId: z.coerce.number(),
   agentId: z.coerce.number(),
   supplierId: z.coerce.number(),
+  profits: z.array(profitSchema),
 });
 
 interface EditTransactionModalProps {
@@ -137,6 +143,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
       commissionRate: editTransaction?.commissionRate || 0,
       agentId: editTransaction?.agentId || 0,
       supplierId: editTransaction?.supplierId || 0,
+      profits: editTransaction?.profits || undefined,
     },
   });
 

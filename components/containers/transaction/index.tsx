@@ -12,6 +12,10 @@ import {
   TransactionTypeApiResponse,
 } from "@/types/transactionType";
 import { Currency, CurrencyApiResponse } from "@/types/currency";
+import {
+  ProfitDisplayCurrency,
+  ProfitDisplayCurrencyApiResponse,
+} from "@/types/profitDisplayCurrency";
 import { useAuth } from "@/context/authContext";
 import { toast } from "sonner";
 
@@ -62,8 +66,21 @@ const TransactionContainer = () => {
 
   const { data: currenciesData, error: currenciesError } =
     useSWR<CurrencyApiResponse>(`/currencies?tenantId=${tenantId}`, fetcher);
-  if (currenciesError) toast.error("Error fetching transaction types.");
+  if (currenciesError) toast.error("Error fetching currencies.");
   const currencies: Currency[] = currenciesData?.data || [];
+
+  const {
+    data: profitDisplayCurrenciesData,
+    error: profitDisplayCurrenciesError,
+  } = useSWR<ProfitDisplayCurrencyApiResponse>(
+    `/profit-display-currencies?tenantId=${tenantId}`,
+    fetcher,
+  );
+  if (profitDisplayCurrenciesError)
+    toast.error("Error fetching profit display currencies.");
+  const profitDisplayCurrencies: ProfitDisplayCurrency[] =
+    profitDisplayCurrenciesData?.data || [];
+
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
@@ -75,6 +92,7 @@ const TransactionContainer = () => {
           transactionTypes={transactionTypes}
           currencies={currencies}
           tenantId={tenantId}
+          profitDisplayCurrencies={profitDisplayCurrencies}
         />
       </div>
 

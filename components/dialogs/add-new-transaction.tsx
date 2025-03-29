@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
 import { Currency } from "@/types/currency";
+import { ProfitDisplayCurrency } from "@/types/profitDisplayCurrency";
 import { TransactionType } from "@/types/transactionType";
 
 interface AddNewTransactionProps {
@@ -48,8 +49,14 @@ interface AddNewTransactionProps {
   suppliers: Supplier[];
   transactionTypes: TransactionType[];
   currencies: Currency[];
+  profitDisplayCurrencies: ProfitDisplayCurrency[];
   tenantId: number | undefined;
 }
+
+const profitSchema = z.object({
+  currencyId: z.coerce.number(),
+  rate: z.coerce.number(),
+});
 
 // Zod Schema
 const formSchema = z.object({
@@ -64,6 +71,7 @@ const formSchema = z.object({
   transactionTypeId: z.coerce.number(),
   agentId: z.coerce.number(),
   supplierId: z.coerce.number(),
+  profits: z.array(profitSchema),
 });
 
 export function AddNewTransaction({
@@ -72,6 +80,7 @@ export function AddNewTransaction({
   suppliers,
   transactionTypes,
   currencies,
+  profitDisplayCurrencies,
   tenantId,
 }: AddNewTransactionProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -123,31 +132,97 @@ export function AddNewTransaction({
         transactionTypeId: undefined,
         agentId: undefined,
         supplierId: undefined,
+        profits: profitDisplayCurrencies.map((profit) => ({
+          currencyId: profit.currencyId,
+          rate: 0,
+        })),
       }),
-      [tenantId, exchangeRates, commissionRates],
+      [tenantId, exchangeRates, commissionRates, profitDisplayCurrencies],
     ),
   });
 
-  const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
-  const { quoteAmountBuy, quoteAmountSell, commission, profit, totalEarnings } =
-    useMemo(() => {
-      const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
-      const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
-      const commissionValue = quoteAmountSell * (commissionRate / 100);
-      const profitValue =
-        quoteAmountSell > 0 && quoteAmountBuy > 0
-          ? quoteAmountSell - quoteAmountBuy
-          : 0;
-      const totalEarnings = profitValue + commissionValue;
+  const { reset } = form;
 
+  useEffect(() => {
+    reset({
+      tenantId,
+      baseCurrencyId: undefined,
+      quoteCurrencyId: undefined,
+      transactionDate: new Date(),
+      baseAmount: 0,
+      buyRate: exchangeRates.buyRate,
+      sellRate: exchangeRates.sellRate,
+      commissionRate: commissionRates.rate,
+      transactionTypeId: undefined,
+      agentId: undefined,
+      supplierId: undefined,
+      profits: profitDisplayCurrencies.map((profit) => ({
+        currencyId: profit.currencyId,
+        rate: 0,
+      })),
+    });
+  }, [
+    tenantId,
+    exchangeRates,
+    commissionRates,
+    profitDisplayCurrencies,
+    reset,
+  ]);
+
+  const { fields } = useFieldArray({
+    control: form.control,
+    name: "profits",
+  });
+
+  const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
+  const profits = useWatch({ control: form.control, name: "profits", defaultValue: [] }); // Ensures stable reference
+
+  const {
+    quoteAmountBuy,
+    quoteAmountSell,
+    commission,
+    profit,
+    totalEarnings,
+    profitData,
+  } = useMemo(() => {
+    const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
+    const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
+    const commissionValue = quoteAmountSell * (commissionRate / 100);
+    const profitValue =
+      quoteAmountSell > 0 && quoteAmountBuy > 0
+        ? quoteAmountSell - quoteAmountBuy
+        : 0;
+    const totalEarnings = profitValue + commissionValue;
+  
+    const profitData = profits.map((profit) => {
+      const currency = profitDisplayCurrencies.find(
+        (c) => c.currencyId === profit.currencyId
+      );
+  
       return {
-        quoteAmountBuy: quoteAmountBuy,
-        quoteAmountSell: quoteAmountSell,
-        commission: commissionValue,
-        profit: profitValue,
-        totalEarnings: totalEarnings,
+        currencyId: profit.currencyId,
+        currencyName: currency ? currency.Currency.name : "Unknown",
+        currencySymbol: currency ? currency.Currency.symbol : "",
+        amount: totalEarnings * profit.rate,
       };
-    }, [baseAmount, buyRate, sellRate, commissionRate]);
+    });
+  
+    return {
+      quoteAmountBuy,
+      quoteAmountSell,
+      commission: commissionValue,
+      profit: profitValue,
+      totalEarnings,
+      profitData,
+    };
+  }, [
+    baseAmount,
+    buyRate,
+    sellRate,
+    commissionRate,
+    profits, // Now stable
+    profitDisplayCurrencies
+  ]);
 
   const { trigger } = useSWRMutation(
     `/transactions`,
@@ -215,6 +290,19 @@ export function AddNewTransaction({
                 <span>Total Earnings</span>
                 <span>{totalEarnings.toFixed(2)}</span>
               </div>
+              {profitData.map((data) => {
+                return (
+                  <div
+                    key={data.currencyId}
+                    className="flex justify-between text-xl font-bold"
+                  >
+                    <span>
+                      Profit In {data.currencyName} ({data.currencySymbol})
+                    </span>
+                    <span>{data.amount.toFixed(2)}</span>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
           <Form {...form}>
@@ -444,6 +532,34 @@ export function AddNewTransaction({
                   </FormItem>
                 )}
               />
+
+              <label className="font-semibold">Profit Rates</label>
+              {fields.map((field, index) => {
+                const currency = profitDisplayCurrencies.find(
+                  (profit) =>
+                    profit.Currency.id ===
+                    form.watch(`profits.${index}.currencyId`),
+                );
+
+                return (
+                  <div key={field.id} className="flex gap-2 items-center">
+                    {/* Currency Display (Single Line) */}
+                    <span className="font-medium whitespace-nowrap">
+                      {currency
+                        ? `${currency.Currency.name} (${currency.Currency.symbol})`
+                        : "N/A"}
+                    </span>
+
+                    {/* Rate Input (Read-Only) */}
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Rate"
+                      {...form.register(`profits.${index}.rate`)}
+                    />
+                  </div>
+                );
+              })}
 
               <DialogFooter className="mt-4">
                 <Button type="submit">Save</Button>
