@@ -355,6 +355,18 @@ const TransactionTable = ({
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
+                  {transaction.TransactionProfit?.map((profit) => {
+                    return (
+                      <>
+                        <br></br>
+                        <span key={profit.id} className="text-blue-500">
+                          <span className="text-blue-500">
+                            {profit.profitAmount}({profit.Currency.symbol})
+                          </span>
+                        </span>
+                      </>
+                    );
+                  })}
                 </TableCell>
                 <TableCell className="truncate">
                   <DropdownMenu>

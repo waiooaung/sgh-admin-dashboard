@@ -175,7 +175,11 @@ export function AddNewTransaction({
   });
 
   const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
-  const profits = useWatch({ control: form.control, name: "profits", defaultValue: [] }); // Ensures stable reference
+  const profits = useWatch({
+    control: form.control,
+    name: "profits",
+    defaultValue: [],
+  }); // Ensures stable reference
 
   const {
     quoteAmountBuy,
@@ -193,12 +197,12 @@ export function AddNewTransaction({
         ? quoteAmountSell - quoteAmountBuy
         : 0;
     const totalEarnings = profitValue + commissionValue;
-  
+
     const profitData = profits.map((profit) => {
       const currency = profitDisplayCurrencies.find(
-        (c) => c.currencyId === profit.currencyId
+        (c) => c.currencyId === profit.currencyId,
       );
-  
+
       return {
         currencyId: profit.currencyId,
         currencyName: currency ? currency.Currency.name : "Unknown",
@@ -206,7 +210,7 @@ export function AddNewTransaction({
         amount: totalEarnings * profit.rate,
       };
     });
-  
+
     return {
       quoteAmountBuy,
       quoteAmountSell,
@@ -221,7 +225,7 @@ export function AddNewTransaction({
     sellRate,
     commissionRate,
     profits, // Now stable
-    profitDisplayCurrencies
+    profitDisplayCurrencies,
   ]);
 
   const { trigger } = useSWRMutation(

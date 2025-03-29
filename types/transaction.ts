@@ -1,6 +1,19 @@
 import { Supplier } from "./supplier";
 import { Agent } from "./agent";
 import { Currency } from "./currency";
+
+export type TransactionProfit = {
+  id: number;
+  tenantId: number;
+  transactionId: number;
+  currencyId: number;
+  Currency: Currency;
+  rate: number;
+  profitAmount: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type Transaction = {
   id: number;
   tenantId: number;
@@ -29,10 +42,11 @@ export type Transaction = {
   supplierPaymentStatus: string;
   createdAt: string;
   updatedAt: string;
-  profits: profit[];
+  TransactionProfit: TransactionProfit[];
 };
 
 export type profit = {
+  id: number;
   currencyId: number;
   rate: number;
 };
