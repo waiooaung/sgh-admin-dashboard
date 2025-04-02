@@ -46,7 +46,6 @@ export type Transaction = {
 };
 
 export type profit = {
-  id: number;
   currencyId: number;
   rate: number;
 };
