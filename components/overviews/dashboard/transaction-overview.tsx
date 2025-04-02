@@ -31,7 +31,7 @@ interface ApiResponse {
 
 const DashboardTransactionOverview = () => {
   const { user } = useAuth();
-  const tenantId = user?.tenantId || 0;
+  const tenantId = user?.tenantId || undefined;
   const { data, error } = useSWR<ApiResponse>(
     `/dashboard/transaction-statistics?tenantId=${tenantId}`,
     fetcher,

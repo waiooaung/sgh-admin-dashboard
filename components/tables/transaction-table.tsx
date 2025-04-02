@@ -357,14 +357,9 @@ const TransactionTable = ({
                   {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
                   {transaction.TransactionProfit?.map((profit) => {
                     return (
-                      <>
-                        <br></br>
-                        <span key={profit.id} className="text-blue-500">
-                          <span className="text-blue-500">
-                            {profit.profitAmount}({profit.Currency.symbol})
-                          </span>
-                        </span>
-                      </>
+                      <p className="text-blue-500" key={profit.id}>
+                        {profit.profitAmount}({profit.Currency.symbol})
+                      </p>
                     );
                   })}
                 </TableCell>

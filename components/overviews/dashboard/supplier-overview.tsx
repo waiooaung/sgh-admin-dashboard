@@ -11,7 +11,6 @@ import { useAuth } from "@/context/authContext";
 
 interface Data {
   suppliersCount: number;
-  totalAmountToPay: number;
 }
 
 interface ApiResponse {
@@ -28,7 +27,7 @@ const DashboardSupplierOverview = () => {
     `/dashboard/supplier-statistics?tenantId=${tenantId}`,
     fetcher,
   );
-  const { suppliersCount = 0, totalAmountToPay = 0 } = data?.data || {};
+  const { suppliersCount = 0 } = data?.data || {};
 
   useEffect(() => {
     if (error) {
@@ -48,21 +47,6 @@ const DashboardSupplierOverview = () => {
           <Link href="/dashboard/suppliers">
             <div className="text-xl font-bold text-orange-500 truncate">
               {new Intl.NumberFormat("en-US").format(suppliersCount)}
-            </div>
-          </Link>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium truncate">
-            Amount to Pay (USD)
-          </CardTitle>
-          <Upload className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <Link href="/dashboard/suppliers">
-            <div className="text-xl font-bold text-orange-500 truncate">
-              ${new Intl.NumberFormat("en-US").format(totalAmountToPay)}
             </div>
           </Link>
         </CardContent>
