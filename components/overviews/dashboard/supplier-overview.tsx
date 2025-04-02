@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Handshake, Upload } from "lucide-react";
+import { Handshake } from "lucide-react";
 import Link from "next/link";
 
 import useSWR from "swr";
