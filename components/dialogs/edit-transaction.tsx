@@ -143,7 +143,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
       commissionRate: editTransaction?.commissionRate || 0,
       agentId: editTransaction?.agentId || 0,
       supplierId: editTransaction?.supplierId || 0,
-      profits: editTransaction?.profits || undefined,
+      profits: editTransaction?.TransactionProfit || undefined,
     },
   });
 
