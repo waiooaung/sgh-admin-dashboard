@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
@@ -121,12 +121,6 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     transaction,
   );
 
-  useEffect(() => {
-    if (open && transaction) {
-      setEditTransaction(transaction);
-    }
-  }, [open, transaction]);
-
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -147,6 +141,43 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (open && transaction) {
+      setEditTransaction(transaction);
+      form.reset({
+        tenantId: transaction.tenantId,
+        baseCurrencyId: transaction.baseCurrencyId,
+        quoteCurrencyId: transaction.quoteCurrencyId,
+        transactionTypeId: transaction.transactionTypeId || undefined,
+        transactionDate: transaction.transactionDate
+          ? new Date(transaction.transactionDate)
+          : undefined,
+        baseAmount: transaction.baseAmount || 0,
+        buyRate: transaction.buyRate || 0,
+        sellRate: transaction.sellRate || 0,
+        commissionRate: transaction.commissionRate || 0,
+        agentId: transaction.agentId || 0,
+        supplierId: transaction.supplierId || 0,
+        profits: transaction.TransactionProfit || undefined,
+      });
+    }
+  }, [open, transaction, form]);
+
+  const { fields } = useFieldArray({
+    control: form.control,
+    name: "profits",
+  });
+
+  const transactionProfit = editTransaction?.TransactionProfit || [];
+  const profitDisplayCurrencies = transactionProfit.map(
+    (data) => data.Currency,
+  );
+  const profits = useWatch({
+    control: form.control,
+    name: "profits",
+    defaultValue: editTransaction?.TransactionProfit,
+  });
+
   const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
   const {
     quoteAmountBuy,
@@ -154,6 +185,7 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
     commission,
     profit,
     totalEarningsUSD,
+    profitData,
   } = useMemo(() => {
     const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
     const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
@@ -164,14 +196,35 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
         : 0;
     const totalEarnings = profitValue + commissionValue;
 
+    const profitData = profits.map((profit) => {
+      const currency = profitDisplayCurrencies.find(
+        (c) => c.id === profit.currencyId,
+      );
+
+      return {
+        currencyId: profit.currencyId,
+        currencyName: currency ? currency.name : "Unknown",
+        currencySymbol: currency ? currency.symbol : "",
+        amount: totalEarnings * profit.rate,
+      };
+    });
+
     return {
       quoteAmountBuy: quoteAmountBuy,
       quoteAmountSell: quoteAmountSell,
       commission: commissionValue,
       profit: profitValue,
       totalEarningsUSD: totalEarnings,
+      profitData,
     };
-  }, [baseAmount, buyRate, sellRate, commissionRate]);
+  }, [
+    baseAmount,
+    buyRate,
+    sellRate,
+    commissionRate,
+    profits,
+    profitDisplayCurrencies,
+  ]);
 
   const { trigger } = useSWRMutation(
     `/transactions/${editTransaction?.id}`,
@@ -273,6 +326,19 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
                 <span>Total Earnings</span>
                 <span>{totalEarningsUSD.toFixed(2)}</span>
               </div>
+              {profitData.map((data) => {
+                return (
+                  <div
+                    key={data.currencyId}
+                    className="flex justify-between text-xl font-bold"
+                  >
+                    <span>
+                      Profit In {data.currencyName} ({data.currencySymbol})
+                    </span>
+                    <span>{data.amount.toFixed(2)}</span>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
           <Form {...form}>
@@ -567,8 +633,35 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
                   </FormItem>
                 )}
               />
+
+              <label className="font-semibold">Profit Rates</label>
+              {fields.map((field, index) => {
+                const currency = profitDisplayCurrencies.find(
+                  (profit) =>
+                    profit.id === form.watch(`profits.${index}.currencyId`),
+                );
+
+                return (
+                  <div key={field.id} className="flex gap-2 items-center">
+                    {/* Currency Display (Single Line) */}
+                    <span className="font-medium whitespace-nowrap">
+                      {currency
+                        ? `${currency.name} (${currency.symbol})`
+                        : "N/A"}
+                    </span>
+
+                    {/* Rate Input (Read-Only) */}
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Rate"
+                      {...form.register(`profits.${index}.rate`)}
+                    />
+                  </div>
+                );
+              })}
               <DialogFooter>
-                <Button variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" onClick={onClose}>
                   Cancel
                 </Button>
                 <Button type="submit">Save</Button>

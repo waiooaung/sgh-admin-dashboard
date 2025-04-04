@@ -179,7 +179,7 @@ export function AddNewTransaction({
     control: form.control,
     name: "profits",
     defaultValue: [],
-  }); // Ensures stable reference
+  });
 
   const {
     quoteAmountBuy,
@@ -224,7 +224,7 @@ export function AddNewTransaction({
     buyRate,
     sellRate,
     commissionRate,
-    profits, // Now stable
+    profits,
     profitDisplayCurrencies,
   ]);
 

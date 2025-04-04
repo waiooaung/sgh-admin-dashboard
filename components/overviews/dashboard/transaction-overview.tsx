@@ -52,11 +52,11 @@ const DashboardTransactionOverview = () => {
         <Card>
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xs font-medium">
+              <CardTitle className="text-sm font-medium">
                 {stats.baseCurrency.name} - {stats.quoteCurrency.name}
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">Total Transactions</p>
+            <p className="text-sm text-muted-foreground">Total Transactions</p>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard/transactions">
