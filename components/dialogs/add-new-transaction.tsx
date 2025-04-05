@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -31,9 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import fetcher from "@/lib/fetcher";
 import axiosInstance from "@/lib/axios-instance";
 import { TransactionFormData } from "@/types/transaction";
 import { toast } from "sonner";
@@ -64,10 +62,11 @@ const formSchema = z.object({
   baseCurrencyId: z.coerce.number(),
   quoteCurrencyId: z.coerce.number(),
   transactionDate: z.date(),
-  baseAmount: z.coerce.number(),
-  buyRate: z.coerce.number(),
-  sellRate: z.coerce.number(),
-  commissionRate: z.coerce.number(),
+  baseAmount: z.coerce.number().gt(0, "Amount must be greater than 0"),
+  buyRate: z.coerce.number().gt(0, "Buy rate must be greater than 0"),
+  sellRate: z.coerce.number().gt(0, "Sell rate must be greater than 0"),
+  commissionRate: z.coerce.number().min(0, "Cannot be negative"),
+  transactionType: z.string(),
   transactionTypeId: z.coerce.number(),
   agentId: z.coerce.number(),
   supplierId: z.coerce.number(),
@@ -80,153 +79,126 @@ export function AddNewTransaction({
   suppliers,
   transactionTypes,
   currencies,
-  profitDisplayCurrencies,
   tenantId,
 }: AddNewTransactionProps) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const { data: exchangeRateData, error: exchangeRateError } = useSWR(
-    "/exchange-rates/latest?tenantId=" + tenantId,
-    fetcher,
+  const [baseCurrency, setBaseCurrency] = useState<Currency | undefined>(
+    undefined,
   );
-
-  if (exchangeRateError) toast.error("Exchange rate error.");
-
-  const exchangeRates = useMemo(() => {
-    return (
-      exchangeRateData?.data || {
-        baseCurrency: "USD",
-        quoteCurrency: "RMB",
-        buyRate: 0,
-        sellRate: 0,
-      }
-    );
-  }, [exchangeRateData]);
-
-  const { data: commissionRateData, error: commissionRateError } = useSWR(
-    "/commission-rates/common-rate?tenantId=" + tenantId,
-    fetcher,
+  const [quoteCurrency, setQuoteCurrency] = useState<Currency | undefined>(
+    undefined,
   );
-  if (commissionRateError) toast.error("Commission rate error.");
-  const commissionRates = useMemo(() => {
-    return (
-      commissionRateData?.data || {
-        supplierId: null,
-        rate: 0,
-      }
-    );
-  }, [commissionRateData]);
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: useMemo(
-      () => ({
-        tenantId,
-        baseCurrencyId: undefined,
-        quoteCurrencyId: undefined,
-        transactionDate: new Date(),
-        baseAmount: 0,
-        buyRate: exchangeRates.buyRate,
-        sellRate: exchangeRates.sellRate,
-        commissionRate: commissionRates.rate,
-        transactionTypeId: undefined,
-        agentId: undefined,
-        supplierId: undefined,
-        profits: profitDisplayCurrencies.map((profit) => ({
-          currencyId: profit.currencyId,
-          rate: 0,
-        })),
-      }),
-      [tenantId, exchangeRates, commissionRates, profitDisplayCurrencies],
-    ),
-  });
-
-  const { reset } = form;
-
-  useEffect(() => {
-    reset({
+    defaultValues: {
       tenantId,
       baseCurrencyId: undefined,
       quoteCurrencyId: undefined,
       transactionDate: new Date(),
-      baseAmount: 0,
-      buyRate: exchangeRates.buyRate,
-      sellRate: exchangeRates.sellRate,
-      commissionRate: commissionRates.rate,
+      baseAmount: undefined,
+      buyRate: undefined,
+      sellRate: undefined,
+      commissionRate: 0,
+      transactionType: "RMB",
       transactionTypeId: undefined,
       agentId: undefined,
       supplierId: undefined,
-      profits: profitDisplayCurrencies.map((profit) => ({
-        currencyId: profit.currencyId,
-        rate: 0,
-      })),
-    });
-  }, [
-    tenantId,
-    exchangeRates,
-    commissionRates,
-    profitDisplayCurrencies,
-    reset,
-  ]);
-
-  const { fields } = useFieldArray({
-    control: form.control,
-    name: "profits",
+      profits: [],
+    },
   });
 
-  const { baseAmount, buyRate, sellRate, commissionRate } = form.watch();
-  const profits = useWatch({
-    control: form.control,
-    name: "profits",
-    defaultValue: [],
-  });
+  const { transactionType, baseAmount, buyRate, sellRate, commissionRate } =
+    form.watch();
 
-  const {
-    quoteAmountBuy,
-    quoteAmountSell,
-    commission,
-    profit,
-    totalEarnings,
-    profitData,
-  } = useMemo(() => {
-    const quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
-    const quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
-    const commissionValue = quoteAmountSell * (commissionRate / 100);
-    const profitValue =
-      quoteAmountSell > 0 && quoteAmountBuy > 0
-        ? quoteAmountSell - quoteAmountBuy
-        : 0;
-    const totalEarnings = profitValue + commissionValue;
+  useEffect(() => {
+    if (currencies.length === 0) return;
 
-    const profitData = profits.map((profit) => {
-      const currency = profitDisplayCurrencies.find(
-        (c) => c.currencyId === profit.currencyId,
-      );
+    let newBase: Currency | undefined;
+    let newQuote: Currency | undefined;
+
+    if (transactionType === "RMB") {
+      newBase = currencies.find((c) => c.name === "RMB");
+      newQuote = currencies.find((c) => c.name === "USD");
+
+      const usd = currencies.find((c) => c.name === "USD");
+      const aed = currencies.find((c) => c.name === "AED");
+
+      const newProfits = [
+        {
+          currencyId: usd?.id ?? 0,
+          rate: 1,
+        },
+        {
+          currencyId: aed?.id ?? 0,
+          rate: 3.67,
+        },
+      ];
+      form.setValue("baseCurrencyId", newBase?.id ?? 0);
+      form.setValue("quoteCurrencyId", newQuote?.id ?? 0);
+      form.setValue("profits", newProfits);
+    } else if (transactionType === "USDT") {
+      newBase = currencies.find((c) => c.name === "USDT");
+      newQuote = currencies.find((c) => c.name === "AED");
+
+      const usd = currencies.find((c) => c.name === "USD");
+      const aed = currencies.find((c) => c.name === "AED");
+
+      const newProfits = [
+        {
+          currencyId: usd?.id ?? 0,
+          rate: 0.27,
+        },
+        {
+          currencyId: aed?.id ?? 0,
+          rate: 1,
+        },
+      ];
+      form.setValue("profits", newProfits);
+      form.setValue("baseCurrencyId", newBase?.id ?? 0);
+      form.setValue("quoteCurrencyId", newQuote?.id ?? 0);
+    }
+
+    const selectedType = transactionTypes.find(
+      (type) => type.name === transactionType,
+    );
+    form.setValue("transactionTypeId", selectedType?.id ?? 0);
+
+    setBaseCurrency(newBase);
+    setQuoteCurrency(newQuote);
+  }, [transactionType, currencies, form, transactionTypes]);
+
+  const { quoteAmountBuy, quoteAmountSell, commission, profit, totalEarnings } =
+    useMemo(() => {
+      let quoteAmountBuy = 0;
+      let quoteAmountSell = 0;
+      let commissionValue = 0;
+      let profitValue = 0;
+      let totalEarnings = 0;
+
+      if (transactionType === "RMB") {
+        quoteAmountBuy = buyRate > 0 ? baseAmount / buyRate : 0;
+        quoteAmountSell = sellRate > 0 ? baseAmount / sellRate : 0;
+      } else if (transactionType === "USDT") {
+        quoteAmountBuy = buyRate > 0 ? baseAmount * buyRate : 0;
+        quoteAmountSell = sellRate > 0 ? baseAmount * sellRate : 0;
+      }
+
+      commissionValue = quoteAmountSell * (commissionRate / 100);
+      profitValue =
+        quoteAmountSell > 0 && quoteAmountBuy > 0
+          ? quoteAmountSell - quoteAmountBuy
+          : 0;
+      totalEarnings = profitValue + commissionValue;
 
       return {
-        currencyId: profit.currencyId,
-        currencyName: currency ? currency.Currency.name : "Unknown",
-        currencySymbol: currency ? currency.Currency.symbol : "",
-        amount: totalEarnings * profit.rate,
+        quoteAmountBuy,
+        quoteAmountSell,
+        commission: commissionValue,
+        profit: profitValue,
+        totalEarnings,
       };
-    });
-
-    return {
-      quoteAmountBuy,
-      quoteAmountSell,
-      commission: commissionValue,
-      profit: profitValue,
-      totalEarnings,
-      profitData,
-    };
-  }, [
-    baseAmount,
-    buyRate,
-    sellRate,
-    commissionRate,
-    profits,
-    profitDisplayCurrencies,
-  ]);
+    }, [transactionType, baseAmount, buyRate, sellRate, commissionRate]);
 
   const { trigger } = useSWRMutation(
     `/transactions`,
@@ -249,15 +221,40 @@ export function AddNewTransaction({
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && currencies.length > 0) {
+      const defaultBase = currencies.find((c) => c.name === "RMB");
+      const defaultQuote = currencies.find((c) => c.name === "USD");
+
+      setBaseCurrency(defaultBase);
+      setQuoteCurrency(defaultQuote);
+
       form.reset({
-        ...form.getValues(),
-        buyRate: exchangeRates.buyRate,
-        sellRate: exchangeRates.sellRate,
-        commissionRate: commissionRates.rate,
+        tenantId,
+        baseCurrencyId: defaultBase?.id ?? 0,
+        quoteCurrencyId: defaultQuote?.id ?? 0,
+        transactionDate: new Date(),
+        baseAmount: 0,
+        buyRate: 0,
+        sellRate: 0,
+        commissionRate: 0,
+        transactionType: "RMB",
+        transactionTypeId:
+          transactionTypes.find((t) => t.name === "RMB")?.id ?? 0,
+        agentId: undefined,
+        supplierId: undefined,
+        profits: [
+          {
+            currencyId: currencies.find((c) => c.name === "USD")?.id ?? 0,
+            rate: 1,
+          },
+          {
+            currencyId: currencies.find((c) => c.name === "AED")?.id ?? 0,
+            rate: 3.67,
+          },
+        ],
       });
     }
-  }, [exchangeRates, commissionRates, isOpen, form]);
+  }, [isOpen, tenantId, currencies, form, transactionTypes]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -276,37 +273,34 @@ export function AddNewTransaction({
             <CardContent className="grid gap-2">
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Amount To (Buy)</span>
-                <span>{quoteAmountBuy.toFixed(2)}</span>
+                <span>
+                  {quoteCurrency?.symbol} {quoteAmountBuy.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="font-semibold">Amount To (Sell)</span>
-                <span>{quoteAmountSell.toFixed(2)}</span>
+                <span>
+                  {quoteCurrency?.symbol} {quoteAmountSell.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
-                <span className="font-semibold">Commission</span>
-                <span>{commission.toFixed(2)}</span>
+                <span className="font-semibold">Commission Profit</span>
+                <span>
+                  {quoteCurrency?.symbol} {commission.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
-                <span className="font-semibold">Profit</span>
-                <span>{profit.toFixed(2)}</span>
+                <span className="font-semibold">Exchange Profit</span>
+                <span>
+                  {quoteCurrency?.symbol} {profit.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between text-xl font-bold">
                 <span>Total Earnings</span>
-                <span>{totalEarnings.toFixed(2)}</span>
+                <span>
+                  {quoteCurrency?.symbol} {totalEarnings.toFixed(2)}
+                </span>
               </div>
-              {profitData.map((data) => {
-                return (
-                  <div
-                    key={data.currencyId}
-                    className="flex justify-between text-xl font-bold"
-                  >
-                    <span>
-                      Profit In {data.currencyName} ({data.currencySymbol})
-                    </span>
-                    <span>{data.amount.toFixed(2)}</span>
-                  </div>
-                );
-              })}
             </CardContent>
           </Card>
           <Form {...form}>
@@ -314,65 +308,22 @@ export function AddNewTransaction({
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
-              {/* Base Currency */}
+              {/* Transaction Type */}
               <FormField
                 control={form.control}
-                name="baseCurrencyId"
+                name="transactionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Currency ( From )</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <FormLabel>Transaction Type</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Currency from..." />
+                          <SelectValue placeholder="Select Transaction Type..." />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {currencies.length > 0 ? (
-                          currencies.map((currency) => (
-                            <SelectItem
-                              key={currency.id}
-                              value={currency.id.toString()}
-                            >
-                              {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <h1>Data not found.</h1>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Quote Currency */}
-              <FormField
-                control={form.control}
-                name="quoteCurrencyId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency (To)</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Currency To..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {currencies.length > 0 ? (
-                          currencies.map((currency) => (
-                            <SelectItem
-                              key={currency.id}
-                              value={currency.id.toString()}
-                            >
-                              {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <h1>Data not found.</h1>
-                        )}
+                        <SelectItem value="RMB">RMB</SelectItem>
+                        <SelectItem value="USDT">USDT</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -386,7 +337,7 @@ export function AddNewTransaction({
                 name="baseAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount</FormLabel>
+                    <FormLabel>Amount ({baseCurrency?.symbol})</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -433,39 +384,6 @@ export function AddNewTransaction({
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Transaction Type */}
-              <FormField
-                control={form.control}
-                name="transactionTypeId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Type</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Transaction Type..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {transactionTypes.length > 0 ? (
-                          transactionTypes.map((transactionType) => (
-                            <SelectItem
-                              key={transactionType.id}
-                              value={transactionType.id.toString()}
-                            >
-                              {transactionType.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <h1>Data not found.</h1>
-                        )}
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -536,34 +454,6 @@ export function AddNewTransaction({
                   </FormItem>
                 )}
               />
-
-              <label className="font-semibold">Profit Rates</label>
-              {fields.map((field, index) => {
-                const currency = profitDisplayCurrencies.find(
-                  (profit) =>
-                    profit.Currency.id ===
-                    form.watch(`profits.${index}.currencyId`),
-                );
-
-                return (
-                  <div key={field.id} className="flex gap-2 items-center">
-                    {/* Currency Display (Single Line) */}
-                    <span className="font-medium whitespace-nowrap">
-                      {currency
-                        ? `${currency.Currency.name} (${currency.Currency.symbol})`
-                        : "N/A"}
-                    </span>
-
-                    {/* Rate Input (Read-Only) */}
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Rate"
-                      {...form.register(`profits.${index}.rate`)}
-                    />
-                  </div>
-                );
-              })}
 
               <DialogFooter className="mt-4">
                 <Button type="submit">Save</Button>

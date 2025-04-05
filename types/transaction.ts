@@ -52,6 +52,7 @@ export type profit = {
 
 export type TransactionFormData = {
   tenantId: number;
+  transactionType: string;
   transactionTypeId: number;
   baseCurrencyId: number;
   quoteCurrencyId: number;
