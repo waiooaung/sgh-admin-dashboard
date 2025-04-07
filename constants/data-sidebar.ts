@@ -71,11 +71,11 @@ export const data = {
       icon: FileCogIcon,
       items: [],
     },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings2,
-      items: [],
-    },
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings",
+    //   icon: Settings2,
+    //   items: [],
+    // },
   ],
 };

@@ -1,22 +1,21 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { ExchangeRateForm } from "@/components/forms/exchange-rate-form";
 import { CommissionRateForm } from "@/components/forms/commission-rate-form";
-import TransactionTypeTable from "@/components/tables/transaction-type-table";
-import { AddTransactionType } from "@/components/dialogs/add-transaction-type";
-import { mutate } from "swr";
+// import TransactionTypeTable from "@/components/tables/transaction-type-table";
+// import { AddTransactionType } from "@/components/dialogs/add-transaction-type";
+// import { mutate } from "swr";
 
 export default function ConfigsContainer() {
-  const handleSubmit = async () => {
-    console.log("handleSubmit");
-    await mutate(
-      (key) => typeof key === "string" && key.startsWith("/transaction-types"),
-      undefined,
-      { revalidate: true },
-    );
-  };
+  // const handleSubmit = async () => {
+  //   await mutate(
+  //     (key) => typeof key === "string" && key.startsWith("/transaction-types"),
+  //     undefined,
+  //     { revalidate: true },
+  //   );
+  // };
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
@@ -28,7 +27,7 @@ export default function ConfigsContainer() {
         <CommissionRateForm />
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      {/* <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Transaction Types</CardTitle>
@@ -38,7 +37,7 @@ export default function ConfigsContainer() {
             <TransactionTypeTable />
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }
