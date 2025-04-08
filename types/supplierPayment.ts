@@ -1,10 +1,13 @@
+import { Currency } from "./currency";
 import { Supplier } from "./supplier";
-import { SupplierTransaction } from "./supplierTransaction";
+import { Transaction } from "./transaction";
 export type SupplierPayment = {
   id: number;
-  amountPaidUSD: number;
+  amountPaid: number;
   supplierId: number;
   Supplier: Supplier;
+  currencyId: number;
+  Currency: Currency;
   paymentType: string;
   appliedTransactions?: SupplierPaymentTransaction[];
   createdAt: Date;
@@ -14,7 +17,8 @@ export type SupplierPayment = {
 export type SupplierPaymentFormData = {
   tenantId: number;
   supplierId: number;
-  amountPaidUSD: number;
+  currencyId: number;
+  amountPaid: number;
   paymentType: string;
 };
 
@@ -24,5 +28,5 @@ export type SupplierPaymentTransaction = {
   amountApplied: number;
   createdAt: Date;
   updatedAt: Date;
-  SupplierTransaction: SupplierTransaction;
+  SupplierTransaction: Transaction;
 };

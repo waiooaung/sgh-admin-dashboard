@@ -87,7 +87,7 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== "undefined" && supplierPayment) {
       localStorage.setItem("supplierPayment", JSON.stringify(supplierPayment));
     }
-  }, [transaction, supplier, agent, agentPayment]);
+  }, [transaction, supplier, agent, agentPayment, supplierPayment]);
 
   return (
     <DataContext.Provider

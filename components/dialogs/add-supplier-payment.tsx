@@ -31,34 +31,24 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import fetcher from "@/lib/fetcher";
 import axiosInstance from "@/lib/axios-instance";
 import { SupplierPaymentFormData } from "@/types/supplierPayment";
 import { toast } from "sonner";
-import { Supplier } from "@/types/supplier";
-import { MetaData } from "@/types/meta-data";
 import { useAuth } from "@/context/authContext";
+import { useSuppliers } from "@/hooks/useSuppliers";
+import { useCurrencies } from "@/hooks/useCurrencies";
 
 interface AddSupplierPaymentProps {
   onSuccess: () => void;
-}
-
-interface SupplierApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Supplier[];
-  meta: MetaData;
-  overview: null;
 }
 
 // Zod Schema
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   supplierId: z.coerce.number(),
-  amountPaidUSD: z.coerce.number(),
+  currencyId: z.coerce.number(),
+  amountPaid: z.coerce.number(),
   paymentType: z.string().min(5),
 });
 
@@ -73,7 +63,8 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
     defaultValues: {
       tenantId,
       supplierId: undefined,
-      amountPaidUSD: 0,
+      currencyId: undefined,
+      amountPaid: 0,
       paymentType: "",
     },
   });
@@ -85,23 +76,14 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
     },
   );
 
-  const {
-    data: supplierData,
-    isLoading: isLoadingSupplierData,
-    error: supplierDataError,
-  } = useSWR<SupplierApiResponse>(
-    `/suppliers?limit=100&tenantId=${tenantId}`,
-    fetcher,
-  );
-
-  if (supplierDataError) toast.error("Error fetching suppliers.");
-  const suppliers: Supplier[] = supplierData?.data || [];
+  const { suppliers } = useSuppliers(tenantId);
+  const { currencies } = useCurrencies(tenantId);
 
   const handleSubmit = async (values: SupplierPaymentFormData) => {
-    if (loading) return; // Prevent multiple submissions
+    if (loading) return;
 
     try {
-      setLoading(true); // Set loading to true
+      setLoading(true);
       await trigger(values);
       toast.success("Payment added successfully!");
       onSuccess();
@@ -144,33 +126,59 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {isLoadingSupplierData ? (
-                          <h1>Loading...</h1>
-                        ) : suppliers.length > 0 ? (
-                          suppliers.map((suppliers) => (
+                        {suppliers.length > 0 &&
+                          suppliers.map((supplier) => (
                             <SelectItem
-                              key={suppliers.id}
-                              value={suppliers.id.toString()}
+                              key={supplier.id}
+                              value={supplier.id.toString()}
                             >
-                              {suppliers.name}
+                              {supplier.name}
                             </SelectItem>
-                          ))
-                        ) : (
-                          <h1>No suppliers found</h1>
-                        )}
+                          ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Currencies */}
+              <FormField
+                control={form.control}
+                name="currencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {currencies.length > 0 &&
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Commission Rate */}
               <FormField
                 control={form.control}
-                name="amountPaidUSD"
+                name="amountPaid"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Paid Amount ( USD )</FormLabel>
+                    <FormLabel>Paid Amount</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

@@ -1,10 +1,13 @@
 import { Agent } from "./agent";
-import { AgentTransaction } from "./agentTransaction";
+import { Currency } from "./currency";
+import { Transaction } from "./transaction";
 export type AgentPayment = {
   id: number;
-  amountPaidUSD: number;
+  amountPaid: number;
   agentId: number;
   Agent: Agent;
+  currencyId: number;
+  Currency: Currency;
   paymentType: string;
   appliedTransactions?: AgentPaymentTransaction[];
   createdAt: Date;
@@ -14,7 +17,8 @@ export type AgentPayment = {
 export type AgentPaymentFormData = {
   tenantId: number;
   agentId: number;
-  amountPaidUSD: number;
+  currencyId: number;
+  amountPaid: number;
   paymentType: string;
 };
 
@@ -24,5 +28,5 @@ export type AgentPaymentTransaction = {
   amountApplied: number;
   createdAt: Date;
   updatedAt: Date;
-  AgentTransaction: AgentTransaction;
+  AgentTransaction: Transaction;
 };

@@ -24,6 +24,7 @@ const AgentDetailContainer = () => {
   }
   const agent = agentPayment.Agent;
   const appliedTransactions = agentPayment.appliedTransactions;
+  const currency = agentPayment.Currency;
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
@@ -45,8 +46,9 @@ const AgentDetailContainer = () => {
                 {new Date(agentPayment.createdAt).toLocaleString()}
               </p>
               <p>
-                <strong>Amount (RMB):</strong> ¥
-                {agentPayment.amountPaidUSD.toLocaleString()}
+                <strong>Paid Amount ({currency.name}): </strong>
+                {currency.symbol}
+                {agentPayment.amountPaid.toFixed(2)}
               </p>
               <p>
                 <strong>Payment Type:</strong>{" "}
@@ -111,7 +113,7 @@ const AgentDetailContainer = () => {
                     Transaction Status
                   </TableHead>
                   <TableHead className="text-left truncate">
-                    Amount Applied ( USD )
+                    Amount Applied ({currency.name})
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -122,13 +124,14 @@ const AgentDetailContainer = () => {
                     className="hover:bg-blend-color transition-colors"
                   >
                     <TableCell className="w-15 truncate">
-                      TNX-{transaction.AgentTransaction.transactionId}
+                      TNX-{transaction.transactionId}
                     </TableCell>
                     <TableCell className="truncate">
-                      {transaction.AgentTransaction.status}
+                      {transaction.AgentTransaction.agentPaymentStatus}
                     </TableCell>
                     <TableCell className="truncate">
-                      $ {transaction.amountApplied}
+                      {currency.symbol}
+                      {transaction.amountApplied}
                     </TableCell>
                   </TableRow>
                 ))}

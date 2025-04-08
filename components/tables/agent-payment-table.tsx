@@ -106,9 +106,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
         <TableHeader className="text-sm font-semibold">
           <TableRow>
             <TableHead className="text-left truncate">Agent</TableHead>
-            <TableHead className="text-left truncate">
-              Amount Paid (USD)
-            </TableHead>
+            <TableHead className="text-left truncate">Amount Paid</TableHead>
             <TableHead className="text-left truncate">Payment Type</TableHead>
             <TableHead className="text-left truncate">Payment Date</TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
@@ -136,7 +134,8 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                     </a>
                   </TableCell>
                   <TableCell className="truncate">
-                    $ {data.amountPaidUSD.toFixed(2)}
+                    {data.Currency.symbol}
+                    {data.amountPaid.toFixed(2)}
                   </TableCell>
                   <TableCell className="truncate">{data.paymentType}</TableCell>
                   <TableCell className="truncate">

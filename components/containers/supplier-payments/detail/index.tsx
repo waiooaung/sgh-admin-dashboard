@@ -19,13 +19,14 @@ const SupplierDetailContainer = () => {
     return (
       <div className="flex flex-1 items-center justify-center h-full">
         <p className="text-gray-500 text-lg">
-          No supplier information available.
+          No supplier payment information available.
         </p>
       </div>
     );
   }
   const supplier = supplierPayment.Supplier;
   const appliedTransactions = supplierPayment.appliedTransactions;
+  const currency = supplierPayment.Currency;
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
@@ -47,8 +48,9 @@ const SupplierDetailContainer = () => {
                 {new Date(supplierPayment.createdAt).toLocaleString()}
               </p>
               <p>
-                <strong>Amount (RMB):</strong> ¥
-                {supplierPayment.amountPaidUSD.toLocaleString()}
+                <strong>Amount ({currency.name}): </strong>
+                {currency.symbol}
+                {supplierPayment.amountPaid.toFixed(2)}
               </p>
               <p>
                 <strong>Payment Type:</strong>{" "}
@@ -113,7 +115,7 @@ const SupplierDetailContainer = () => {
                     Transaction Status
                   </TableHead>
                   <TableHead className="text-left truncate">
-                    Amount Applied ( USD )
+                    Amount Applied ({currency.name})
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -124,13 +126,14 @@ const SupplierDetailContainer = () => {
                     className="hover:bg-blend-color transition-colors"
                   >
                     <TableCell className="w-15 truncate">
-                      TNX-{transaction.SupplierTransaction.transactionId}
+                      TNX-{transaction.transactionId}
                     </TableCell>
                     <TableCell className="truncate">
-                      {transaction.SupplierTransaction.status}
+                      {transaction.SupplierTransaction.supplierPaymentStatus}
                     </TableCell>
                     <TableCell className="truncate">
-                      $ {transaction.amountApplied}
+                      {currency.symbol}
+                      {transaction.amountApplied}
                     </TableCell>
                   </TableRow>
                 ))}

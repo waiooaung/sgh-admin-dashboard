@@ -31,34 +31,24 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import fetcher from "@/lib/fetcher";
 import axiosInstance from "@/lib/axios-instance";
 import { AgentPaymentFormData } from "@/types/agentPayment";
 import { toast } from "sonner";
-import { Agent } from "@/types/agent";
-import { MetaData } from "@/types/meta-data";
 import { useAuth } from "@/context/authContext";
+import { useAgents } from "@/hooks/useAgents";
+import { useCurrencies } from "@/hooks/useCurrencies";
 
 interface AddAgentPaymentProps {
   onSuccess: () => void;
-}
-
-interface AgentApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Agent[];
-  meta: MetaData;
-  overview: null;
 }
 
 // Zod Schema
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   agentId: z.coerce.number(),
-  amountPaidUSD: z.coerce.number(),
+  currencyId: z.coerce.number(),
+  amountPaid: z.coerce.number(),
   paymentType: z.string().min(5),
 });
 
@@ -73,7 +63,8 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
     defaultValues: {
       tenantId,
       agentId: undefined,
-      amountPaidUSD: 0,
+      currencyId: undefined,
+      amountPaid: 0,
       paymentType: "",
     },
   });
@@ -85,17 +76,8 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
     },
   );
 
-  const {
-    data: agentData,
-    isLoading: isLoadingAgentData,
-    error: agentDataError,
-  } = useSWR<AgentApiResponse>(
-    `/agents?limit=100&tenantId=${tenantId}`,
-    fetcher,
-  );
-
-  if (agentDataError) toast.error("Error fetching agents.");
-  const agents: Agent[] = agentData?.data || [];
+  const { agents } = useAgents(tenantId);
+  const { currencies } = useCurrencies(tenantId);
 
   const handleSubmit = async (values: AgentPaymentFormData) => {
     if (loading) return;
@@ -143,9 +125,7 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {isLoadingAgentData ? (
-                          <h1>Loading...</h1>
-                        ) : agents.length > 0 ? (
+                        {agents.length > 0 &&
                           agents.map((agents) => (
                             <SelectItem
                               key={agents.id}
@@ -153,10 +133,37 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
                             >
                               {agents.name}
                             </SelectItem>
-                          ))
-                        ) : (
-                          <h1>No suppliers found</h1>
-                        )}
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Agent */}
+              <FormField
+                control={form.control}
+                name="currencyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {currencies.length > 0 &&
+                          currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.id}
+                              value={currency.id.toString()}
+                            >
+                              {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -166,10 +173,10 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
               {/* Commission Rate */}
               <FormField
                 control={form.control}
-                name="amountPaidUSD"
+                name="amountPaid"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Paid Amount ( USD )</FormLabel>
+                    <FormLabel>Paid Amount</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

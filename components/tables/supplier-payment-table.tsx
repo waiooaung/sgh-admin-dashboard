@@ -90,16 +90,6 @@ const SupplierPaymentTable = ({
     mutate();
   };
 
-  // const handleEdit = (supplierPayment: SupplierPayment) => {
-  //   setSelectedSupplierPayment(supplierPayment);
-  //   setOpen(true);
-  // };
-
-  // const handleUpdate = () => {
-  //   setOpen(false);
-  //   mutate();
-  // };
-
   const handleDelete = async (id: number) => {
     try {
       await deletePayment(id);
@@ -146,7 +136,8 @@ const SupplierPaymentTable = ({
                     </a>
                   </TableCell>
                   <TableCell className="truncate">
-                    $ {data.amountPaidUSD.toFixed(2)}
+                    {data.Currency.symbol}
+                    {data.amountPaid.toFixed(2)}
                   </TableCell>
                   <TableCell className="truncate">{data.paymentType}</TableCell>
                   <TableCell className="truncate">
