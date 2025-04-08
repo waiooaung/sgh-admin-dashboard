@@ -98,7 +98,7 @@ const SupplierDetailContainer = () => {
           </CardContent>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1">
         <SupplierOverview
           tenantId={supplier.tenantId}
           supplierId={supplier.id}
