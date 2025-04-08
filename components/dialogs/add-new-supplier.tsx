@@ -46,7 +46,7 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
   const { user } = useAuth();
   const tenantId = user?.tenantId || undefined;
   const [isOpen, setIsOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const form = useForm<CreateSupplier>({
     resolver: zodResolver(formSchema), // Add resolver here
     defaultValues: {
@@ -69,6 +69,7 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
 
   const handleSubmit = async (values: CreateSupplier) => {
     try {
+      setLoading(true);
       await trigger(values);
       toast.success("Supplier created successfully!");
       form.reset();
@@ -77,6 +78,8 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
     } catch (error) {
       console.error(error);
       toast.error("Failed to create supplier!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -186,7 +189,9 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
 
             {/* Submit Button */}
             <DialogFooter className="mt-4">
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}{" "}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,6 +52,7 @@ const EditAgent: React.FC<EditAgentProps> = ({
   agent,
   onSave,
 }) => {
+  const [loading, setLoading] = useState(false);
   const form = useForm<AgentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,6 +85,7 @@ const EditAgent: React.FC<EditAgentProps> = ({
       id: agent.id,
     };
     try {
+      setLoading(true);
       await trigger(updatedAgentData);
       toast.success("Agent updated successfully!");
       onSave();
@@ -91,6 +93,8 @@ const EditAgent: React.FC<EditAgentProps> = ({
     } catch (error) {
       console.error(error);
       toast.error("Failed to update agent!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -193,7 +197,9 @@ const EditAgent: React.FC<EditAgentProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}{" "}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

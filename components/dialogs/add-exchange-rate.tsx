@@ -49,6 +49,7 @@ interface Props {
 
 export function AddExchangeRate({ onSuccess }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : undefined;
 
@@ -77,6 +78,7 @@ export function AddExchangeRate({ onSuccess }: Props) {
 
   const handleSubmit = async (values: ExchangeRateFormData) => {
     try {
+      setLoading(true);
       await trigger(values);
       toast.success("Data created successfully!");
       onSuccess();
@@ -84,6 +86,8 @@ export function AddExchangeRate({ onSuccess }: Props) {
       setIsOpen(false);
     } catch {
       toast.error("Failed to create data.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -201,7 +205,9 @@ export function AddExchangeRate({ onSuccess }: Props) {
               )}
             />
             <div className="flex justify-end">
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}{" "}
+              </Button>
             </div>
           </form>
         </Form>

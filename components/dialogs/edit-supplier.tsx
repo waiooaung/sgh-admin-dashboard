@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,6 +53,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
   supplier,
   onSave,
 }) => {
+  const [loading, setLoading] = useState(false);
   const form = useForm<CreateSupplier>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -82,9 +83,10 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
   const handleSubmit = async (values: CreateSupplier) => {
     const updatedSupplierData = {
       ...values,
-      id: supplier.id, // Add the existing supplier id here
+      id: supplier.id,
     };
     try {
+      setLoading(true);
       await trigger(updatedSupplierData);
       toast.success("Supplier updated successfully!");
       onSave();
@@ -92,6 +94,8 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
     } catch (error) {
       console.error(error);
       toast.error("Failed to update supplier!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -194,7 +198,9 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}{" "}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

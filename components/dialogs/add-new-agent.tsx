@@ -45,6 +45,7 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
   const { user } = useAuth();
   const tenantId = user?.tenantId || undefined;
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<AgentFormData>({
     resolver: zodResolver(formSchema),
@@ -68,6 +69,7 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
 
   const handleSubmit = async (values: AgentFormData) => {
     try {
+      setLoading(true);
       await trigger(values);
       toast.success("Agent created successfully!");
       form.reset();
@@ -76,6 +78,8 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
     } catch (error) {
       console.error(error);
       toast.error("Failed to create agent!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,7 +189,9 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
 
             {/* Submit Button */}
             <DialogFooter className="mt-4">
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}{" "}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

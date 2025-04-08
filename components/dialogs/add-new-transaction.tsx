@@ -82,6 +82,7 @@ export function AddNewTransaction({
   tenantId,
 }: AddNewTransactionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [baseCurrency, setBaseCurrency] = useState<Currency | undefined>(
     undefined,
   );
@@ -209,6 +210,7 @@ export function AddNewTransaction({
 
   const handleSubmit = async (values: TransactionFormData) => {
     try {
+      setLoading(true);
       await trigger(values);
       toast.success("Transaction added successfully!");
       onSuccess();
@@ -217,6 +219,8 @@ export function AddNewTransaction({
     } catch (error) {
       console.error(error);
       toast.error("Failed to create transaction!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -456,7 +460,10 @@ export function AddNewTransaction({
               />
 
               <DialogFooter className="mt-4">
-                <Button type="submit">Save</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Save"}{" "}
+                  {/* Button text based on loading */}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
