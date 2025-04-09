@@ -89,9 +89,12 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
       onSuccess();
       form.reset();
       setIsOpen(false);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create payment!");
+    } catch (error: any) {
+      const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Fail to create data";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
