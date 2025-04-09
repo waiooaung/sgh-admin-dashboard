@@ -90,9 +90,9 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
       setIsOpen(false);
     } catch (error: any) {
       const errorMessage =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Fail to create data";
+        error?.response?.data?.message ||
+        error?.message ||
+        "Fail to create data";
       toast.error(errorMessage);
     } finally {
       setLoading(false);

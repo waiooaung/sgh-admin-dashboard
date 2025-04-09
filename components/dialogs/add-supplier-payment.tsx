@@ -91,9 +91,9 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
       setIsOpen(false);
     } catch (error: any) {
       const errorMessage =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Fail to create data";
+        error?.response?.data?.message ||
+        error?.message ||
+        "Fail to create data";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
