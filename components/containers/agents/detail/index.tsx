@@ -69,7 +69,7 @@ const AgentDetailContainer = () => {
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             <p className="truncate">
-              <strong>Name:</strong> {agent.contactName || "N/A"}
+              <strong>Name:</strong> {agent.name || "N/A"}
             </p>
             <p className="truncate">
               <strong>Email:</strong> {agent.contactEmail || "N/A"}
@@ -81,8 +81,9 @@ const AgentDetailContainer = () => {
             <p className="truncate">
               <strong>Bank Account:</strong> {agent.bankAccount || "N/A"}
             </p>
-            <p className="truncate">
-              <strong>Address:</strong> {agent.address || "N/A"}
+            <p className="">
+              <strong>Address:</strong> {agent.address || "N/A"},{" "}
+              {agent.country}
             </p>
             <p className="truncate">
               <strong>Created At:</strong> {formattedCreatedAt}

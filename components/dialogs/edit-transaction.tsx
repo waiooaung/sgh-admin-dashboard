@@ -357,7 +357,6 @@ const EditTransaction: React.FC<EditTransactionModalProps> = ({
         supplierId: transaction.supplierId || 0,
         profits: profits,
       });
-      console.log(form.getValues());
     }
   }, [open, transaction, currencies, transactionTypes, form]);
 

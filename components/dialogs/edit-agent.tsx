@@ -20,11 +20,19 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Agent, AgentFormData } from "@/types/agent";
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { toast } from "sonner";
+import { useCountries } from "@/hooks/useCountries";
 
 interface EditAgentProps {
   open: boolean;
@@ -37,9 +45,9 @@ interface EditAgentProps {
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  contactName: z.string().min(2, "Contact name must be at least 2 characters"),
   contactEmail: z.string().email("Invalid email address"),
   contactPhone: z.string().min(2, "Phone must be at least 2 characters"),
+  country: z.string().min(1, "Country is required"),
   address: z.string().min(10, "Address must be at least 10 characters"),
   bankAccount: z
     .string()
@@ -53,24 +61,33 @@ const EditAgent: React.FC<EditAgentProps> = ({
   onSave,
 }) => {
   const [loading, setLoading] = useState(false);
+  const { countries } = useCountries();
   const form = useForm<AgentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId: agent.tenantId,
       name: agent.name,
-      contactName: agent.contactName,
       contactEmail: agent.contactEmail,
       contactPhone: agent.contactPhone,
+      country: agent.country,
       address: agent.address,
       bankAccount: agent.bankAccount,
     },
   });
 
   useEffect(() => {
-    if (open && agent) {
-      form.reset(agent);
+    if (open && agent && countries.length > 0) {
+      form.reset({
+        tenantId: agent.tenantId,
+        name: agent.name,
+        contactEmail: agent.contactEmail,
+        contactPhone: agent.contactPhone,
+        country: agent.country,
+        address: agent.address,
+        bankAccount: agent.bankAccount,
+      });
     }
-  }, [open, agent, form]);
+  }, [open, agent, countries, form]);
 
   const { trigger } = useSWRMutation(
     `/agents/${agent.id}`,
@@ -125,20 +142,6 @@ const EditAgent: React.FC<EditAgentProps> = ({
 
             <FormField
               control={form.control}
-              name="contactName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="contactEmail"
               render={({ field }) => (
                 <FormItem>
@@ -146,6 +149,45 @@ const EditAgent: React.FC<EditAgentProps> = ({
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      const selected = countries.find((c) => c.name === value);
+                      if (selected?.primaryDialCode) {
+                        form.setValue("contactPhone", selected.primaryDialCode);
+                      }
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country ..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {countries.length > 0 ? (
+                        countries.map((country) => (
+                          <SelectItem key={country.name} value={country.name}>
+                            {country.name} ({country.primaryDialCode})
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <h1>No suppliers found</h1>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

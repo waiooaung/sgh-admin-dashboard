@@ -71,7 +71,7 @@ const SupplierDetailContainer = () => {
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             <p>
-              <strong>Name:</strong> {supplier.contactName || "N/A"}
+              <strong>Name:</strong> {supplier.name || "N/A"}
             </p>
             <p>
               <strong>Email:</strong> {supplier.contactEmail || "N/A"}
@@ -84,7 +84,8 @@ const SupplierDetailContainer = () => {
               <strong>Bank Account:</strong> {supplier.bankAccount || "N/A"}
             </p>
             <p>
-              <strong>Address:</strong> {supplier.address || "N/A"}
+              <strong>Address:</strong> {supplier.address || "N/A"},{" "}
+              {supplier.country}
             </p>
             <p>
               <strong>Created At:</strong> {formattedCreatedAt}

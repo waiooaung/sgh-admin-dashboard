@@ -21,12 +21,20 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { CreateSupplier } from "@/types/supplier";
 import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
+import { useCountries } from "@/hooks/useCountries";
 
 interface AddNewSupplierProps {
   onSuccess: () => void;
@@ -35,9 +43,9 @@ interface AddNewSupplierProps {
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   name: z.string().min(2).max(20),
-  contactName: z.string().min(2).max(20),
   contactEmail: z.string().email(),
   contactPhone: z.string().min(2).max(20),
+  country: z.string().min(1),
   address: z.string().min(10).max(255),
   bankAccount: z.string().min(10).max(50),
 });
@@ -52,13 +60,15 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
     defaultValues: {
       tenantId,
       name: "",
-      contactName: "",
       contactEmail: "",
       contactPhone: "",
+      country: "",
       address: "",
       bankAccount: "",
     },
   });
+
+  const { countries } = useCountries();
 
   const { trigger } = useSWRMutation(
     `/suppliers`,
@@ -112,21 +122,6 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
               )}
             />
 
-            {/* Contact Name */}
-            <FormField
-              control={form.control}
-              name="contactName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Contact Email */}
             <FormField
               control={form.control}
@@ -137,6 +132,44 @@ export function AddNewSupplier({ onSuccess }: AddNewSupplierProps) {
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      const selected = countries.find((c) => c.name === value);
+                      if (selected?.primaryDialCode) {
+                        form.setValue("contactPhone", selected.primaryDialCode);
+                      }
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country ..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {countries.length > 0 ? (
+                        countries.map((country) => (
+                          <SelectItem key={country.name} value={country.name}>
+                            {country.name} ({country.primaryDialCode})
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <h1>No suppliers found</h1>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

@@ -42,7 +42,6 @@ interface AddNewAgentProps {
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   name: z.string().min(2).max(20),
-  contactName: z.string().min(2).max(20),
   contactEmail: z.string().email(),
   contactPhone: z.string().min(2).max(20),
   country: z.string(),
@@ -63,7 +62,7 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
       name: "",
       contactEmail: "",
       contactPhone: "",
-      country: undefined,
+      country: "",
       address: "",
       bankAccount: "",
     },
@@ -115,21 +114,6 @@ export function AddNewAgent({ onSuccess }: AddNewAgentProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Contact Name */}
-            <FormField
-              control={form.control}
-              name="contactName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Name</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

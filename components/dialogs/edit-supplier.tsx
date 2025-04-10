@@ -20,11 +20,19 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { CreateSupplier, UpdateSupplier } from "@/types/supplier";
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
 import { toast } from "sonner";
+import { useCountries } from "@/hooks/useCountries";
 
 interface EditSupplierProps {
   open: boolean;
@@ -38,9 +46,9 @@ const formSchema = z.object({
   id: z.number().optional(),
   tenantId: z.number(),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  contactName: z.string().min(2, "Contact name must be at least 2 characters"),
   contactEmail: z.string().email("Invalid email address"),
   contactPhone: z.string().min(2, "Phone must be at least 2 characters"),
+  country: z.string().min(1, "Country is required"),
   address: z.string().min(10, "Address must be at least 10 characters"),
   bankAccount: z
     .string()
@@ -54,14 +62,16 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
   onSave,
 }) => {
   const [loading, setLoading] = useState(false);
+  const { countries } = useCountries();
+
   const form = useForm<CreateSupplier>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId: supplier.tenantId,
       name: supplier.name,
-      contactName: supplier.contactName,
       contactEmail: supplier.contactEmail,
       contactPhone: supplier.contactPhone,
+      country: supplier.country,
       address: supplier.address,
       bankAccount: supplier.bankAccount,
     },
@@ -71,7 +81,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
     if (open && supplier) {
       form.reset(supplier);
     }
-  }, [open, supplier, form]);
+  }, [open, supplier, countries, form]);
 
   const { trigger } = useSWRMutation(
     `/suppliers/${supplier.id}`,
@@ -126,20 +136,6 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
 
             <FormField
               control={form.control}
-              name="contactName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="contactEmail"
               render={({ field }) => (
                 <FormItem>
@@ -147,6 +143,45 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      const selected = countries.find((c) => c.name === value);
+                      if (selected?.primaryDialCode) {
+                        form.setValue("contactPhone", selected.primaryDialCode);
+                      }
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country ..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {countries.length > 0 ? (
+                        countries.map((country) => (
+                          <SelectItem key={country.name} value={country.name}>
+                            {country.name} ({country.primaryDialCode})
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <h1>No suppliers found</h1>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

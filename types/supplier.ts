@@ -4,9 +4,9 @@ export type Supplier = {
   id: number;
   tenantId: number;
   name: string;
-  contactName: string;
   contactEmail: string;
   contactPhone: string;
+  country: string;
   address: string;
   bankAccount: string;
   createdAt: Date;
@@ -16,9 +16,9 @@ export type Supplier = {
 export type CreateSupplier = {
   tenantId: number;
   name: string;
-  contactName: string;
   contactEmail: string;
   contactPhone: string;
+  country: string;
   address: string;
   bankAccount: string;
 };
