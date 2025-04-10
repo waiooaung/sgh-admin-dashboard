@@ -6,6 +6,7 @@ export type AgentFormData = {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
+  country: string;
   address: string;
   bankAccount: string;
 };
