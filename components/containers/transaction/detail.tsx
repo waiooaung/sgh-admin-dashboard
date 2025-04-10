@@ -24,6 +24,7 @@ const TransactionDetailContainer = ({
   );
   if (!data?.data) return null;
   const transaction: TransactionDetail = data?.data;
+  console.log(transaction);
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
@@ -78,13 +79,13 @@ const TransactionDetailContainer = ({
             {/* Supplier & Agent Info */}
             <div className="p-6 rounded-lg shadow-sm">
               <h2 className="text-lg font-semibold">Supplier</h2>
-              <p className="">{transaction.supplier.name}</p>
-              <p className="">{transaction.supplier.contactEmail}</p>
+              <p className="">{transaction.Supplier.name}</p>
+              <p className="">{transaction.Supplier.contactEmail}</p>
             </div>
             <div className="p-6 rounded-lg shadow-sm">
               <h2 className="text-lg font-semibold">Agent</h2>
-              <p className="">{transaction.agent.name}</p>
-              <p className="">{transaction.agent.contactEmail}</p>
+              <p className="">{transaction.Agent.name}</p>
+              <p className="">{transaction.Agent.contactEmail}</p>
             </div>
           </CardContent>
         </Card>

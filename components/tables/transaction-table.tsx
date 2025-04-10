@@ -145,14 +145,24 @@ const TransactionTable = ({
     }
 
     const dataToExport = transactions.map((transaction) => ({
-      ID: `#TNX-${transaction.id}`,
+      "Transaction ID": `#TNX-${transaction.id}`,
       Date: new Date(transaction.transactionDate).toLocaleDateString(),
-      "Amount (From)": `${transaction.baseCurrency.symbol} ${transaction.baseAmount}`,
-      "Amount (To) (Buy Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountBuy} (${transaction.buyRate})`,
-      "Amount (To) (Sell Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountSell} (${transaction.sellRate})`,
+      "Transaction Type": `${transaction.baseCurrency.name} - ${transaction.quoteCurrency.name}`,
+      "Amount From": `${transaction.baseCurrency.symbol} ${transaction.baseAmount}`,
+      "Amount To (Buy Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountBuy} (${transaction.buyRate})`,
+      "Amount To (Sell Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountSell} (${transaction.sellRate})`,
       Profit: `${transaction.quoteCurrency.symbol} ${transaction.profit}`,
       Commission: `${transaction.quoteCurrency.symbol} ${transaction.commission}`,
       "Total Earnings": `${transaction.quoteCurrency.symbol} ${transaction.totalEarnings}`,
+      "Agent Name": transaction.Agent.name,
+      "Supplier Name": transaction.Supplier.name,
+      "Agent Payment Status": transaction.agentPaymentStatus,
+      "Supplier Payment Status": transaction.supplierPaymentStatus,
+      "Amount Received From Agent": transaction.amountReceivedFromAgent,
+      "Remaining Amount From Agent": transaction.remainingAmountFromAgent,
+      "Amount Paid To Supplier": transaction.amountPaidToSupplier,
+      "Remaining Amount To Pay To Supplier":
+        transaction.remainingAmountToPayToSupplier,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);

@@ -23,6 +23,8 @@ export type Transaction = {
   quoteCurrencyId: number;
   quoteCurrency: Currency;
   supplierId: number;
+  Supplier: Supplier;
+  Agent: Agent;
   agentId: number;
   transactionDate: string;
   baseAmount: number;
@@ -71,6 +73,6 @@ export type UpdateTransaction = TransactionFormData & {
 };
 
 export type TransactionDetail = Transaction & {
-  supplier: Supplier;
-  agent: Agent;
+  Supplier: Supplier;
+  Agent: Agent;
 };
