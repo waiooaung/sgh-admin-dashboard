@@ -78,7 +78,6 @@ const AgentDetailContainer = () => {
               </Avatar>
               <div>
                 <h1 className="text-xl font-bold">{agent.name}</h1>
-                <p className="text-gray-600 text-sm">{agent.contactName}</p>
                 <p className="text-gray-500 text-sm">{agent.contactEmail}</p>
               </div>
             </CardContent>

@@ -80,7 +80,6 @@ const SupplierDetailContainer = () => {
               </Avatar>
               <div>
                 <h1 className="text-xl font-bold">{supplier.name}</h1>
-                <p className="text-gray-600 text-sm">{supplier.contactName}</p>
                 <p className="text-gray-500 text-sm">{supplier.contactEmail}</p>
               </div>
             </CardContent>
