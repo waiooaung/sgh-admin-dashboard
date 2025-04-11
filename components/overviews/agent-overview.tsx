@@ -1,10 +1,9 @@
-import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import Link from "next/link";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
-import { toast } from "sonner";
 import { Currency } from "@/types/currency";
+import { useAgentBalances } from "@/hooks/useAgentBalances";
 
 interface Data {
   totalTransactionsCount: number;
@@ -29,19 +28,25 @@ const AgentOverview = ({
   tenantId: number;
   agentId: number;
 }) => {
-  const { data, error } = useSWR<ApiResponse>(
+  const { data } = useSWR<ApiResponse>(
     `/transactions/statistics?tenantId=${tenantId}&agentId=${agentId}`,
     fetcher,
   );
 
   const statistics = data?.data || [];
 
-  useEffect(() => {
-    if (error) {
-      toast.error("Failed to load transaction statistics");
-    }
-  }, [error]);
-  return statistics.map((stats, index) => {
+  const { agentBalances } = useAgentBalances(agentId);
+  const updatedStatistics = statistics.map((stats) => {
+    const match = agentBalances.find(
+      (r) => r.currencyId === stats.quoteCurrency.id,
+    );
+
+    return {
+      ...stats,
+      totalAmountReceivedFromAgent: match ? match.receivedAmount : 0,
+    };
+  });
+  return updatedStatistics.map((stats, index) => {
     return (
       <div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-3"
