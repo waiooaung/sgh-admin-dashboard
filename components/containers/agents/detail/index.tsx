@@ -13,7 +13,6 @@ import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 
 import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
-import { mutate } from "swr";
 
 const AgentDetailContainer = () => {
   const { agent } = useDataContext();
