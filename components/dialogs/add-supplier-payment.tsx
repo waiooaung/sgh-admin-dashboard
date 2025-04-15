@@ -38,8 +38,10 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { useCurrencies } from "@/hooks/useCurrencies";
+import { Supplier } from "@/types/supplier";
 
 interface AddSupplierPaymentProps {
+  defaultSupplier?: Supplier;
   onSuccess: () => void;
 }
 
@@ -52,7 +54,10 @@ const formSchema = z.object({
   paymentType: z.string().min(5),
 });
 
-export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
+export function AddSupplierPayment({
+  defaultSupplier,
+  onSuccess,
+}: AddSupplierPaymentProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
@@ -62,7 +67,7 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId,
-      supplierId: undefined,
+      supplierId: defaultSupplier ? defaultSupplier.id : undefined,
       currencyId: undefined,
       amountPaid: 0,
       paymentType: "",
@@ -116,34 +121,36 @@ export function AddSupplierPayment({ onSuccess }: AddSupplierPaymentProps) {
               className="space-y-4"
             >
               {/* Supplier */}
-              <FormField
-                control={form.control}
-                name="supplierId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Supplier</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select supplier..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {suppliers.length > 0 &&
-                          suppliers.map((supplier) => (
-                            <SelectItem
-                              key={supplier.id}
-                              value={supplier.id.toString()}
-                            >
-                              {supplier.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!defaultSupplier && (
+                <FormField
+                  control={form.control}
+                  name="supplierId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supplier</FormLabel>
+                      <Select onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select supplier..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {suppliers.length > 0 &&
+                            suppliers.map((supplier) => (
+                              <SelectItem
+                                key={supplier.id}
+                                value={supplier.id.toString()}
+                              >
+                                {supplier.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Currencies */}
               <FormField

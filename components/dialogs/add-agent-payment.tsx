@@ -38,8 +38,10 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
 import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
+import { Agent } from "@/types/agent";
 
 interface AddAgentPaymentProps {
+  defaultAgent?: Agent;
   onSuccess: () => void;
 }
 
@@ -52,7 +54,10 @@ const formSchema = z.object({
   paymentType: z.string().min(5),
 });
 
-export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
+export function AddAgentPayment({
+  onSuccess,
+  defaultAgent,
+}: AddAgentPaymentProps) {
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : undefined;
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +67,7 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId,
-      agentId: undefined,
+      agentId: defaultAgent ? defaultAgent.id : undefined,
       currencyId: undefined,
       amountPaid: 0,
       paymentType: "",
@@ -115,34 +120,36 @@ export function AddAgentPayment({ onSuccess }: AddAgentPaymentProps) {
               className="space-y-4"
             >
               {/* Agent */}
-              <FormField
-                control={form.control}
-                name="agentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Agent</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select agent..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {agents.length > 0 &&
-                          agents.map((agents) => (
-                            <SelectItem
-                              key={agents.id}
-                              value={agents.id.toString()}
-                            >
-                              {agents.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!defaultAgent && (
+                <FormField
+                  control={form.control}
+                  name="agentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Agent</FormLabel>
+                      <Select onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select agent..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {agents.length > 0 &&
+                            agents.map((agent) => (
+                              <SelectItem
+                                key={agent.id}
+                                value={agent.id.toString()}
+                              >
+                                {agent.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Agent */}
               <FormField

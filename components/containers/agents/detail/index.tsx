@@ -12,6 +12,9 @@ import AgentOverview from "@/components/overviews/agent-overview";
 import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 
+import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
+import { mutate } from "swr";
+
 const AgentDetailContainer = () => {
   const { agent } = useDataContext();
   if (!agent) {
@@ -44,22 +47,29 @@ const AgentDetailContainer = () => {
 
       <div className="grid grid-cols-1 gap-4">
         {/* Header Section */}
-        <div className="flex items-center gap-6 p-6 border rounded-2xl shadow-md">
-          <Avatar className="h-20 w-20">
-            <AvatarImage alt={agent.name} />
-            <AvatarFallback>{agent.name[0]}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold">{agent.name}</h1>
-            <Badge variant="default">
-              {agent.name ? (
-                <CheckCircle className="h-4 w-4 mr-1 inline" />
-              ) : (
-                <XCircle className="h-4 w-4 mr-1 inline" />
-              )}
-              Active
-            </Badge>
+        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-md">
+          <div className="flex items-center gap-6">
+            <Avatar className="h-20 w-20">
+              <AvatarImage alt={agent.name} />
+              <AvatarFallback>{agent.name[0]}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold">{agent.name}</h1>
+              <Badge variant="default">
+                {agent.name ? (
+                  <CheckCircle className="h-4 w-4 mr-1 inline" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-1 inline" />
+                )}
+                Active
+              </Badge>
+            </div>
           </div>
+
+          <AddAgentPayment
+            defaultAgent={agent}
+            onSuccess={() => console.log("Payment added.")}
+          />
         </div>
 
         {/* Agent Details */}

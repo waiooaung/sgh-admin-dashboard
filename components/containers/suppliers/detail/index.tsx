@@ -11,6 +11,7 @@ import useDataContext from "@/hooks/useDataContext";
 import SupplierOverview from "@/components/overviews/supplier-overview";
 import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
+import { AddSupplierPayment } from "@/components/dialogs/add-supplier-payment";
 
 const SupplierDetailContainer = () => {
   const { supplier } = useDataContext();
@@ -46,22 +47,29 @@ const SupplierDetailContainer = () => {
 
       <div className="grid grid-cols-1 gap-4">
         {/* Header Section */}
-        <div className="flex items-center gap-6 p-6 border rounded-2xl shadow-md">
-          <Avatar className="h-20 w-20">
-            <AvatarImage alt={supplier.name} />
-            <AvatarFallback>{supplier.name[0]}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold">{supplier.name}</h1>
-            <Badge variant="default">
-              {supplier.name ? (
-                <CheckCircle className="h-4 w-4 mr-1 inline" />
-              ) : (
-                <XCircle className="h-4 w-4 mr-1 inline" />
-              )}
-              Active
-            </Badge>
+        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-md">
+          <div className="flex items-center gap-6">
+            <Avatar className="h-20 w-20">
+              <AvatarImage alt={supplier.name} />
+              <AvatarFallback>{supplier.name[0]}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold">{supplier.name}</h1>
+              <Badge variant="default">
+                {supplier.name ? (
+                  <CheckCircle className="h-4 w-4 mr-1 inline" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-1 inline" />
+                )}
+                Active
+              </Badge>
+            </div>
           </div>
+
+          <AddSupplierPayment
+            defaultSupplier={supplier}
+            onSuccess={() => console.log("Payment added.")}
+          />
         </div>
 
         {/* Supplier Details */}
