@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  FileCogIcon,
   GalleryVerticalEnd,
   Settings2,
   Handshake,
@@ -40,16 +39,16 @@ export const data = {
     {
       title: "Payments",
       icon: Banknote,
-      url: "/dashboard/payment",
+      url: "/dashboard/payments",
       isActive: false,
       items: [
         {
           title: "Agent Payments",
-          url: "/dashboard/agent-payments",
+          url: "/dashboard/payments/agent-payments",
         },
         {
           title: "Suppliers Payments",
-          url: "/dashboard/supplier-payments",
+          url: "/dashboard/payments/supplier-payments",
         },
       ],
     },
@@ -66,16 +65,20 @@ export const data = {
       items: [],
     },
     {
-      title: "Configs",
-      url: "/dashboard/configs",
-      icon: FileCogIcon,
-      items: [],
+      title: "Settings",
+      icon: Settings2,
+      url: "/dashboard/settings",
+      isActive: false,
+      items: [
+        {
+          title: "Daily Rates",
+          url: "/dashboard/settings/daily-rates",
+        },
+        {
+          title: "Transacted Rates",
+          url: "/dashboard/settings/transacted-rates",
+        },
+      ],
     },
-    // {
-    //   title: "Settings",
-    //   url: "/dashboard/settings",
-    //   icon: Settings2,
-    //   items: [],
-    // },
   ],
 };

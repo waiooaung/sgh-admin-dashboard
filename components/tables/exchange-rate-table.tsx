@@ -107,8 +107,7 @@ const ExchangeRateTable = () => {
       {meta && (
         <div className="flex justify-between items-center mt-4">
           <p className="text-sm">
-            Total Transactions:{" "}
-            <span className="font-semibold">{meta.totalItems}</span>
+            Total : <span className="font-semibold">{meta.totalItems}</span>
           </p>
 
           <PaginationControls

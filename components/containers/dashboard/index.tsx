@@ -2,7 +2,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { ExchangeRateCard } from "@/components/forms/exchange-rate-card";
-import { CommissionRateForm } from "@/components/forms/commission-rate-form";
 import TransactionTable from "@/components/tables/transaction-table";
 import DisplayProfitOverview from "@/components/overviews/display-profit-overview";
 import DashboardTransactionOverview from "@/components/overviews/dashboard/transaction-overview";
@@ -29,9 +28,8 @@ export default function DashboardContainer() {
         <DashboardTransactionOverview />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <ExchangeRateCard />
-        <CommissionRateForm />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <DashboardChart />

@@ -43,13 +43,22 @@ export function NavMain({
     return baseUrl === url;
   };
 
+  const isActiveSubUrl = (url: string) => {
+    return pathname === url;
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           return item.items && item.items?.length > 0 ? (
-            <Collapsible key={item.title} asChild className="group/collapsible">
+            <Collapsible
+              key={item.title}
+              asChild
+              className="group/collapsible"
+              defaultOpen={isActive(item.url)}
+            >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -62,7 +71,10 @@ export function NavMain({
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={isActiveSubUrl(subItem.url)}
+                        >
                           <Link href={subItem.url}>
                             <span>{subItem.title}</span>
                           </Link>

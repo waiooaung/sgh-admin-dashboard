@@ -1,15 +1,11 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
-// import { CommissionRateForm } from "@/components/forms/commission-rate-form";
-// import TransactionTypeTable from "@/components/tables/transaction-type-table";
-// import { AddTransactionType } from "@/components/dialogs/add-transaction-type";
 import { mutate } from "swr";
 import { AddExchangeRate } from "@/components/dialogs/add-exchange-rate";
 import ExchangeRateTable from "@/components/tables/exchange-rate-table";
 
-export default function ConfigsContainer() {
+export default function DailyRatesContainer() {
   // const handleSubmit = async () => {
   //   await mutate(
   //     (key) => typeof key === "string" && key.startsWith("/transaction-types"),
