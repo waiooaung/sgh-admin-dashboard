@@ -29,7 +29,10 @@ export default function DashboardContainer() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        <ExchangeRateCard />
+        <ExchangeRateCard
+          defaultDateFrom={new Date()}
+          defaultDateTo={new Date()}
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <DashboardChart />

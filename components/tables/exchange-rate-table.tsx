@@ -13,8 +13,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import { Trash, MoreHorizontal } from "lucide-react";
+import { Trash, MoreHorizontal, CalendarIcon, Search } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 import { Button } from "../ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { useAuth } from "@/context/authContext";
 import { useExchangeRates } from "@/hooks/useExchangeRates";
@@ -22,25 +28,53 @@ import ExchangeRateSkeleton from "./exchange-rate-skeleton";
 import { PaginationControls } from "./pagination-controls";
 import useDelete from "@/hooks/useDelete";
 import { toast } from "sonner";
-import { mutate } from "swr";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
-const ExchangeRateTable = () => {
+interface Props {
+  defaultDateFrom?: Date;
+  defaultDateTo?: Date;
+}
+
+const ExchangeRateTable = ({ defaultDateFrom, defaultDateTo }: Props) => {
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : undefined;
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const { exchangeRates, meta, isLoading } = useExchangeRates(tenantId);
+  const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
+  const [to, setTo] = useState<Date | undefined>(defaultDateTo);
+  const queryParams = new URLSearchParams({
+    page: currentPage.toString(),
+    limit: itemsPerPage.toString(),
+  });
+
+  if (tenantId) {
+    queryParams.append("tenantId", tenantId.toString());
+  }
+  if (from) {
+    from.setHours(0, 0, 0, 0);
+    queryParams.append("from", from.toISOString());
+  }
+  if (to) {
+    to.setHours(23, 59, 59, 999);
+    queryParams.append("to", to.toISOString());
+  }
+
+  const { exchangeRates, meta, isLoading, mutate } =
+    useExchangeRates(queryParams);
+
+  const handleSearch = async () => {
+    setCurrentPage(1);
+    await mutate();
+  };
 
   const { trigger: deleteData } = useDelete("exchange-rates");
   const handleDelete = async (id: number) => {
     try {
       await deleteData(id);
       toast.success("Data deleted successfully!");
-      await mutate(
-        (key) => typeof key === "string" && key.startsWith("/exchange-rates"),
-        undefined,
-        { revalidate: true },
-      );
+      await mutate();
     } catch {
       toast.error(`Failed to delete data`);
     }
@@ -52,6 +86,57 @@ const ExchangeRateTable = () => {
 
   return (
     <div>
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !from && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {from ? format(from, "PPP") : <span>Pick from date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={from}
+              onSelect={setFrom}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !to && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {to ? format(to, "PPP") : <span>Pick to date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={to}
+              onSelect={setTo}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Button onClick={handleSearch} className="">
+          <Search className="w-5 h-5" />
+        </Button>
+      </div>
       <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
         <TableHeader className="text-sm font-semibold">
           <TableRow>

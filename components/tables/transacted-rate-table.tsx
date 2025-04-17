@@ -37,7 +37,7 @@ const TransactedRateTable = ({
   defaultDateTo,
 }: TransactedRateTableProps) => {
   const { user } = useAuth();
-  const tenantId = user ? user.tenantId : 0;
+  const tenantId = user ? user.tenantId : undefined;
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -45,11 +45,13 @@ const TransactedRateTable = ({
   const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
   const [to, setTo] = useState<Date | undefined>(defaultDateTo);
   const queryParams = new URLSearchParams({
-    tenantId: tenantId.toString(),
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
   });
 
+  if (tenantId) {
+    queryParams.append("tenantId", tenantId.toString());
+  }
   if (from) {
     from.setHours(0, 0, 0, 0);
     queryParams.append("from", from.toISOString());
@@ -82,31 +84,19 @@ const TransactedRateTable = ({
     }
 
     const dataToExport = transactions.map((transaction) => ({
-      "Transaction ID": `#TNX-${transaction.id}`,
-      Date: new Date(transaction.transactionDate).toLocaleDateString(),
+      ID: `#TNX-${transaction.id}`,
       "Transaction Type": `${transaction.baseCurrency.name} - ${transaction.quoteCurrency.name}`,
       "Amount From": `${transaction.baseCurrency.symbol} ${transaction.baseAmount}`,
-      "Amount To (Buy Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountBuy} (${transaction.buyRate})`,
-      "Amount To (Sell Rate)": `${transaction.quoteCurrency.symbol} ${transaction.quoteAmountSell} (${transaction.sellRate})`,
-      Profit: `${transaction.quoteCurrency.symbol} ${transaction.profit}`,
-      Commission: `${transaction.quoteCurrency.symbol} ${transaction.commission}`,
-      "Total Earnings": `${transaction.quoteCurrency.symbol} ${transaction.totalEarnings}`,
-      "Agent Name": transaction.Agent.name,
-      "Supplier Name": transaction.Supplier.name,
-      "Agent Payment Status": transaction.agentPaymentStatus,
-      "Supplier Payment Status": transaction.supplierPaymentStatus,
-      "Amount Received From Agent": transaction.amountReceivedFromAgent,
-      "Remaining Amount From Agent": transaction.remainingAmountFromAgent,
-      "Amount Paid To Supplier": transaction.amountPaidToSupplier,
-      "Remaining Amount To Pay To Supplier":
-        transaction.remainingAmountToPayToSupplier,
+      "Buy Rate": `${transaction.buyRate}`,
+      "Sell Rate": `${transaction.sellRate}`,
+      Date: new Date(transaction.transactionDate).toLocaleDateString(),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
 
-    XLSX.writeFile(workbook, "transactions.xlsx");
+    XLSX.writeFile(workbook, "transacted_rates.xlsx");
   };
 
   return (

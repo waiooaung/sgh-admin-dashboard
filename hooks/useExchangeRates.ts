@@ -1,19 +1,21 @@
 import { useMemo } from "react";
 import { useApi } from "./useApi";
 import { ExchangeRateApiResponse } from "@/types/exchangeRate";
+import { mutate } from "swr";
 
-export const useExchangeRates = (tenantId: number | undefined) => {
-  const { data, error, isLoading } = useApi<ExchangeRateApiResponse>(
-    tenantId ? `/exchange-rates?limit=100&tenantId=${tenantId}` : null,
+export const useExchangeRates = (queryString: URLSearchParams) => {
+  const { data, error, isLoading, mutate } = useApi<ExchangeRateApiResponse>(
+    `/exchange-rates?${queryString}`,
   );
 
   const exchangeRates = useMemo(() => data?.data || [], [data]);
-  const meta = useMemo(() => data?.meta, [data]);
+  const meta = useMemo(() => data?.meta || null, [data]);
 
   return {
     exchangeRates,
     meta,
     isError: !!error,
     isLoading,
+    mutate,
   };
 };
