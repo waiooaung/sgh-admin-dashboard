@@ -104,7 +104,7 @@ const SupplierOverview = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              Paid Amount
+              Amount Paid
             </CardTitle>
           </CardHeader>
           <CardContent>

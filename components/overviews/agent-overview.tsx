@@ -49,7 +49,7 @@ const AgentOverview = ({
   return updatedStatistics.map((stats, index) => {
     return (
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-3"
+        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-3"
         key={index}
       >
         <Card>
@@ -104,7 +104,7 @@ const AgentOverview = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              Received Amount
+              Amount Received
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -122,7 +122,7 @@ const AgentOverview = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              Amount to Receive
+              Balance Owed
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -131,6 +131,25 @@ const AgentOverview = ({
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalRemainingAmountFromAgent,
+                )}
+              </div>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-medium truncate">
+              Credit Balance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Link href="/transactions">
+              <div className="text-base font-bold text-red-500 truncate">
+                {stats.quoteCurrency.symbol}
+                {new Intl.NumberFormat("en-US").format(
+                  stats.totalAmountReceivedFromAgent -
+                    stats.totalRemainingAmountFromAgent,
                 )}
               </div>
             </Link>
