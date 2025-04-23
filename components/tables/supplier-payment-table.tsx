@@ -154,7 +154,7 @@ const SupplierPaymentTable = ({
                         <DropdownMenuItem
                           onClick={() => {
                             setSupplierPayment(data);
-                            router.push("/dashboard/supplier-payments/detail");
+                            router.push("/dashboard/payments/supplier-payments/detail");
                           }}
                         >
                           <View className="w-4 h-4 mr-2" /> Detail

@@ -152,7 +152,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                         <DropdownMenuItem
                           onClick={() => {
                             setAgentPayment(data);
-                            router.push("/dashboard/agent-payments/detail");
+                            router.push("/dashboard/payments/agent-payments/detail");
                           }}
                         >
                           <View className="w-4 h-4 mr-2" /> Detail
