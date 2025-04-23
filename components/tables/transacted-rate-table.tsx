@@ -197,7 +197,7 @@ const TransactedRateTable = ({
                   {transaction.sellRate}
                 </TableCell>
                 <TableCell className="truncate">
-                  {new Date(transaction.transactionDate).toLocaleDateString()}
+                  {new Date(transaction.transactionDate).toLocaleString()}
                 </TableCell>
               </TableRow>
             ))}
