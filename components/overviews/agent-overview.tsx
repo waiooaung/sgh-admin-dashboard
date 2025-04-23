@@ -43,7 +43,7 @@ const AgentOverview = ({
 
     return {
       ...stats,
-      totalAmountReceivedFromAgent: match ? match.receivedAmount : 0,
+      agentBalance: match ? match.receivedAmount : 0,
     };
   });
   return updatedStatistics.map((stats, index) => {
@@ -148,8 +148,7 @@ const AgentOverview = ({
               <div className="text-base font-bold text-red-500 truncate">
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
-                  stats.totalAmountReceivedFromAgent -
-                    stats.totalRemainingAmountFromAgent,
+                  stats.agentBalance
                 )}
               </div>
             </Link>
