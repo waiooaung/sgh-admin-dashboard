@@ -22,6 +22,12 @@ export type AgentPaymentFormData = {
   paymentType: string;
 };
 
+export type DirectAgentPaymentFormData = AgentPaymentFormData & {
+  transactionId: number;
+  transactionCurrencyId: number;
+  exchangeRate: number;
+};
+
 export type AgentPaymentTransaction = {
   id: number;
   transactionId: number;

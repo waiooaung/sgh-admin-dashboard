@@ -147,9 +147,7 @@ const AgentOverview = ({
             <Link href="/transactions">
               <div className="text-base font-bold text-red-500 truncate">
                 {stats.quoteCurrency.symbol}
-                {new Intl.NumberFormat("en-US").format(
-                  stats.agentBalance
-                )}
+                {new Intl.NumberFormat("en-US").format(stats.agentBalance)}
               </div>
             </Link>
           </CardContent>

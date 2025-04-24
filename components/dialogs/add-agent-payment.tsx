@@ -39,6 +39,7 @@ import { useAuth } from "@/context/authContext";
 import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Agent } from "@/types/agent";
+import AgentOverview from "../overviews/agent-overview";
 
 interface AddAgentPaymentProps {
   defaultAgent?: Agent;
@@ -104,20 +105,25 @@ export function AddAgentPayment({
     }
   };
 
+  const agentId = form.watch("agentId");
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>Add Payment</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-10/12 w-full max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Payment</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 grid-cols-1">
+          {tenantId && agentId && (
+            <AgentOverview tenantId={tenantId} agentId={agentId} />
+          )}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
             >
               {/* Agent */}
               {!defaultAgent && (
@@ -134,15 +140,14 @@ export function AddAgentPayment({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {agents.length > 0 &&
-                            agents.map((agent) => (
-                              <SelectItem
-                                key={agent.id}
-                                value={agent.id.toString()}
-                              >
-                                {agent.name}
-                              </SelectItem>
-                            ))}
+                          {agents.map((agent) => (
+                            <SelectItem
+                              key={agent.id}
+                              value={agent.id.toString()}
+                            >
+                              {agent.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -151,7 +156,7 @@ export function AddAgentPayment({
                 />
               )}
 
-              {/* Agent */}
+              {/* Currency */}
               <FormField
                 control={form.control}
                 name="currencyId"
@@ -165,22 +170,22 @@ export function AddAgentPayment({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {currencies.length > 0 &&
-                          currencies.map((currency) => (
-                            <SelectItem
-                              key={currency.id}
-                              value={currency.id.toString()}
-                            >
-                              {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))}
+                        {currencies.map((currency) => (
+                          <SelectItem
+                            key={currency.id}
+                            value={currency.id.toString()}
+                          >
+                            {currency.name} ({currency.symbol})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {/* Commission Rate */}
+
+              {/* Amount Paid */}
               <FormField
                 control={form.control}
                 name="amountPaid"
@@ -195,7 +200,7 @@ export function AddAgentPayment({
                 )}
               />
 
-              {/* Payment Type */}
+              {/* Payment Note */}
               <FormField
                 control={form.control}
                 name="paymentType"
@@ -203,19 +208,24 @@ export function AddAgentPayment({
                   <FormItem>
                     <FormLabel>Payment Note</FormLabel>
                     <FormControl>
-                      <Textarea className="resize-none" {...field} />
+                      <Textarea
+                        className="resize-none min-h-[40px]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter className="mt-4">
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : "Save"}{" "}
-                  {/* Button text based on loading */}
-                </Button>
-              </DialogFooter>
+              {/* Submit Button */}
+              <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-end">
+                <DialogFooter className="p-0">
+                  <Button type="submit" disabled={loading}>
+                    {loading ? "Saving..." : "Save"}
+                  </Button>
+                </DialogFooter>
+              </div>
             </form>
           </Form>
         </div>

@@ -39,6 +39,7 @@ import {
   Pencil,
   Trash,
   MoreHorizontal,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
@@ -53,6 +54,7 @@ import * as XLSX from "xlsx";
 import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
 import { TransactionType } from "@/types/transactionType";
+import { AddDirectAgentPayment } from "../dialogs/add-direct-agent-payment";
 
 interface ApiResponse {
   statusCode: number;
@@ -89,6 +91,8 @@ const TransactionTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [open, setOpen] = useState<boolean>(false);
+  const [directAgentPaymentOpen, setDirectAgentPaymentOpen] =
+    useState<boolean>(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
@@ -175,6 +179,11 @@ const TransactionTable = ({
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setOpen(true);
+  };
+
+  const handleDirectAgentPayment = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setDirectAgentPaymentOpen(true);
   };
 
   const handleUpdate = () => {
@@ -390,6 +399,11 @@ const TransactionTable = ({
                       >
                         <View className="w-4 h-4 mr-2" /> Detail
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDirectAgentPayment(transaction)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" /> Apply Payment
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleEdit(transaction)}>
                         <Pencil className="w-4 h-4 mr-2" /> Edit
                       </DropdownMenuItem>
@@ -413,6 +427,17 @@ const TransactionTable = ({
           onClose={() => setOpen(false)}
           transaction={selectedTransaction}
           onSave={handleUpdate}
+        />
+      )}
+
+      {selectedTransaction && (
+        <AddDirectAgentPayment
+          transaction={selectedTransaction}
+          onSuccess={() => {
+            setDirectAgentPaymentOpen(false);
+          }}
+          isOpen={directAgentPaymentOpen}
+          setIsOpen={setDirectAgentPaymentOpen}
         />
       )}
 
