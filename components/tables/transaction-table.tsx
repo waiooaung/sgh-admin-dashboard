@@ -419,7 +419,7 @@ const TransactionTable = ({
                 className="hover:bg-blend-color transition-colors"
               >
                 <TableCell className="truncate">
-                  #TNX-{transaction.id}
+                  #TNX-{transaction.baseCurrency.name}-{transaction.quoteCurrency.name}-{transaction.id}
                 </TableCell>
                 <TableCell className="truncate">
                   {new Date(transaction.transactionDate).toLocaleDateString()}
