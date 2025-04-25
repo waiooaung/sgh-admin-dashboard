@@ -42,6 +42,7 @@ import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Transaction } from "@/types/transaction";
 import AgentBalances from "../overviews/agent-balances";
+import { mutate } from "swr";
 
 interface Props {
   transaction: Transaction;
@@ -74,7 +75,7 @@ export function AddDirectAgentPayment({
   const transactionId = transaction.id;
   const defaultAgent = transaction.Agent;
   const defaultCurrency = transaction.quoteCurrency;
-  const defaultAmount = transaction.quoteAmountSell;
+  const defaultAmount = transaction.remainingAmountFromAgent;
   const transactionCurrencies = [
     transaction.baseCurrency,
     transaction.quoteCurrency,
@@ -95,7 +96,7 @@ export function AddDirectAgentPayment({
   });
 
   const { trigger } = useSWRMutation(
-    `/agent-payments`,
+    `/agent-payments/directPayment`,
     async (url, { arg }: { arg: AgentPaymentFormData }) => {
       return await axiosInstance.post<AgentPaymentFormData>(url, arg);
     },
@@ -111,6 +112,11 @@ export function AddDirectAgentPayment({
       await trigger(values);
       toast.success("Payment added successfully!");
       onSuccess();
+      await mutate(
+        (key) => typeof key === "string" && key.startsWith("/transactions"),
+        undefined,
+        { revalidate: true },
+      );
       form.reset();
       setIsOpen(false);
     } catch (error: any) {
@@ -130,7 +136,7 @@ export function AddDirectAgentPayment({
       transactionId,
       agentId: transaction.Agent?.id,
       currencyId: transaction.quoteCurrency.id,
-      amountPaid: transaction.quoteAmountSell,
+      amountPaid: transaction.remainingAmountFromAgent,
       transactionCurrencyId: undefined,
       paymentType: "",
     });

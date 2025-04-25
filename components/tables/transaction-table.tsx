@@ -64,24 +64,34 @@ interface ApiResponse {
   meta: MetaData;
 }
 
+type PaymentStatus = "PENDING" | "PARTIALLY_PAID" | "PAID";
+
 interface TransactionTableProps {
   agentList?: Agent[];
   supplierList?: Supplier[];
   transactionTypeList?: TransactionType[];
+  agentPaymentStatusList?: PaymentStatus[];
+  supplierPaymentStatusList?: PaymentStatus[];
   defaultSupplierId?: number;
   defaultAgentId?: number;
   defaultDateFrom?: Date;
   defaultDateTo?: Date;
+  defaultAgentPaymentStatus?: PaymentStatus[];
+  defaultSupplierPaymentStatus?: PaymentStatus[];
 }
 
 const TransactionTable = ({
   agentList,
   supplierList,
   transactionTypeList,
+  agentPaymentStatusList,
+  supplierPaymentStatusList,
   defaultSupplierId,
   defaultAgentId,
   defaultDateFrom,
   defaultDateTo,
+  defaultAgentPaymentStatus,
+  defaultSupplierPaymentStatus,
 }: TransactionTableProps) => {
   const router = useRouter();
   const { user } = useAuth();
@@ -104,6 +114,12 @@ const TransactionTable = ({
   );
   const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
   const [to, setTo] = useState<Date | undefined>(defaultDateTo);
+  const [agentPaymentStatus, setAgentPaymentStatus] = useState<
+    PaymentStatus[] | undefined
+  >(defaultAgentPaymentStatus);
+  const [supplierPaymentStatus, setSupplierPaymentStatus] = useState<
+    PaymentStatus[] | undefined
+  >(defaultSupplierPaymentStatus);
   const queryParams = new URLSearchParams({
     tenantId: tenantId.toString(),
     page: currentPage.toString(),
@@ -119,6 +135,16 @@ const TransactionTable = ({
   if (to) {
     to.setHours(23, 59, 59, 999);
     queryParams.append("to", to.toISOString());
+  }
+  if (agentPaymentStatus) {
+    agentPaymentStatus.forEach((status) => {
+      queryParams.append("agentPaymentStatus", status);
+    });
+  }
+  if (supplierPaymentStatus) {
+    supplierPaymentStatus.forEach((status) => {
+      queryParams.append("supplierPaymentStatus", status);
+    });
   }
 
   const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
@@ -264,6 +290,52 @@ const TransactionTable = ({
           </Select>
         )}
 
+        {agentPaymentStatusList && (
+          <Select
+            onValueChange={(value: PaymentStatus) =>
+              setAgentPaymentStatus([value])
+            }
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Agent" />
+            </SelectTrigger>
+            <SelectContent>
+              {agentPaymentStatusList?.length > 0 &&
+                agentPaymentStatusList?.map((agentPaymentStatus) => (
+                  <SelectItem
+                    key={agentPaymentStatus}
+                    value={agentPaymentStatus}
+                  >
+                    {agentPaymentStatus}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {supplierPaymentStatusList && (
+          <Select
+            onValueChange={(value: PaymentStatus) =>
+              setSupplierPaymentStatus([value])
+            }
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Agent" />
+            </SelectTrigger>
+            <SelectContent>
+              {supplierPaymentStatusList?.length > 0 &&
+                supplierPaymentStatusList?.map((supplierPaymentStatus) => (
+                  <SelectItem
+                    key={supplierPaymentStatus}
+                    value={supplierPaymentStatus}
+                  >
+                    {supplierPaymentStatus}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
+
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -327,14 +399,13 @@ const TransactionTable = ({
             <TableHead className="text-left truncate">Date</TableHead>
             <TableHead className="text-left truncate">Amount (From)</TableHead>
             <TableHead className="text-left truncate">
-              Amount (To)<span className="text-blue-500">(Buy Rate)</span>
-            </TableHead>
-            <TableHead className="text-left truncate">
               Amount (To) <span className="text-green-500">(Sell Rate)</span>
             </TableHead>
+            <TableHead className="text-left truncate">Amount Owed</TableHead>
             <TableHead className="text-left truncate">Profit</TableHead>
             <TableHead className="text-left truncate">Commission</TableHead>
             <TableHead className="text-left truncate">Total Earnings</TableHead>
+            <TableHead className="text-left truncate">Payment Status</TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -367,10 +438,17 @@ const TransactionTable = ({
                   <span>({transaction.sellRate})</span>
                 </TableCell>
                 <TableCell className="truncate">
+                  {transaction.quoteCurrency.symbol}{" "}
+                  {transaction.remainingAmountFromAgent}
+                </TableCell>
+                <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.profit}
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.commission}
+                </TableCell>
+                <TableCell className="truncate">
+                  {transaction.agentPaymentStatus}
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
@@ -399,11 +477,13 @@ const TransactionTable = ({
                       >
                         <View className="w-4 h-4 mr-2" /> Detail
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDirectAgentPayment(transaction)}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2" /> Apply Payment
-                      </DropdownMenuItem>
+                      {transaction.agentPaymentStatus !== "PAID" && (
+                        <DropdownMenuItem
+                          onClick={() => handleDirectAgentPayment(transaction)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Payment
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={() => handleEdit(transaction)}>
                         <Pencil className="w-4 h-4 mr-2" /> Edit
                       </DropdownMenuItem>

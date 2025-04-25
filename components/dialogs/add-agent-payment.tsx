@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardContent, CardTitle } from "../ui/card";
 
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
@@ -40,6 +41,7 @@ import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Agent } from "@/types/agent";
 import AgentOverview from "../overviews/agent-overview";
+import TransactionTable from "../tables/transaction-table";
 
 interface AddAgentPaymentProps {
   defaultAgent?: Agent;
@@ -228,6 +230,22 @@ export function AddAgentPayment({
               </div>
             </form>
           </Form>
+
+          {tenantId && agentId && (
+            <div className="grid grid-cols-1 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Open Transactions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TransactionTable
+                    defaultAgentId={agentId}
+                    defaultAgentPaymentStatus={["PARTIALLY_PAID", "PENDING"]}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
