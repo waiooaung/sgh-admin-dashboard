@@ -429,11 +429,6 @@ const TransactionTable = ({
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol}{" "}
-                  {transaction.quoteAmountBuy}
-                  <span>({transaction.buyRate})</span>
-                </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol}{" "}
                   {transaction.quoteAmountSell}
                   <span>({transaction.sellRate})</span>
                 </TableCell>
@@ -448,9 +443,6 @@ const TransactionTable = ({
                   {transaction.quoteCurrency.symbol} {transaction.commission}
                 </TableCell>
                 <TableCell className="truncate">
-                  {transaction.agentPaymentStatus}
-                </TableCell>
-                <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
                   {transaction.TransactionProfit?.map((profit) => {
                     return (
@@ -459,6 +451,9 @@ const TransactionTable = ({
                       </p>
                     );
                   })}
+                </TableCell>
+                <TableCell className="truncate">
+                  {transaction.agentPaymentStatus}
                 </TableCell>
                 <TableCell className="truncate">
                   <DropdownMenu>
