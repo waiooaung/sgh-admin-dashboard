@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import fetcher from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import {
@@ -55,6 +55,8 @@ import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
 import { TransactionType } from "@/types/transactionType";
 import { AddDirectAgentPayment } from "../dialogs/add-direct-agent-payment";
+import { Currency } from "@/types/currency";
+import { useSearchParams } from "next/navigation";
 
 interface ApiResponse {
   statusCode: number;
@@ -72,12 +74,15 @@ interface TransactionTableProps {
   transactionTypeList?: TransactionType[];
   agentPaymentStatusList?: PaymentStatus[];
   supplierPaymentStatusList?: PaymentStatus[];
+  currencyList?: Currency[];
   defaultSupplierId?: number;
   defaultAgentId?: number;
   defaultDateFrom?: Date;
   defaultDateTo?: Date;
   defaultAgentPaymentStatus?: PaymentStatus[];
   defaultSupplierPaymentStatus?: PaymentStatus[];
+  defaultBaseCurrencyId?: number;
+  defaultQuoteCurrencyId?: number;
 }
 
 const TransactionTable = ({
@@ -86,14 +91,18 @@ const TransactionTable = ({
   transactionTypeList,
   agentPaymentStatusList,
   supplierPaymentStatusList,
+  currencyList,
   defaultSupplierId,
   defaultAgentId,
   defaultDateFrom,
   defaultDateTo,
   defaultAgentPaymentStatus,
   defaultSupplierPaymentStatus,
+  defaultBaseCurrencyId,
+  defaultQuoteCurrencyId,
 }: TransactionTableProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : 0;
   const { trigger: deleteTransaction } = useDeleteTransaction();
@@ -120,6 +129,13 @@ const TransactionTable = ({
   const [supplierPaymentStatus, setSupplierPaymentStatus] = useState<
     PaymentStatus[] | undefined
   >(defaultSupplierPaymentStatus);
+  const [baseCurrencyId, setBaseCurrencyId] = useState<number | undefined>(
+    defaultBaseCurrencyId,
+  );
+  const [quoteCurrencyId, setQuoteCurrencyId] = useState<number | undefined>(
+    defaultQuoteCurrencyId,
+  );
+
   const queryParams = new URLSearchParams({
     tenantId: tenantId.toString(),
     page: currentPage.toString(),
@@ -147,11 +163,27 @@ const TransactionTable = ({
     });
   }
 
+  if (baseCurrencyId)
+    queryParams.append("baseCurrencyId", baseCurrencyId.toString());
+  if (quoteCurrencyId)
+    queryParams.append("quoteCurrencyId", quoteCurrencyId.toString());
+
+  useEffect(() => {
+    const baseCurrencyIdParam = searchParams.get("baseCurrencyId");
+    const quoteCurrencyIdParam = searchParams.get("quoteCurrencyId");
+
+    setBaseCurrencyId(
+      baseCurrencyIdParam ? parseInt(baseCurrencyIdParam) : undefined,
+    );
+    setQuoteCurrencyId(
+      quoteCurrencyIdParam ? parseInt(quoteCurrencyIdParam) : undefined,
+    );
+  }, [searchParams]);
+
   const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
     `/transactions?${queryParams.toString()}`,
     fetcher,
   );
-
   if (error)
     return <p className="text-red-500">Failed to load transactions.</p>;
 
@@ -336,6 +368,46 @@ const TransactionTable = ({
           </Select>
         )}
 
+        {currencyList && (
+          <Select
+            onValueChange={(value: string) =>
+              setBaseCurrencyId(parseInt(value))
+            }
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Base Currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyList?.length > 0 &&
+                currencyList?.map((currency) => (
+                  <SelectItem key={currency.id} value={currency.name}>
+                    {currency.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {currencyList && (
+          <Select
+            onValueChange={(value: string) =>
+              setQuoteCurrencyId(parseInt(value))
+            }
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select Quote Currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyList?.length > 0 &&
+                currencyList?.map((currency) => (
+                  <SelectItem key={currency.id} value={currency.name}>
+                    {currency.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        )}
+
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -419,7 +491,8 @@ const TransactionTable = ({
                 className="hover:bg-blend-color transition-colors"
               >
                 <TableCell className="truncate">
-                  #TNX-{transaction.baseCurrency.name}-{transaction.quoteCurrency.name}-{transaction.id}
+                  #TNX-{transaction.baseCurrency.name}-
+                  {transaction.quoteCurrency.name}-{transaction.id}
                 </TableCell>
                 <TableCell className="truncate">
                   {new Date(transaction.transactionDate).toLocaleDateString()}

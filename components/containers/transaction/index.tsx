@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { AddNewTransaction } from "@/components/dialogs/add-new-transaction";
 import TransactionTable from "@/components/tables/transaction-table";
@@ -18,10 +19,24 @@ import {
 } from "@/types/profitDisplayCurrency";
 import { useAuth } from "@/context/authContext";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 const TransactionContainer = () => {
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : undefined;
+
+  const searchParams = useSearchParams();
+
+  const [baseCurrencyId, setBaseCurrencyId] = useState<number | undefined>();
+  const [quoteCurrencyId, setQuoteCurrencyId] = useState<number | undefined>();
+
+  useEffect(() => {
+    const baseId = searchParams.get("baseCurrencyId");
+    const quoteId = searchParams.get("quoteCurrencyId");
+
+    setBaseCurrencyId(baseId ? parseInt(baseId) : undefined);
+    setQuoteCurrencyId(quoteId ? parseInt(quoteId) : undefined);
+  }, [searchParams]);
   const revalidateAll = async () => {
     await mutate(
       (key) =>
@@ -110,6 +125,8 @@ const TransactionContainer = () => {
               agentList={agents}
               supplierList={suppliers}
               transactionTypeList={transactionTypes}
+              defaultBaseCurrencyId={baseCurrencyId}
+              defaultQuoteCurrencyId={quoteCurrencyId}
             />
           </CardContent>
         </Card>

@@ -59,7 +59,9 @@ const DashboardTransactionOverview = () => {
             <p className="text-sm text-muted-foreground">Total Transactions</p>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
+            >
               <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalTransactionsCount,
@@ -79,7 +81,9 @@ const DashboardTransactionOverview = () => {
             <p className="text-xs text-muted-foreground">Profit + Commission</p>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
+            >
               <div className="text-xl font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(stats.totalEarnings)}
               </div>
@@ -97,7 +101,9 @@ const DashboardTransactionOverview = () => {
             <p className="text-xs text-muted-foreground">Total Exchanged</p>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
+            >
               <div className="text-xl font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(stats.totalBaseAmount)}
               </div>
@@ -117,7 +123,9 @@ const DashboardTransactionOverview = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
+            >
               <div className="text-xl font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalQuoteAmountSell,
@@ -137,7 +145,9 @@ const DashboardTransactionOverview = () => {
             <p className="text-xs text-muted-foreground">Paid to Suppliers</p>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
+            >
               <div className="text-xl font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalQuoteAmountBuy,

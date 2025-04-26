@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/authContext";
 import { DataContextProvider } from "@/context/dataContext";
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,12 +41,14 @@ export default async function RootLayout({
           disableTransitionOnChange
           storageKey="theme"
         >
-          <AuthProvider>
-            <DataContextProvider>
-              {children}
-              <Toaster position="top-right" richColors />
-            </DataContextProvider>
-          </AuthProvider>
+          <Suspense fallback={<div>Loading transactions...</div>}>
+            <AuthProvider>
+              <DataContextProvider>
+                {children}
+                <Toaster position="top-right" richColors />
+              </DataContextProvider>
+            </AuthProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
