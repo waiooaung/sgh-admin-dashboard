@@ -22,6 +22,12 @@ export type SupplierPaymentFormData = {
   paymentType: string;
 };
 
+export type DirectSupplierPaymentFormData = SupplierPaymentFormData & {
+  transactionId: number;
+  transactionCurrencyId: number;
+  exchangeRate: number;
+};
+
 export type SupplierPaymentTransaction = {
   id: number;
   transactionId: number;

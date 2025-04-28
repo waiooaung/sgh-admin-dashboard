@@ -55,6 +55,7 @@ import { Agent } from "@/types/agent";
 import { Supplier } from "@/types/supplier";
 import { TransactionType } from "@/types/transactionType";
 import { AddDirectAgentPayment } from "../dialogs/add-direct-agent-payment";
+import { AddDirectSupplierPayment } from "../dialogs/add-direct-supplier-payment";
 import { Currency } from "@/types/currency";
 import { useSearchParams } from "next/navigation";
 
@@ -111,6 +112,8 @@ const TransactionTable = ({
   const itemsPerPage = 10;
   const [open, setOpen] = useState<boolean>(false);
   const [directAgentPaymentOpen, setDirectAgentPaymentOpen] =
+    useState<boolean>(false);
+  const [directSupplierPaymentOpen, setDirectSupplierPaymentOpen] =
     useState<boolean>(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
@@ -242,6 +245,11 @@ const TransactionTable = ({
   const handleDirectAgentPayment = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setDirectAgentPaymentOpen(true);
+  };
+
+  const handleDirectSupplierPayment = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setDirectSupplierPaymentOpen(true);
   };
 
   const handleUpdate = () => {
@@ -473,11 +481,13 @@ const TransactionTable = ({
             <TableHead className="text-left truncate">
               Amount (To) <span className="text-green-500">(Sell Rate)</span>
             </TableHead>
+            <TableHead className="text-left truncate">Amount Due</TableHead>
             <TableHead className="text-left truncate">Amount Owed</TableHead>
             <TableHead className="text-left truncate">Profit</TableHead>
             <TableHead className="text-left truncate">Commission</TableHead>
             <TableHead className="text-left truncate">Total Earnings</TableHead>
-            <TableHead className="text-left truncate">Payment Status</TableHead>
+            <TableHead className="text-left truncate">Payment Status (Customer)</TableHead>
+            <TableHead className="text-left truncate">Payment Status (Supplier)</TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -529,6 +539,9 @@ const TransactionTable = ({
                   {transaction.agentPaymentStatus}
                 </TableCell>
                 <TableCell className="truncate">
+                  {transaction.supplierPaymentStatus}
+                </TableCell>
+                <TableCell className="truncate">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="icon" variant="ghost">
@@ -549,7 +562,14 @@ const TransactionTable = ({
                         <DropdownMenuItem
                           onClick={() => handleDirectAgentPayment(transaction)}
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Payment
+                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Customer Payment
+                        </DropdownMenuItem>
+                      )}
+                      {transaction.supplierPaymentStatus !== "PAID" && (
+                        <DropdownMenuItem
+                          onClick={() => handleDirectSupplierPayment(transaction)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Supplier Payment
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem onClick={() => handleEdit(transaction)}>
@@ -586,6 +606,17 @@ const TransactionTable = ({
           }}
           isOpen={directAgentPaymentOpen}
           setIsOpen={setDirectAgentPaymentOpen}
+        />
+      )}
+
+      {selectedTransaction && (
+        <AddDirectSupplierPayment
+          transaction={selectedTransaction}
+          onSuccess={() => {
+            setDirectSupplierPaymentOpen(false);
+          }}
+          isOpen={directSupplierPaymentOpen}
+          setIsOpen={setDirectSupplierPaymentOpen}
         />
       )}
 

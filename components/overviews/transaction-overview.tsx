@@ -63,7 +63,7 @@ const TransactionOverview = () => {
             <Link
               href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
             >
-              <div className="font-bold text-red-500 truncate">
+              <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalTransactionsCount,
                 )}

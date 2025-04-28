@@ -32,16 +32,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
-import {
-  AgentPaymentFormData,
-  DirectAgentPaymentFormData,
-} from "@/types/agentPayment";
+import { DirectSupplierPaymentFormData } from "@/types/supplierPayment";
 import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
-import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Transaction } from "@/types/transaction";
-import AgentBalances from "../overviews/agent-balances";
 import { mutate } from "swr";
 
 interface Props {
@@ -55,7 +50,7 @@ interface Props {
 const formSchema = z.object({
   tenantId: z.coerce.number(),
   transactionId: z.coerce.number(),
-  agentId: z.coerce.number(),
+  supplierId: z.coerce.number(),
   currencyId: z.coerce.number(),
   amountPaid: z.coerce.number(),
   transactionCurrencyId: z.coerce.number(),
@@ -63,7 +58,7 @@ const formSchema = z.object({
   paymentType: z.string().min(5),
 });
 
-export function AddDirectAgentPayment({
+export function AddDirectSupplierPayment({
   transaction,
   onSuccess,
   isOpen,
@@ -73,20 +68,20 @@ export function AddDirectAgentPayment({
   const tenantId = user ? user.tenantId : undefined;
   const [loading, setLoading] = useState(false);
   const transactionId = transaction.id;
-  const defaultAgent = transaction.Agent;
+  const defaultSupplier = transaction.Supplier;
   const defaultCurrency = transaction.quoteCurrency;
-  const defaultAmount = transaction.remainingAmountFromAgent;
+  const defaultAmount = transaction.remainingAmountToPayToSupplier;
   const transactionCurrencies = [
     transaction.baseCurrency,
     transaction.quoteCurrency,
   ];
 
-  const form = useForm<DirectAgentPaymentFormData>({
+  const form = useForm<DirectSupplierPaymentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tenantId,
       transactionId: transactionId,
-      agentId: defaultAgent.id,
+      supplierId: defaultSupplier.id,
       currencyId: defaultCurrency.id,
       amountPaid: defaultAmount,
       transactionCurrencyId: undefined,
@@ -96,16 +91,15 @@ export function AddDirectAgentPayment({
   });
 
   const { trigger } = useSWRMutation(
-    `/agent-payments/directPayment`,
-    async (url, { arg }: { arg: AgentPaymentFormData }) => {
-      return await axiosInstance.post<AgentPaymentFormData>(url, arg);
+    `/supplier-payments/directPayment`,
+    async (url, { arg }: { arg: DirectSupplierPaymentFormData }) => {
+      return await axiosInstance.post<DirectSupplierPaymentFormData>(url, arg);
     },
   );
 
-  const { agents } = useAgents(tenantId);
   const { currencies } = useCurrencies(tenantId);
 
-  const handleSubmit = async (values: AgentPaymentFormData) => {
+  const handleSubmit = async (values: DirectSupplierPaymentFormData) => {
     if (loading) return;
     try {
       setLoading(true);
@@ -134,9 +128,9 @@ export function AddDirectAgentPayment({
     form.reset({
       tenantId,
       transactionId,
-      agentId: transaction.Agent?.id,
+      supplierId: transaction.Supplier?.id,
       currencyId: transaction.quoteCurrency.id,
-      amountPaid: transaction.remainingAmountFromAgent,
+      amountPaid: transaction.remainingAmountToPayToSupplier,
       transactionCurrencyId: undefined,
       paymentType: "",
     });
@@ -154,47 +148,14 @@ export function AddDirectAgentPayment({
     >
       <DialogContent className="sm:max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Apply Customer Payment</DialogTitle>
+          <DialogTitle>Apply Supplier Payment</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 grid-cols-1">
-          <AgentBalances agentId={defaultAgent.id} />
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
-              {/* Agent */}
-              {!defaultAgent && (
-                <FormField
-                  control={form.control}
-                  name="agentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Agent</FormLabel>
-                      <Select onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select agent..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {agents.length > 0 &&
-                            agents.map((agent) => (
-                              <SelectItem
-                                key={agent.id}
-                                value={agent.id.toString()}
-                              >
-                                {agent.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
               {/* Currency Id */}
               <FormField
                 control={form.control}
