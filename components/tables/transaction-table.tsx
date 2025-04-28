@@ -486,8 +486,12 @@ const TransactionTable = ({
             <TableHead className="text-left truncate">Profit</TableHead>
             <TableHead className="text-left truncate">Commission</TableHead>
             <TableHead className="text-left truncate">Total Earnings</TableHead>
-            <TableHead className="text-left truncate">Payment Status (Customer)</TableHead>
-            <TableHead className="text-left truncate">Payment Status (Supplier)</TableHead>
+            <TableHead className="text-left truncate">
+              Payment Status (Customer)
+            </TableHead>
+            <TableHead className="text-left truncate">
+              Payment Status (Supplier)
+            </TableHead>
             <TableHead className="text-left truncate">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -518,6 +522,10 @@ const TransactionTable = ({
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol}{" "}
                   {transaction.remainingAmountFromAgent}
+                </TableCell>
+                <TableCell className="truncate">
+                  {transaction.quoteCurrency.symbol}{" "}
+                  {transaction.remainingAmountToPayToSupplier}
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.quoteCurrency.symbol} {transaction.profit}
@@ -562,14 +570,18 @@ const TransactionTable = ({
                         <DropdownMenuItem
                           onClick={() => handleDirectAgentPayment(transaction)}
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Customer Payment
+                          <CheckCircle className="w-4 h-4 mr-2" /> Apply
+                          Customer Payment
                         </DropdownMenuItem>
                       )}
                       {transaction.supplierPaymentStatus !== "PAID" && (
                         <DropdownMenuItem
-                          onClick={() => handleDirectSupplierPayment(transaction)}
+                          onClick={() =>
+                            handleDirectSupplierPayment(transaction)
+                          }
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Apply Supplier Payment
+                          <CheckCircle className="w-4 h-4 mr-2" /> Apply
+                          Supplier Payment
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem onClick={() => handleEdit(transaction)}>
