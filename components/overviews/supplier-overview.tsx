@@ -43,13 +43,13 @@ const SupplierOverview = ({
 
     return {
       ...stats,
-      totalAmountPaidToSupplier: match ? match.paidAmount : 0,
+      supplierBalance: match ? match.paidAmount : 0,
     };
   });
   return updatedStatistics.map((stats, index) => {
     return (
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-3"
+        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-2"
         key={index}
       >
         <Card>
@@ -122,7 +122,7 @@ const SupplierOverview = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              Amount to Pay
+              Amount Owed
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -131,6 +131,24 @@ const SupplierOverview = ({
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalRemainingAmountToPayToSupplier,
+                )}
+              </div>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-medium truncate">
+              Credit Balance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Link href="/transactions">
+              <div className="text-base font-bold text-red-500 truncate">
+                {stats.quoteCurrency.symbol}
+                {new Intl.NumberFormat("en-US").format(
+                  stats.supplierBalance,
                 )}
               </div>
             </Link>

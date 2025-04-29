@@ -49,7 +49,7 @@ const AgentOverview = ({
   return updatedStatistics.map((stats, index) => {
     return (
       <div
-        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-3"
+        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-2"
         key={index}
       >
         <Card>
