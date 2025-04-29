@@ -122,7 +122,7 @@ const AgentOverview = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              Balance Owed
+              Balance Due
             </CardTitle>
           </CardHeader>
           <CardContent>
