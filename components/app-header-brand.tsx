@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 
 export function AppHeaderBrand({
   teams,
@@ -21,6 +22,7 @@ export function AppHeaderBrand({
     plan: string;
   }[];
 }) {
+  const router = useRouter();
   const [activeTeam] = React.useState(teams[0]);
 
   return (
@@ -30,7 +32,11 @@ export function AppHeaderBrand({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push("/dashboard");
+              }}
+              className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
                 <span className="text-xs">SGH</span>

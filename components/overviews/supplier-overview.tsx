@@ -147,9 +147,7 @@ const SupplierOverview = ({
             <Link href="/transactions">
               <div className="text-base font-bold text-red-500 truncate">
                 {stats.quoteCurrency.symbol}
-                {new Intl.NumberFormat("en-US").format(
-                  stats.supplierBalance,
-                )}
+                {new Intl.NumberFormat("en-US").format(stats.supplierBalance)}
               </div>
             </Link>
           </CardContent>
