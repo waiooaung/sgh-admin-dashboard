@@ -45,6 +45,15 @@ const TransactionSkeletonTable = () => {
             <Skeleton className="h-5" />
           </TableCell>
           <TableCell>
+            <Skeleton className="h-5" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5" />
+          </TableCell>
+          <TableCell>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="ghost">

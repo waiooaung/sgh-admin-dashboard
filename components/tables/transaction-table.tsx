@@ -78,6 +78,7 @@ interface TransactionTableProps {
   currencyList?: Currency[];
   defaultSupplierId?: number;
   defaultAgentId?: number;
+  defaultTransactionTypeId?: number;
   defaultDateFrom?: Date;
   defaultDateTo?: Date;
   defaultAgentPaymentStatus?: PaymentStatus[];
@@ -95,6 +96,7 @@ const TransactionTable = ({
   currencyList,
   defaultSupplierId,
   defaultAgentId,
+  defaultTransactionTypeId,
   defaultDateFrom,
   defaultDateTo,
   defaultAgentPaymentStatus,
@@ -124,6 +126,9 @@ const TransactionTable = ({
   const [agentId, setAgentId] = useState<string | undefined>(
     defaultAgentId ? defaultAgentId.toString() : undefined,
   );
+  const [transactionTypeId, setTransactionTypeId] = useState<
+    string | undefined
+  >(defaultTransactionTypeId ? defaultTransactionTypeId.toString() : undefined);
   const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
   const [to, setTo] = useState<Date | undefined>(defaultDateTo);
   const [agentPaymentStatus, setAgentPaymentStatus] = useState<
@@ -147,6 +152,8 @@ const TransactionTable = ({
 
   if (supplierId) queryParams.append("supplierId", supplierId.toString());
   if (agentId) queryParams.append("agentId", agentId.toString());
+  if (transactionTypeId)
+    queryParams.append("transactionTypeId", transactionTypeId.toString());
   if (from) {
     from.setHours(0, 0, 0, 0);
     queryParams.append("from", from.toISOString());
@@ -310,13 +317,16 @@ const TransactionTable = ({
 
         {transactionTypeList && (
           <Select
-            onValueChange={(value) => setAgentId(value)}
-            defaultValue={agentId}
+            onValueChange={(value) =>
+              setTransactionTypeId(value === "all" ? undefined : value)
+            }
+            defaultValue={transactionTypeId}
           >
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Agent" />
+              <SelectValue placeholder="Select Transaction Type" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All</SelectItem>
               {transactionTypeList?.length > 0 &&
                 transactionTypeList?.map((transactionType) => (
                   <SelectItem
@@ -461,7 +471,6 @@ const TransactionTable = ({
             />
           </PopoverContent>
         </Popover>
-
         <Button onClick={handleSearch} className="">
           <Search className="w-5 h-5" />
         </Button>
@@ -477,6 +486,8 @@ const TransactionTable = ({
           <TableRow>
             <TableHead className="text-left truncate">ID</TableHead>
             <TableHead className="text-left truncate">Date</TableHead>
+            <TableHead className="text-left truncate">Customer</TableHead>
+            <TableHead className="text-left truncate">Supplier</TableHead>
             <TableHead className="text-left truncate">Amount (From)</TableHead>
             <TableHead className="text-left truncate">
               Amount (To) <span className="text-green-500">(Sell Rate)</span>
@@ -510,6 +521,12 @@ const TransactionTable = ({
                 </TableCell>
                 <TableCell className="truncate">
                   {new Date(transaction.transactionDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="truncate">
+                  {transaction.Agent.name}
+                </TableCell>
+                <TableCell className="truncate">
+                  {transaction.Supplier.name}
                 </TableCell>
                 <TableCell className="truncate">
                   {transaction.baseCurrency.symbol} {transaction.baseAmount}
