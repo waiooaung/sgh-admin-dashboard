@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useApi } from "./useApi";
 import { ExchangeRateApiResponse } from "@/types/exchangeRate";
-import { mutate } from "swr";
 
 export const useExchangeRates = (queryString: URLSearchParams) => {
   const { data, error, isLoading, mutate } = useApi<ExchangeRateApiResponse>(
