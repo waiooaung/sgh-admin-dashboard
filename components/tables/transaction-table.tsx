@@ -282,8 +282,8 @@ const TransactionTable = ({
             onValueChange={(value) => setSupplierId(value)}
             defaultValue={supplierId}
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
-              <SelectValue placeholder="Select Supplier" className="truncate" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
+              <SelectValue placeholder="Select Supplier"/>
             </SelectTrigger>
             <SelectContent>
               {supplierList?.length > 0 &&
@@ -301,8 +301,8 @@ const TransactionTable = ({
             onValueChange={(value) => setAgentId(value)}
             defaultValue={agentId}
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
-              <SelectValue placeholder="Select Agent" className="truncate" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
+              <SelectValue placeholder="Select Agent"/>
             </SelectTrigger>
             <SelectContent>
               {agentList?.length > 0 &&
@@ -322,10 +322,10 @@ const TransactionTable = ({
             }
             defaultValue={transactionTypeId}
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
               <SelectValue
                 placeholder="Select Transaction Type"
-                className="truncate"
+                className="truncate text-xs"
               />
             </SelectTrigger>
             <SelectContent>
@@ -349,8 +349,8 @@ const TransactionTable = ({
               setAgentPaymentStatus([value])
             }
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
-              <SelectValue placeholder="Select Agent" className="truncate" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
+              <SelectValue placeholder="Select Agent"/>
             </SelectTrigger>
             <SelectContent>
               {agentPaymentStatusList?.length > 0 &&
@@ -372,8 +372,8 @@ const TransactionTable = ({
               setSupplierPaymentStatus([value])
             }
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
-              <SelectValue placeholder="Select Agent" className="truncate" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
+              <SelectValue placeholder="Select Agent"/>
             </SelectTrigger>
             <SelectContent>
               {supplierPaymentStatusList?.length > 0 &&
@@ -395,10 +395,10 @@ const TransactionTable = ({
               setBaseCurrencyId(parseInt(value))
             }
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
               <SelectValue
                 placeholder="Select Base Currency"
-                className="truncate"
+                className="truncate text-xs"
               />
             </SelectTrigger>
             <SelectContent>
@@ -418,10 +418,10 @@ const TransactionTable = ({
               setQuoteCurrencyId(parseInt(value))
             }
           >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
               <SelectValue
                 placeholder="Select Quote Currency"
-                className="truncate"
+                className="truncate text-xs"
               />
             </SelectTrigger>
             <SelectContent>
@@ -440,7 +440,7 @@ const TransactionTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-sm",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
                 !from && "text-muted-foreground",
               )}
             >
@@ -463,7 +463,7 @@ const TransactionTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-sm",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
                 !from && "text-muted-foreground",
               )}
             >
@@ -640,7 +640,7 @@ const TransactionTable = ({
       )}
 
       <div className="flex justify-between items-center mt-4">
-        <p className="text-sm">
+        <p className="text-xs">
           Total Transactions:{" "}
           <span className="font-semibold">{meta.totalItems}</span>
         </p>
