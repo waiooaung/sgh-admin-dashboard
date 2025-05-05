@@ -485,7 +485,7 @@ const TransactionTable = ({
         </Button>
       </div>
       <Table className="table-auto w-full text-xs text-left">
-        <TableHeader className="text-xs">
+        <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Date</TableHead>
