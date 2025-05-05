@@ -163,12 +163,8 @@ const TransactedRateTable = ({
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Transaction Type</TableHead>
-            <TableHead className="text-blue-500">
-              Buy Rate
-            </TableHead>
-            <TableHead className="text-green-500">
-              Sell Rate
-            </TableHead>
+            <TableHead className="text-blue-500">Buy Rate</TableHead>
+            <TableHead className="text-green-500">Sell Rate</TableHead>
             <TableHead>Date</TableHead>
           </TableRow>
         </TableHeader>
@@ -181,19 +177,13 @@ const TransactedRateTable = ({
                 key={transaction.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell>
-                  #TNX-{transaction.id}
-                </TableCell>
+                <TableCell>#TNX-{transaction.id}</TableCell>
                 <TableCell>
                   {transaction.baseCurrency.name} -{" "}
                   {transaction.quoteCurrency.name}
                 </TableCell>
-                <TableCell>
-                  {transaction.buyRate}
-                </TableCell>
-                <TableCell>
-                  {transaction.sellRate}
-                </TableCell>
+                <TableCell>{transaction.buyRate}</TableCell>
+                <TableCell>{transaction.sellRate}</TableCell>
                 <TableCell>
                   {new Date(transaction.transactionDate).toLocaleString()}
                 </TableCell>
