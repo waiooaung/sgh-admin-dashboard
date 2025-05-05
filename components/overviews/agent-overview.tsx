@@ -59,7 +59,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions?date=25-02-2025">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-green-500 truncate">
                 {stats.totalTransactionsCount}
               </div>
@@ -74,7 +76,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions?date=25-02-2025">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-green-500 truncate">
                 {stats.baseCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(stats.totalBaseAmount)}
@@ -90,7 +94,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-blue-500 truncate">
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
@@ -108,7 +114,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-amber-500 truncate">
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
@@ -126,7 +134,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-red-500 truncate">
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(
@@ -144,7 +154,9 @@ const AgentOverview = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/transactions">
+            <Link
+              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&agentId=${agentId}`}
+            >
               <div className="text-base font-bold text-red-500 truncate">
                 {stats.quoteCurrency.symbol}
                 {new Intl.NumberFormat("en-US").format(stats.agentBalance)}

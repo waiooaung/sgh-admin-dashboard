@@ -114,12 +114,10 @@ const TransactionTable = ({
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
-  const [supplierId, setSupplierId] = useState<string | undefined>(
-    defaultSupplierId ? defaultSupplierId.toString() : undefined,
+  const [supplierId, setSupplierId] = useState<number | undefined>(
+    defaultSupplierId,
   );
-  const [agentId, setAgentId] = useState<string | undefined>(
-    defaultAgentId ? defaultAgentId.toString() : undefined,
-  );
+  const [agentId, setAgentId] = useState<number | undefined>(defaultAgentId);
   const [transactionTypeId, setTransactionTypeId] = useState<
     string | undefined
   >(defaultTransactionTypeId ? defaultTransactionTypeId.toString() : undefined);
@@ -175,6 +173,8 @@ const TransactionTable = ({
   useEffect(() => {
     const baseCurrencyIdParam = searchParams.get("baseCurrencyId");
     const quoteCurrencyIdParam = searchParams.get("quoteCurrencyId");
+    const agentIdParam = searchParams.get("agentId");
+    const supplierIdParma = searchParams.get("supplierId");
 
     setBaseCurrencyId(
       baseCurrencyIdParam ? parseInt(baseCurrencyIdParam) : undefined,
@@ -182,6 +182,8 @@ const TransactionTable = ({
     setQuoteCurrencyId(
       quoteCurrencyIdParam ? parseInt(quoteCurrencyIdParam) : undefined,
     );
+    setAgentId(agentIdParam ? parseInt(agentIdParam) : undefined);
+    setSupplierId(supplierIdParma ? parseInt(supplierIdParma) : undefined);
   }, [searchParams]);
 
   const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
@@ -272,10 +274,7 @@ const TransactionTable = ({
     <div>
       <div className="flex flex-wrap gap-2 mb-4 items-center md:flex-nowrap">
         {supplierList && (
-          <Select
-            onValueChange={(value) => setSupplierId(value)}
-            defaultValue={supplierId}
-          >
+          <Select onValueChange={(value) => setSupplierId(parseInt(value))}>
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
               <SelectValue placeholder="Select Supplier" />
             </SelectTrigger>
@@ -291,10 +290,7 @@ const TransactionTable = ({
         )}
 
         {agentList && (
-          <Select
-            onValueChange={(value) => setAgentId(value)}
-            defaultValue={agentId}
-          >
+          <Select onValueChange={(value) => setAgentId(parseInt(value))}>
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
               <SelectValue placeholder="Select Agent" />
             </SelectTrigger>
