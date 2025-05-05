@@ -276,14 +276,14 @@ const TransactionTable = ({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
+      <div className="flex flex-wrap gap-2 mb-4 items-center md:flex-nowrap">
         {supplierList && (
           <Select
             onValueChange={(value) => setSupplierId(value)}
             defaultValue={supplierId}
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Supplier" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue placeholder="Select Supplier" className="truncate" />
             </SelectTrigger>
             <SelectContent>
               {supplierList?.length > 0 &&
@@ -301,8 +301,8 @@ const TransactionTable = ({
             onValueChange={(value) => setAgentId(value)}
             defaultValue={agentId}
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Agent" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue placeholder="Select Agent" className="truncate" />
             </SelectTrigger>
             <SelectContent>
               {agentList?.length > 0 &&
@@ -322,8 +322,11 @@ const TransactionTable = ({
             }
             defaultValue={transactionTypeId}
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Transaction Type" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue
+                placeholder="Select Transaction Type"
+                className="truncate"
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
@@ -346,8 +349,8 @@ const TransactionTable = ({
               setAgentPaymentStatus([value])
             }
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Agent" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue placeholder="Select Agent" className="truncate" />
             </SelectTrigger>
             <SelectContent>
               {agentPaymentStatusList?.length > 0 &&
@@ -369,8 +372,8 @@ const TransactionTable = ({
               setSupplierPaymentStatus([value])
             }
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Agent" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue placeholder="Select Agent" className="truncate" />
             </SelectTrigger>
             <SelectContent>
               {supplierPaymentStatusList?.length > 0 &&
@@ -392,8 +395,11 @@ const TransactionTable = ({
               setBaseCurrencyId(parseInt(value))
             }
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Base Currency" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue
+                placeholder="Select Base Currency"
+                className="truncate"
+              />
             </SelectTrigger>
             <SelectContent>
               {currencyList?.length > 0 &&
@@ -412,8 +418,11 @@ const TransactionTable = ({
               setQuoteCurrencyId(parseInt(value))
             }
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select Quote Currency" />
+            <SelectTrigger className="w-full md:w-[200px] h-9 text-sm truncate">
+              <SelectValue
+                placeholder="Select Quote Currency"
+                className="truncate"
+              />
             </SelectTrigger>
             <SelectContent>
               {currencyList?.length > 0 &&
@@ -431,12 +440,12 @@ const TransactionTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-sm",
                 !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {from ? format(from, "PPP") : <span>Pick from date</span>}
+              {from ? format(from, "PPP") : <span>From</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -454,12 +463,12 @@ const TransactionTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !to && "text-muted-foreground",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-sm",
+                !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {to ? format(to, "PPP") : <span>Pick to date</span>}
+              {to ? format(to, "PPP") : <span>To</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -481,77 +490,64 @@ const TransactionTable = ({
           <FileSpreadsheet className="w-5 h-5" />
         </Button>
       </div>
-      <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-        <TableHeader className="text-sm font-semibold">
+      <Table className="table-auto w-full">
+        <TableHeader className="text-xs">
           <TableRow>
-            <TableHead className="text-left truncate">ID</TableHead>
-            <TableHead className="text-left truncate">Date</TableHead>
-            <TableHead className="text-left truncate">Customer</TableHead>
-            <TableHead className="text-left truncate">Supplier</TableHead>
-            <TableHead className="text-left truncate">Amount (From)</TableHead>
-            <TableHead className="text-left truncate">
-              Amount (To) <span className="text-green-500">(Sell Rate)</span>
-            </TableHead>
-            <TableHead className="text-left truncate">Amount Due</TableHead>
-            <TableHead className="text-left truncate">Amount Owed</TableHead>
-            <TableHead className="text-left truncate">Profit</TableHead>
-            <TableHead className="text-left truncate">Commission</TableHead>
-            <TableHead className="text-left truncate">Total Earnings</TableHead>
-            <TableHead className="text-left truncate">
-              Payment Status (Customer)
-            </TableHead>
-            <TableHead className="text-left truncate">
-              Payment Status (Supplier)
-            </TableHead>
-            <TableHead className="text-left truncate">Actions</TableHead>
+            <TableHead className="text-left">ID</TableHead>
+            <TableHead className="text-left">Date</TableHead>
+            <TableHead className="text-left">Customer</TableHead>
+            <TableHead className="text-left">Supplier</TableHead>
+            <TableHead className="text-left">Amount(From)</TableHead>
+            <TableHead className="text-left">Amount(To)</TableHead>
+            <TableHead className="text-left">Profit</TableHead>
+            <TableHead className="text-left">Commission</TableHead>
+            <TableHead className="text-left">TotalEarnings</TableHead>
+            <TableHead className="text-left">Actions</TableHead>
           </TableRow>
         </TableHeader>
+
         {isLoading ? (
           <TransactionSkeletonTable />
         ) : (
-          <TableBody>
+          <TableBody className="text-xs">
             {transactions.map((transaction) => (
               <TableRow
                 key={transaction.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell className="truncate">
+                <TableCell className="text-left">
                   #TNX-{transaction.baseCurrency.name}-
                   {transaction.quoteCurrency.name}-{transaction.id}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell className="text-left">
                   {new Date(transaction.transactionDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell className="text-left">
                   {transaction.Agent.name}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell className="text-left">
                   {transaction.Supplier.name}
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.baseCurrency.symbol} {transaction.baseAmount}
+                <TableCell className="text-left">
+                  {transaction.baseCurrency.symbol}
+                  {transaction.baseAmount}
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol}{" "}
-                  {transaction.quoteAmountSell}
+                <TableCell className="text-left">
+                  {transaction.quoteCurrency.symbol}
+                  {transaction.quoteAmountSell}{" "}
                   <span>({transaction.sellRate})</span>
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol}{" "}
-                  {transaction.remainingAmountFromAgent}
+                <TableCell className="text-left">
+                  {transaction.quoteCurrency.symbol}
+                  {transaction.profit}
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol}{" "}
-                  {transaction.remainingAmountToPayToSupplier}
+                <TableCell className="text-left">
+                  {transaction.quoteCurrency.symbol}
+                  {transaction.commission}
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol} {transaction.profit}
-                </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol} {transaction.commission}
-                </TableCell>
-                <TableCell className="truncate">
-                  {transaction.quoteCurrency.symbol} {transaction.totalEarnings}
+                <TableCell className="text-left">
+                  {transaction.quoteCurrency.symbol}
+                  {transaction.totalEarnings}
                   {transaction.TransactionProfit?.map((profit) => {
                     return (
                       <p className="text-blue-500" key={profit.id}>
@@ -560,13 +556,7 @@ const TransactionTable = ({
                     );
                   })}
                 </TableCell>
-                <TableCell className="truncate">
-                  {transaction.agentPaymentStatus}
-                </TableCell>
-                <TableCell className="truncate">
-                  {transaction.supplierPaymentStatus}
-                </TableCell>
-                <TableCell className="truncate">
+                <TableCell className="text-left">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="icon" variant="ghost">

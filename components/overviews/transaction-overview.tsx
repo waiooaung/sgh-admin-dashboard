@@ -57,7 +57,7 @@ const TransactionOverview = () => {
                 {stats.baseCurrency.name} - {stats.quoteCurrency.name}
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">Total Transactions</p>
+            <p className="text-xs text-muted-foreground truncate">Total Transactions</p>
           </CardHeader>
           <CardContent>
             <Link
@@ -79,7 +79,7 @@ const TransactionOverview = () => {
                 Total Profit ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">Profit + Commission</p>
+            <p className="text-xs text-muted-foreground truncate">Profit + Commission</p>
           </CardHeader>
           <CardContent>
             <Link
@@ -99,7 +99,7 @@ const TransactionOverview = () => {
                 Total ({stats.baseCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">Total Exchanged</p>
+            <p className="text-xs text-muted-foreground truncate">Total Exchanged</p>
           </CardHeader>
           <CardContent>
             <Link
@@ -119,7 +119,7 @@ const TransactionOverview = () => {
                 Total ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground truncate">
               Received from Agents
             </p>
           </CardHeader>
@@ -143,7 +143,7 @@ const TransactionOverview = () => {
                 Total ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground">Paid to Suppliers</p>
+            <p className="text-xs text-muted-foreground truncate">Paid to Suppliers</p>
           </CardHeader>
           <CardContent>
             <Link
