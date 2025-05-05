@@ -84,7 +84,11 @@ export function AddAgentPayment({
     },
   );
 
-  const { agents } = useAgents(tenantId);
+  const queryParams = new URLSearchParams();
+  if (tenantId) {
+    if (tenantId) queryParams.append("tenantId", tenantId.toString());
+  }
+  const { agents } = useAgents(queryParams);
   const { currencies } = useCurrencies(tenantId);
 
   const handleSubmit = async (values: AgentPaymentFormData) => {
