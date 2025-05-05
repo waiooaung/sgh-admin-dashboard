@@ -27,24 +27,7 @@ const AgentPaymentSkeletonTable = () => {
             <Skeleton className="h-5" />
           </TableCell>
           <TableCell>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <View className="w-4 h-4 mr-2" /> Detail
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Pencil className="w-4 h-4 mr-2" /> Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Trash className="w-4 h-4 mr-2" /> Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Skeleton className="h-5" />
           </TableCell>
         </TableRow>
       ))}
