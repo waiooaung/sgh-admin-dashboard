@@ -11,14 +11,8 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../ui/dropdown-menu";
-import { View, Trash, MoreHorizontal } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { View, Trash } from "lucide-react";
 import { PaginationControls } from "./pagination-controls";
 import { AgentPayment } from "@/types/agentPayment";
 import { MetaData } from "@/types/meta-data";
@@ -27,6 +21,7 @@ import useDeleteAgentPayment from "@/hooks/useDeleteAgentPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
 import { useAuth } from "@/context/authContext";
+import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 
 interface ApiResponse {
   statusCode: number;
@@ -102,14 +97,14 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
 
   return (
     <div>
-      <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-        <TableHeader className="text-sm font-semibold">
+      <Table className="table-auto w-full text-xs">
+        <TableHeader>
           <TableRow>
-            <TableHead className="text-left truncate">Agent</TableHead>
-            <TableHead className="text-left truncate">Amount Paid</TableHead>
-            <TableHead className="text-left truncate">Payment Type</TableHead>
-            <TableHead className="text-left truncate">Payment Date</TableHead>
-            <TableHead className="text-left truncate">Actions</TableHead>
+            <TableHead className="text-left">Agent</TableHead>
+            <TableHead className="text-left">Amount Paid</TableHead>
+            <TableHead className="text-left">Payment Type</TableHead>
+            <TableHead className="text-left">Payment Date</TableHead>
+            <TableHead className="text-left">Actions</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
@@ -122,7 +117,7 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                   key={data.id}
                   className="hover:bg-blend-color transition-colors"
                 >
-                  <TableCell className="w-15 truncate">
+                  <TableCell>
                     <a
                       className="cursor-pointer"
                       onClick={() => {
@@ -133,57 +128,54 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                       {data.Agent.name}
                     </a>
                   </TableCell>
-                  <TableCell className="truncate">
+                  <TableCell className="text-left">
                     {data.Currency.symbol}
                     {data.amountPaid.toFixed(2)}
                   </TableCell>
-                  <TableCell className="truncate">{data.paymentType}</TableCell>
-                  <TableCell className="truncate">
+                  <TableCell className="text-left">
+                    {data.paymentType}
+                  </TableCell>
+                  <TableCell className="text-left">
                     {new Date(data.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell className="truncate">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setAgentPayment(data);
-                            router.push(
-                              "/dashboard/payments/agent-payments/detail",
-                            );
-                          }}
-                        >
-                          <View className="w-4 h-4 mr-2" /> Detail
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem onClick={() => handleEdit(data)}>
-                        <Pencil className="w-4 h-4 mr-2" /> Edit
-                      </DropdownMenuItem> */}
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => handleDelete(data.id)}
-                        >
-                          <Trash className="w-4 h-4 mr-2" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="text-left">
+                    <div className="flex items-center space-x-0">
+                      <Button
+                        size={null}
+                        variant="ghost"
+                        className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                        onClick={() => {
+                          setAgentPayment(data);
+                          router.push(
+                            `/dashboard/payments/agent-payments/detail`,
+                          );
+                        }}
+                      >
+                        <View className="w-3 h-3" />
+                      </Button>
+
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            size={null}
+                            variant="ghost"
+                            className="w-5 h-5 p-0 min-w-0 cursor-pointer text-red-600"
+                          >
+                            <Trash className="w-3 h-3" />
+                          </Button>
+                        }
+                        title="Delete Payment"
+                        description="Are you sure you want to delete this payment?"
+                        confirmText="Delete"
+                        onConfirm={() => handleDelete(data.id)}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         )}
       </Table>
-      {/* {selectedAgentPayment && (
-        <EditAgentPayment
-          open={open}
-          onClose={() => setOpen(false)}
-          agentPayment={selectedAgentPayment}
-          onSave={handleUpdate}
-        />
-      )} */}
 
       <div className="flex justify-between items-center mt-4">
         <p className="text-sm">
