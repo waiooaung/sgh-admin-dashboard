@@ -7,13 +7,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../ui/dropdown-menu";
-import { Trash, MoreHorizontal, CalendarIcon, Search } from "lucide-react";
+import { Trash, CalendarIcon, Search } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "../ui/button";
 import {
@@ -30,6 +24,7 @@ import useDelete from "@/hooks/useDelete";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 
 interface Props {
   defaultDateFrom?: Date;
@@ -86,18 +81,18 @@ const ExchangeRateTable = ({ defaultDateFrom, defaultDateTo }: Props) => {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
+      <div className="flex flex-wrap gap-2 mb-4 items-center md:flex-nowrap">
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
                 !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {from ? format(from, "PPP") : <span>Pick from date</span>}
+              {from ? format(from, "PPP") : <span>From</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -115,12 +110,12 @@ const ExchangeRateTable = ({ defaultDateFrom, defaultDateTo }: Props) => {
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !to && "text-muted-foreground",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
+                !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {to ? format(to, "PPP") : <span>Pick to date</span>}
+              {to ? format(to, "PPP") : <span>To</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -137,15 +132,15 @@ const ExchangeRateTable = ({ defaultDateFrom, defaultDateTo }: Props) => {
           <Search className="w-5 h-5" />
         </Button>
       </div>
-      <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-        <TableHeader className="text-sm font-semibold">
+      <Table className="table-auto w-full text-xs text-left">
+        <TableHeader>
           <TableRow>
-            <TableHead className="text-left truncate">Name</TableHead>
-            <TableHead className="text-left truncate">Exchange</TableHead>
-            <TableHead className="text-left truncate">Buy Rate</TableHead>
-            <TableHead className="text-left truncate">Sell Rate</TableHead>
-            <TableHead className="text-left truncate">CreatedAt</TableHead>
-            <TableHead className="text-left truncate">Actions</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Exchange</TableHead>
+            <TableHead>Buy Rate</TableHead>
+            <TableHead>Sell Rate</TableHead>
+            <TableHead>CreatedAt</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
@@ -157,32 +152,33 @@ const ExchangeRateTable = ({ defaultDateFrom, defaultDateTo }: Props) => {
                 key={data.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell className="truncate">{data.name}</TableCell>
-                <TableCell className="truncate">
+                <TableCell>{data.name}</TableCell>
+                <TableCell>
                   {data.baseCurrency.name} - {data.quoteCurrency.name}
                 </TableCell>
-                <TableCell className="truncate">{data.buyRate}</TableCell>
-                <TableCell className="truncate">{data.sellRate}</TableCell>
-                <TableCell className="truncate">
+                <TableCell>{data.buyRate}</TableCell>
+                <TableCell>{data.sellRate}</TableCell>
+                <TableCell>
                   {new Date(data.createdAt).toLocaleString()}
                 </TableCell>
-
-                <TableCell className="truncate">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => handleDelete(data.id)}
-                      >
-                        <Trash className="w-4 h-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <TableCell>
+                  <div className="flex items-center space-x-0">
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          size={null}
+                          variant="ghost"
+                          className="w-5 h-5 p-0 min-w-0 cursor-pointer text-red-600"
+                        >
+                          <Trash className="w-3 h-3" />
+                        </Button>
+                      }
+                      title="Delete Supplier"
+                      description="Are you sure you want to delete this supplier?"
+                      confirmText="Delete"
+                      onConfirm={() => handleDelete(data.id)}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

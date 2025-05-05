@@ -81,7 +81,11 @@ export function AddSupplierPayment({
     },
   );
 
-  const { suppliers } = useSuppliers(tenantId);
+  const queryParams = new URLSearchParams();
+  if (tenantId) {
+    queryParams.append("tenantId", tenantId.toString());
+  }
+  const { suppliers } = useSuppliers(queryParams);
   const { currencies } = useCurrencies(tenantId);
 
   const handleSubmit = async (values: SupplierPaymentFormData) => {

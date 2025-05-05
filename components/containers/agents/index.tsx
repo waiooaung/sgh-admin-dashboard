@@ -17,11 +17,6 @@ const AgentContainer = () => {
       undefined,
       { revalidate: true },
     );
-    await mutate(
-      (key) => typeof key === "string" && key.startsWith("/transactions"),
-      undefined,
-      { revalidate: true },
-    );
   };
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">

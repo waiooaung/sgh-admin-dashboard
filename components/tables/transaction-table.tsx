@@ -259,8 +259,6 @@ const TransactionTable = ({
   };
 
   const handleDelete = async (id: number) => {
-    // const confirmed = window.confirm("Are you sure you want to delete this transaction?");
-    // if (!confirmed) return;
     try {
       await deleteTransaction(id);
       toast.success("Transaction deleted successfully!");

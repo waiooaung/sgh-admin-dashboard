@@ -107,12 +107,12 @@ const TransactedRateTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
                 !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {from ? format(from, "PPP") : <span>Pick from date</span>}
+              {from ? format(from, "PPP") : <span>From</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -130,12 +130,12 @@ const TransactedRateTable = ({
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !to && "text-muted-foreground",
+                "w-full md:w-[150px] h-9 justify-start text-left font-normal text-xs",
+                !from && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {to ? format(to, "PPP") : <span>Pick to date</span>}
+              {to ? format(to, "PPP") : <span>To</span>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -158,20 +158,18 @@ const TransactedRateTable = ({
           <FileSpreadsheet className="w-5 h-5" />
         </Button>
       </div>
-      <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-        <TableHeader className="text-sm font-semibold">
+      <Table className="table-auto w-full text-xs text-left">
+        <TableHeader>
           <TableRow>
-            <TableHead className="text-left truncate">ID</TableHead>
-            <TableHead className="text-left truncate">
-              Transaction Type
-            </TableHead>
-            <TableHead className="text-left truncate text-blue-500">
+            <TableHead>ID</TableHead>
+            <TableHead>Transaction Type</TableHead>
+            <TableHead className="text-blue-500">
               Buy Rate
             </TableHead>
-            <TableHead className="text-left truncate text-green-500">
+            <TableHead className="text-green-500">
               Sell Rate
             </TableHead>
-            <TableHead className="text-left truncate">Date</TableHead>
+            <TableHead>Date</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
@@ -183,20 +181,20 @@ const TransactedRateTable = ({
                 key={transaction.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell className="truncate">
+                <TableCell>
                   #TNX-{transaction.id}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell>
                   {transaction.baseCurrency.name} -{" "}
                   {transaction.quoteCurrency.name}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell>
                   {transaction.buyRate}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell>
                   {transaction.sellRate}
                 </TableCell>
-                <TableCell className="truncate">
+                <TableCell>
                   {new Date(transaction.transactionDate).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -205,7 +203,7 @@ const TransactedRateTable = ({
         )}
       </Table>
       <div className="flex justify-between items-center mt-4">
-        <p className="text-sm">
+        <p className="text-xs">
           Total Transactions:{" "}
           <span className="font-semibold">{meta.totalItems}</span>
         </p>
