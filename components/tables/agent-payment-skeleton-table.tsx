@@ -1,13 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { TableBody, TableRow, TableCell } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../ui/dropdown-menu";
-import { MoreHorizontal, View, Pencil, Trash } from "lucide-react";
-import { Button } from "../ui/button";
 
 const AgentPaymentSkeletonTable = () => {
   return (
