@@ -10,12 +10,6 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../ui/dropdown-menu";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -38,7 +32,6 @@ import {
   View,
   Pencil,
   Trash,
-  MoreHorizontal,
   CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,6 +51,7 @@ import { AddDirectAgentPayment } from "../dialogs/add-direct-agent-payment";
 import { AddDirectSupplierPayment } from "../dialogs/add-direct-supplier-payment";
 import { Currency } from "@/types/currency";
 import { useSearchParams } from "next/navigation";
+import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 
 interface ApiResponse {
   statusCode: number;
@@ -265,6 +259,8 @@ const TransactionTable = ({
   };
 
   const handleDelete = async (id: number) => {
+    // const confirmed = window.confirm("Are you sure you want to delete this transaction?");
+    // if (!confirmed) return;
     try {
       await deleteTransaction(id);
       toast.success("Transaction deleted successfully!");
@@ -283,7 +279,7 @@ const TransactionTable = ({
             defaultValue={supplierId}
           >
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Supplier"/>
+              <SelectValue placeholder="Select Supplier" />
             </SelectTrigger>
             <SelectContent>
               {supplierList?.length > 0 &&
@@ -302,7 +298,7 @@ const TransactionTable = ({
             defaultValue={agentId}
           >
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Agent"/>
+              <SelectValue placeholder="Select Agent" />
             </SelectTrigger>
             <SelectContent>
               {agentList?.length > 0 &&
@@ -350,7 +346,7 @@ const TransactionTable = ({
             }
           >
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Agent"/>
+              <SelectValue placeholder="Select Agent" />
             </SelectTrigger>
             <SelectContent>
               {agentPaymentStatusList?.length > 0 &&
@@ -373,7 +369,7 @@ const TransactionTable = ({
             }
           >
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Agent"/>
+              <SelectValue placeholder="Select Agent" />
             </SelectTrigger>
             <SelectContent>
               {supplierPaymentStatusList?.length > 0 &&
@@ -557,51 +553,65 @@ const TransactionTable = ({
                   })}
                 </TableCell>
                 <TableCell className="text-left">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="w-4 h-4" />
+                  <div className="flex items-center space-x-0">
+                    <Button
+                      size={null}
+                      variant="ghost"
+                      className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                      onClick={() =>
+                        router.push(`/dashboard/transactions/${transaction.id}`)
+                      }
+                    >
+                      <View className="w-3 h-3" />
+                    </Button>
+
+                    <Button
+                      size={null}
+                      variant="ghost"
+                      className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                      onClick={() => handleEdit(transaction)}
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </Button>
+
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          size={null}
+                          variant="ghost"
+                          className="w-5 h-5 p-0 min-w-0 cursor-pointer text-red-600"
+                        >
+                          <Trash className="w-3 h-3" />
+                        </Button>
+                      }
+                      title="Delete Transaction"
+                      description="Are you sure you want to delete this transaction?"
+                      confirmText="Delete"
+                      onConfirm={() => handleDelete(transaction.id)}
+                    />
+
+                    {transaction.agentPaymentStatus !== "PAID" && (
+                      <Button
+                        size={null}
+                        variant="ghost"
+                        className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                        onClick={() => handleDirectAgentPayment(transaction)}
+                      >
+                        <CheckCircle className="w-3 h-3" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          router.push(
-                            `/dashboard/transactions/${transaction.id}`,
-                          );
-                        }}
+                    )}
+
+                    {transaction.supplierPaymentStatus !== "PAID" && (
+                      <Button
+                        size={null}
+                        variant="ghost"
+                        className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                        onClick={() => handleDirectSupplierPayment(transaction)}
                       >
-                        <View className="w-4 h-4 mr-2" /> Detail
-                      </DropdownMenuItem>
-                      {transaction.agentPaymentStatus !== "PAID" && (
-                        <DropdownMenuItem
-                          onClick={() => handleDirectAgentPayment(transaction)}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Apply
-                          Customer Payment
-                        </DropdownMenuItem>
-                      )}
-                      {transaction.supplierPaymentStatus !== "PAID" && (
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleDirectSupplierPayment(transaction)
-                          }
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Apply
-                          Supplier Payment
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={() => handleEdit(transaction)}>
-                        <Pencil className="w-4 h-4 mr-2" /> Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => handleDelete(transaction.id)}
-                      >
-                        <Trash className="w-4 h-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <CheckCircle className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
