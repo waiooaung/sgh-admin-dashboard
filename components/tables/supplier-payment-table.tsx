@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
 import { View, Trash, MoreHorizontal } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
 import { SupplierPayment } from "@/types/supplierPayment";
 import { MetaData } from "@/types/meta-data";
@@ -27,6 +27,7 @@ import useDeleteSupplierPayment from "@/hooks/useDeleteSupplierPayment";
 import { toast } from "sonner";
 import useDataContext from "@/hooks/useDataContext";
 import { useAuth } from "@/context/authContext";
+import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 
 interface ApiResponse {
   statusCode: number;
@@ -102,16 +103,14 @@ const SupplierPaymentTable = ({
 
   return (
     <div>
-      <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-        <TableHeader className="text-sm font-semibold">
+      <Table className="table-auto w-full text-xs text-left">
+        <TableHeader>
           <TableRow>
-            <TableHead className="text-left truncate">Supplier</TableHead>
-            <TableHead className="text-left truncate">
-              Amount Paid (USD)
-            </TableHead>
-            <TableHead className="text-left truncate">Payment Type</TableHead>
-            <TableHead className="text-left truncate">Payment Date</TableHead>
-            <TableHead className="text-left truncate">Actions</TableHead>
+            <TableHead>Supplier</TableHead>
+            <TableHead>Amount Paid (USD)</TableHead>
+            <TableHead>Payment Type</TableHead>
+            <TableHead>Payment Date</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
@@ -124,7 +123,7 @@ const SupplierPaymentTable = ({
                   key={data.id}
                   className="hover:bg-blend-color transition-colors"
                 >
-                  <TableCell className="w-15 truncate">
+                  <TableCell>
                     <a
                       className="cursor-pointer"
                       onClick={() => {
@@ -135,57 +134,52 @@ const SupplierPaymentTable = ({
                       {data.Supplier.name}
                     </a>
                   </TableCell>
-                  <TableCell className="truncate">
+                  <TableCell>
                     {data.Currency.symbol}
                     {data.amountPaid.toFixed(2)}
                   </TableCell>
-                  <TableCell className="truncate">{data.paymentType}</TableCell>
-                  <TableCell className="truncate">
+                  <TableCell>{data.paymentType}</TableCell>
+                  <TableCell>
                     {new Date(data.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell className="truncate">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setSupplierPayment(data);
-                            router.push(
-                              "/dashboard/payments/supplier-payments/detail",
-                            );
-                          }}
-                        >
-                          <View className="w-4 h-4 mr-2" /> Detail
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem onClick={() => handleEdit(data)}>
-                        <Pencil className="w-4 h-4 mr-2" /> Edit
-                      </DropdownMenuItem> */}
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => handleDelete(data.id)}
-                        >
-                          <Trash className="w-4 h-4 mr-2" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell>
+                  <div className="flex items-center space-x-0">
+                      <Button
+                        size={null}
+                        variant="ghost"
+                        className="w-5 h-5 p-0 min-w-0 cursor-pointer"
+                        onClick={() => {
+                          setSupplierPayment(data);
+                          router.push(
+                            `/dashboard/payments/supplier-payments/detail`,
+                          );
+                        }}
+                      >
+                        <View className="w-3 h-3" />
+                      </Button>
+
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            size={null}
+                            variant="ghost"
+                            className="w-5 h-5 p-0 min-w-0 cursor-pointer text-red-600"
+                          >
+                            <Trash className="w-3 h-3" />
+                          </Button>
+                        }
+                        title="Delete Payment"
+                        description="Are you sure you want to delete this payment?"
+                        confirmText="Delete"
+                        onConfirm={() => handleDelete(data.id)}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         )}
       </Table>
-      {/* {selectedSupplierPayment && (
-        <EditSupplierPayment
-          open={open}
-          onClose={() => setOpen(false)}
-          supplierPayment={selectedSupplierPayment}
-          onSave={handleUpdate}
-        />
-      )} */}
 
       <div className="flex justify-between items-center mt-4">
         <p className="text-sm">

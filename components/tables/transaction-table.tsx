@@ -486,62 +486,62 @@ const TransactionTable = ({
           <FileSpreadsheet className="w-5 h-5" />
         </Button>
       </div>
-      <Table className="table-auto w-full">
+      <Table className="table-auto w-full text-xs text-left">
         <TableHeader className="text-xs">
           <TableRow>
-            <TableHead className="text-left">ID</TableHead>
-            <TableHead className="text-left">Date</TableHead>
-            <TableHead className="text-left">Customer</TableHead>
-            <TableHead className="text-left">Supplier</TableHead>
-            <TableHead className="text-left">Amount(From)</TableHead>
-            <TableHead className="text-left">Amount(To)</TableHead>
-            <TableHead className="text-left">Profit</TableHead>
-            <TableHead className="text-left">Commission</TableHead>
-            <TableHead className="text-left">TotalEarnings</TableHead>
-            <TableHead className="text-left">Actions</TableHead>
+            <TableHead>ID</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Supplier</TableHead>
+            <TableHead>Amount(From)</TableHead>
+            <TableHead>Amount(To)</TableHead>
+            <TableHead>Profit</TableHead>
+            <TableHead>Commission</TableHead>
+            <TableHead>TotalEarnings</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         {isLoading ? (
           <TransactionSkeletonTable />
         ) : (
-          <TableBody className="text-xs">
+          <TableBody>
             {transactions.map((transaction) => (
               <TableRow
                 key={transaction.id}
                 className="hover:bg-blend-color transition-colors"
               >
-                <TableCell className="text-left">
+                <TableCell>
                   #TNX-{transaction.baseCurrency.name}-
                   {transaction.quoteCurrency.name}-{transaction.id}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {new Date(transaction.transactionDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.Agent.name}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.Supplier.name}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.baseCurrency.symbol}
                   {transaction.baseAmount}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.quoteCurrency.symbol}
                   {transaction.quoteAmountSell}{" "}
                   <span>({transaction.sellRate})</span>
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.quoteCurrency.symbol}
                   {transaction.profit}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.quoteCurrency.symbol}
                   {transaction.commission}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   {transaction.quoteCurrency.symbol}
                   {transaction.totalEarnings}
                   {transaction.TransactionProfit?.map((profit) => {
@@ -552,7 +552,7 @@ const TransactionTable = ({
                     );
                   })}
                 </TableCell>
-                <TableCell className="text-left">
+                <TableCell>
                   <div className="flex items-center space-x-0">
                     <Button
                       size={null}

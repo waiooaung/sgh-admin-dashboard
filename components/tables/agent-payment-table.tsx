@@ -97,14 +97,14 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
 
   return (
     <div>
-      <Table className="table-auto w-full text-xs">
+      <Table className="table-auto w-full text-xs text-left">
         <TableHeader>
           <TableRow>
-            <TableHead className="text-left">Agent</TableHead>
-            <TableHead className="text-left">Amount Paid</TableHead>
-            <TableHead className="text-left">Payment Type</TableHead>
-            <TableHead className="text-left">Payment Date</TableHead>
-            <TableHead className="text-left">Actions</TableHead>
+            <TableHead>Agent</TableHead>
+            <TableHead>Amount Paid</TableHead>
+            <TableHead>Payment Type</TableHead>
+            <TableHead>Payment Date</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         {isLoading ? (
@@ -128,17 +128,15 @@ const AgentPaymentTable = ({ agentId, from, to }: AgentPaymentTableProps) => {
                       {data.Agent.name}
                     </a>
                   </TableCell>
-                  <TableCell className="text-left">
+                  <TableCell>
                     {data.Currency.symbol}
                     {data.amountPaid.toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-left">
-                    {data.paymentType}
-                  </TableCell>
-                  <TableCell className="text-left">
+                  <TableCell>{data.paymentType}</TableCell>
+                  <TableCell>
                     {new Date(data.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-left">
+                  <TableCell>
                     <div className="flex items-center space-x-0">
                       <Button
                         size={null}
