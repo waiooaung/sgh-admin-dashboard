@@ -518,12 +518,8 @@ const TransactionTable = ({
                 <TableCell>
                   {new Date(transaction.transactionDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell>
-                  {transaction.Agent.name}
-                </TableCell>
-                <TableCell>
-                  {transaction.Supplier.name}
-                </TableCell>
+                <TableCell>{transaction.Agent.name}</TableCell>
+                <TableCell>{transaction.Supplier.name}</TableCell>
                 <TableCell>
                   {transaction.baseCurrency.symbol}
                   {transaction.baseAmount}

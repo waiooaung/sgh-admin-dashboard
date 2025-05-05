@@ -11,13 +11,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../ui/dropdown-menu";
-import { View, Trash, MoreHorizontal } from "lucide-react";
+import { View, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
 import { SupplierPayment } from "@/types/supplierPayment";
@@ -143,7 +137,7 @@ const SupplierPaymentTable = ({
                     {new Date(data.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                  <div className="flex items-center space-x-0">
+                    <div className="flex items-center space-x-0">
                       <Button
                         size={null}
                         variant="ghost"
