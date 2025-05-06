@@ -51,15 +51,13 @@ const TransactionOverview = () => {
         key={index}
       >
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 text-xs">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xs font-medium">
+              <CardTitle className="font-medium">
                 {stats.baseCurrency.name} - {stats.quoteCurrency.name}
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
-              Total Transactions
-            </p>
+            <p className="text-muted-foreground truncate">Total Transactions</p>
           </CardHeader>
           <CardContent>
             <Link
@@ -75,13 +73,13 @@ const TransactionOverview = () => {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 text-xs">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="font-medium">
                 Total Profit ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-muted-foreground truncate">
               Profit + Commission
             </p>
           </CardHeader>
@@ -89,7 +87,7 @@ const TransactionOverview = () => {
             <Link
               href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
             >
-              <div className="text-xl font-bold text-green-500 truncate">
+              <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(stats.totalEarnings)}
               </div>
             </Link>
@@ -97,21 +95,19 @@ const TransactionOverview = () => {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 text-xs">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="font-medium">
                 Total ({stats.baseCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
-              Total Exchanged
-            </p>
+            <p className="text-muted-foreground truncate">Total Exchanged</p>
           </CardHeader>
           <CardContent>
             <Link
               href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
             >
-              <div className="text-xl font-bold text-green-500 truncate">
+              <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(stats.totalBaseAmount)}
               </div>
             </Link>
@@ -119,13 +115,13 @@ const TransactionOverview = () => {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 text-xs">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="font-medium">
                 Total ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-muted-foreground truncate">
               Received from Agents
             </p>
           </CardHeader>
@@ -133,7 +129,7 @@ const TransactionOverview = () => {
             <Link
               href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
             >
-              <div className="text-xl font-bold text-green-500 truncate">
+              <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalQuoteAmountSell,
                 )}
@@ -143,21 +139,19 @@ const TransactionOverview = () => {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 text-xs">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="font-medium">
                 Total ({stats.quoteCurrency.symbol})
               </CardTitle>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
-              Paid to Suppliers
-            </p>
+            <p className="text-muted-foreground truncate">Paid to Suppliers</p>
           </CardHeader>
           <CardContent>
             <Link
               href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}`}
             >
-              <div className="text-xl font-bold text-green-500 truncate">
+              <div className="font-bold text-green-500 truncate">
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalQuoteAmountBuy,
                 )}

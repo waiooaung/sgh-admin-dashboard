@@ -8,11 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
 
 import useDataContext from "@/hooks/useDataContext";
-import AgentOverview from "@/components/overviews/agent-overview";
 import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 
 import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
+import { AgentBalanceCard } from "@/components/cards/agent-balance-card";
+import { AgentOverviewCard } from "@/components/cards/agent-overview-card";
 
 const AgentDetailContainer = () => {
   const { agent } = useDataContext();
@@ -41,12 +42,11 @@ const AgentDetailContainer = () => {
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
-        <p className="text-lg font-semibold tracking-tight">Agent Detail</p>
+        <p className="text-lg font-semibold tracking-tight">Customer Detail</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {/* Header Section */}
-        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-md">
+        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-sm">
           <div className="flex items-center gap-6">
             <Avatar className="h-20 w-20">
               <AvatarImage alt={agent.name} />
@@ -70,13 +70,14 @@ const AgentDetailContainer = () => {
             onSuccess={() => console.log("Payment added.")}
           />
         </div>
+      </div>
 
-        {/* Agent Details */}
+      <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Agent Information</CardTitle>
+            <CardTitle>Information</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-2 gap-4 text-sm">
             <p className="truncate">
               <strong>Name:</strong> {agent.name || "N/A"}
             </p>
@@ -106,9 +107,15 @@ const AgentDetailContainer = () => {
           </CardContent>
         </Card>
       </div>
+
       <div className="grid grid-cols-1">
-        <AgentOverview tenantId={agent.tenantId} agentId={agent.id} />
+        <AgentBalanceCard agentId={agent.id} />
       </div>
+
+      <div className="grid grid-cols-1">
+        <AgentOverviewCard tenantId={agent.tenantId} agentId={agent.id} />
+      </div>
+
       <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader>

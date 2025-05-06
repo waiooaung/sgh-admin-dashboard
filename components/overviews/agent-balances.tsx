@@ -5,7 +5,7 @@ const AgentBalances = ({ agentId }: { agentId: number }) => {
   const { agentBalances } = useAgentBalances(agentId);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-3">
       {agentBalances.map((agentBalance) => (
         <Card key={agentBalance.id}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
