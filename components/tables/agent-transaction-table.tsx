@@ -200,8 +200,6 @@ const AgentTransactionTable = ({
     }
   };
 
-  console.log(transactions);
-
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-4 items-center md:flex-nowrap">

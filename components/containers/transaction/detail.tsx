@@ -24,7 +24,6 @@ const TransactionDetailContainer = ({
   );
   if (!data?.data) return null;
   const transaction: TransactionDetail = data?.data;
-  console.log(transaction);
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
