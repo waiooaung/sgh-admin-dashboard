@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -41,7 +41,6 @@ import { useAuth } from "@/context/authContext";
 import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Transaction } from "@/types/transaction";
-import AgentBalances from "../overviews/agent-balances";
 import { mutate } from "swr";
 
 interface Props {
@@ -58,7 +57,6 @@ const formSchema = z.object({
   agentId: z.coerce.number(),
   currencyId: z.coerce.number(),
   amountPaid: z.coerce.number(),
-  transactionCurrencyId: z.coerce.number(),
   exchangeRate: z.coerce.number(),
   paymentType: z.string().min(5),
 });
@@ -76,10 +74,6 @@ export function AddDirectAgentPayment({
   const defaultAgent = transaction.Agent;
   const defaultCurrency = transaction.quoteCurrency;
   const defaultAmount = transaction.remainingAmountFromAgent;
-  const transactionCurrencies = [
-    transaction.baseCurrency,
-    transaction.quoteCurrency,
-  ];
 
   const form = useForm<DirectAgentPaymentFormData>({
     resolver: zodResolver(formSchema),
@@ -89,10 +83,14 @@ export function AddDirectAgentPayment({
       agentId: defaultAgent.id,
       currencyId: defaultCurrency.id,
       amountPaid: defaultAmount,
-      transactionCurrencyId: undefined,
       exchangeRate: undefined,
       paymentType: "",
     },
+  });
+
+  const selectedCurrency = useWatch({
+    control: form.control,
+    name: "currencyId",
   });
 
   const { trigger } = useSWRMutation(
@@ -141,10 +139,15 @@ export function AddDirectAgentPayment({
       agentId: transaction.Agent?.id,
       currencyId: transaction.quoteCurrency.id,
       amountPaid: transaction.remainingAmountFromAgent,
-      transactionCurrencyId: undefined,
       paymentType: "",
     });
   }, [transaction, tenantId, form, transactionId]);
+
+  useEffect(() => {
+    if (transaction.quoteCurrencyId === selectedCurrency) {
+      form.setValue("exchangeRate", 1);
+    }
+  }, [selectedCurrency, transaction.quoteCurrencyId, form]);
 
   return (
     <Dialog
@@ -161,7 +164,6 @@ export function AddDirectAgentPayment({
           <DialogTitle>Apply Customer Payment</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 grid-cols-1">
-          <AgentBalances agentId={defaultAgent.id} />
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
@@ -247,53 +249,21 @@ export function AddDirectAgentPayment({
                 )}
               />
 
-              {/* Currency Id */}
-              <FormField
-                control={form.control}
-                name="transactionCurrencyId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value?.toString()}
-                    >
+              {transaction.quoteCurrencyId !== Number(selectedCurrency) && (
+                <FormField
+                  control={form.control}
+                  name="exchangeRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exchange Rate</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select currency..." />
-                        </SelectTrigger>
+                        <Input {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {transactionCurrencies.length > 0 &&
-                          transactionCurrencies.map((currency) => (
-                            <SelectItem
-                              key={currency.id}
-                              value={currency.id.toString()}
-                            >
-                              {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Exchange Rate */}
-              <FormField
-                control={form.control}
-                name="exchangeRate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Exchange Rate</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Payment Type */}
               <FormField

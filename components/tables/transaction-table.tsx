@@ -176,7 +176,12 @@ const TransactionTable = ({
     setSupplierId(supplierIdParma ? parseInt(supplierIdParma) : undefined);
   }, [searchParams]);
 
-  const { transactionsData: transactions, metaData: meta, mutate, isLoading } = useTransactions(queryParams);
+  const {
+    transactionsData: transactions,
+    metaData: meta,
+    mutate,
+    isLoading,
+  } = useTransactions(queryParams);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -621,7 +626,7 @@ const TransactionTable = ({
         />
       )}
 
-      { meta &&       
+      {meta && (
         <div className="flex justify-between items-center mt-4">
           <p className="text-xs">
             Total Transactions:{" "}
@@ -634,7 +639,7 @@ const TransactionTable = ({
             onPageChange={handlePageChange}
           />
         </div>
-      }
+      )}
     </div>
   );
 };

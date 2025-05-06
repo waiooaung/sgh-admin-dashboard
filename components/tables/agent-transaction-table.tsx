@@ -365,6 +365,7 @@ const AgentTransactionTable = ({
             <TableHead>Amount(To)</TableHead>
             <TableHead>Amount Received</TableHead>
             <TableHead>Amount Due</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -403,6 +404,7 @@ const AgentTransactionTable = ({
                   {transaction.quoteCurrency.symbol}
                   {transaction.remainingAmountFromAgent}
                 </TableCell>
+                <TableCell>{transaction.agentPaymentStatus}</TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-0">
                     <Button
