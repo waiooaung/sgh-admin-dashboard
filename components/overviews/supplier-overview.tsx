@@ -49,7 +49,7 @@ const SupplierOverview = ({
   return updatedStatistics.map((stats, index) => {
     return (
       <div
-        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-2"
+        className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-2"
         key={index}
       >
         <Card>
@@ -142,24 +142,6 @@ const SupplierOverview = ({
                 {new Intl.NumberFormat("en-US").format(
                   stats.totalRemainingAmountToPayToSupplier,
                 )}
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium truncate">
-              Credit Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href={`/dashboard/transactions?baseCurrencyId=${stats.baseCurrency.id}&quoteCurrencyId=${stats.quoteCurrency.id}&supplierId=${supplierId}`}
-            >
-              <div className="text-base font-bold text-red-500 truncate">
-                {stats.quoteCurrency.symbol}
-                {new Intl.NumberFormat("en-US").format(stats.supplierBalance)}
               </div>
             </Link>
           </CardContent>
