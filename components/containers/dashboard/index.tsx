@@ -7,7 +7,7 @@ import DisplayProfitOverview from "@/components/overviews/display-profit-overvie
 import DashboardTransactionOverview from "@/components/overviews/dashboard/transaction-overview";
 import DashboardAgentOverview from "@/components/overviews/dashboard/agent-overview";
 import DashboardSupplierOverview from "@/components/overviews/dashboard/supplier-overview";
-import DashboardChart from "@/components/charts/dashboard-chart";
+// import DashboardChart from "@/components/charts/dashboard-chart";
 
 export default function DashboardContainer() {
   return (
@@ -34,9 +34,9 @@ export default function DashboardContainer() {
           defaultDateTo={new Date()}
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <DashboardChart />
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 gap-4">
         <Card>
