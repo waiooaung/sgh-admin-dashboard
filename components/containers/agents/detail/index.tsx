@@ -8,12 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
 
 import useDataContext from "@/hooks/useDataContext";
-import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 
 import { AddAgentPayment } from "@/components/dialogs/add-agent-payment";
 import { AgentBalanceCard } from "@/components/cards/agent-balance-card";
 import { AgentOverviewCard } from "@/components/cards/agent-overview-card";
+import AgentTransactionTable from "@/components/tables/agent-transaction-table";
 
 const AgentDetailContainer = () => {
   const { agent } = useDataContext();
@@ -122,7 +122,7 @@ const AgentDetailContainer = () => {
             <CardTitle>Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable defaultAgentId={agentId} />
+            <AgentTransactionTable defaultAgentId={agentId} />
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,4 @@
-import useSWR from "swr";
-import { useState, useEffect } from "react";
-import fetcher from "@/lib/fetcher";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -37,69 +35,46 @@ import {
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
 import { Transaction } from "@/types/transaction";
-import { MetaData } from "@/types/meta-data";
-import TransactionSkeletonTable from "./transaction-skeleton-table";
 import EditTransaction from "@/components/dialogs/edit-transaction";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
 import { toast } from "sonner";
 import { useAuth } from "@/context/authContext";
 import * as XLSX from "xlsx";
-import { Agent } from "@/types/agent";
-import { Supplier } from "@/types/supplier";
 import { TransactionType } from "@/types/transactionType";
-import { AddDirectAgentPayment } from "../dialogs/add-direct-agent-payment";
 import { AddDirectSupplierPayment } from "../dialogs/add-direct-supplier-payment";
 import { Currency } from "@/types/currency";
-import { useSearchParams } from "next/navigation";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
-
-interface ApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Transaction[];
-  meta: MetaData;
-}
+import { useTransactions } from "@/hooks/useTransactions";
+import TableSkeletons from "./table-skeletons";
 
 type PaymentStatus = "PENDING" | "PARTIALLY_PAID" | "PAID";
 
-interface TransactionTableProps {
-  agentList?: Agent[];
-  supplierList?: Supplier[];
+interface SupplierTransactionTableProps {
   transactionTypeList?: TransactionType[];
-  agentPaymentStatusList?: PaymentStatus[];
   supplierPaymentStatusList?: PaymentStatus[];
   currencyList?: Currency[];
-  defaultSupplierId?: number;
-  defaultAgentId?: number;
+  defaultSupplierId: number;
   defaultTransactionTypeId?: number;
   defaultDateFrom?: Date;
   defaultDateTo?: Date;
-  defaultAgentPaymentStatus?: PaymentStatus[];
   defaultSupplierPaymentStatus?: PaymentStatus[];
   defaultBaseCurrencyId?: number;
   defaultQuoteCurrencyId?: number;
 }
 
-const TransactionTable = ({
-  agentList,
-  supplierList,
+const SupplierTransactionTable = ({
   transactionTypeList,
-  agentPaymentStatusList,
   supplierPaymentStatusList,
   currencyList,
   defaultSupplierId,
-  defaultAgentId,
   defaultTransactionTypeId,
   defaultDateFrom,
   defaultDateTo,
-  defaultAgentPaymentStatus,
   defaultSupplierPaymentStatus,
   defaultBaseCurrencyId,
   defaultQuoteCurrencyId,
-}: TransactionTableProps) => {
+}: SupplierTransactionTableProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : 0;
   const { trigger: deleteTransaction } = useDeleteTransaction();
@@ -107,25 +82,15 @@ const TransactionTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [open, setOpen] = useState<boolean>(false);
-  const [directAgentPaymentOpen, setDirectAgentPaymentOpen] =
-    useState<boolean>(false);
   const [directSupplierPaymentOpen, setDirectSupplierPaymentOpen] =
     useState<boolean>(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
-
-  const [supplierId, setSupplierId] = useState<number | undefined>(
-    defaultSupplierId,
-  );
-  const [agentId, setAgentId] = useState<number | undefined>(defaultAgentId);
   const [transactionTypeId, setTransactionTypeId] = useState<
     string | undefined
   >(defaultTransactionTypeId ? defaultTransactionTypeId.toString() : undefined);
   const [from, setFrom] = useState<Date | undefined>(defaultDateFrom);
   const [to, setTo] = useState<Date | undefined>(defaultDateTo);
-  const [agentPaymentStatus, setAgentPaymentStatus] = useState<
-    PaymentStatus[] | undefined
-  >(defaultAgentPaymentStatus);
   const [supplierPaymentStatus, setSupplierPaymentStatus] = useState<
     PaymentStatus[] | undefined
   >(defaultSupplierPaymentStatus);
@@ -138,12 +103,11 @@ const TransactionTable = ({
 
   const queryParams = new URLSearchParams({
     tenantId: tenantId.toString(),
+    supplierId: defaultSupplierId.toString(),
     page: currentPage.toString(),
     limit: itemsPerPage.toString(),
   });
 
-  if (supplierId) queryParams.append("supplierId", supplierId.toString());
-  if (agentId) queryParams.append("agentId", agentId.toString());
   if (transactionTypeId)
     queryParams.append("transactionTypeId", transactionTypeId.toString());
   if (from) {
@@ -153,11 +117,6 @@ const TransactionTable = ({
   if (to) {
     to.setHours(23, 59, 59, 999);
     queryParams.append("to", to.toISOString());
-  }
-  if (agentPaymentStatus) {
-    agentPaymentStatus.forEach((status) => {
-      queryParams.append("agentPaymentStatus", status);
-    });
   }
   if (supplierPaymentStatus) {
     supplierPaymentStatus.forEach((status) => {
@@ -170,31 +129,12 @@ const TransactionTable = ({
   if (quoteCurrencyId)
     queryParams.append("quoteCurrencyId", quoteCurrencyId.toString());
 
-  useEffect(() => {
-    const baseCurrencyIdParam = searchParams.get("baseCurrencyId");
-    const quoteCurrencyIdParam = searchParams.get("quoteCurrencyId");
-    const agentIdParam = searchParams.get("agentId");
-    const supplierIdParma = searchParams.get("supplierId");
-
-    setBaseCurrencyId(
-      baseCurrencyIdParam ? parseInt(baseCurrencyIdParam) : undefined,
-    );
-    setQuoteCurrencyId(
-      quoteCurrencyIdParam ? parseInt(quoteCurrencyIdParam) : undefined,
-    );
-    setAgentId(agentIdParam ? parseInt(agentIdParam) : undefined);
-    setSupplierId(supplierIdParma ? parseInt(supplierIdParma) : undefined);
-  }, [searchParams]);
-
-  const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
-    `/transactions?${queryParams.toString()}`,
-    fetcher,
-  );
-  if (error)
-    return <p className="text-red-500">Failed to load transactions.</p>;
-
-  const transactions = data?.data || [];
-  const meta = data?.meta || { totalItems: 0, totalPages: 0, currentPage: 1 };
+  const {
+    transactionsData: transactions,
+    metaData: meta,
+    mutate,
+    isLoading,
+  } = useTransactions(queryParams);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -222,12 +162,8 @@ const TransactionTable = ({
       Profit: `${transaction.quoteCurrency.symbol} ${transaction.profit}`,
       Commission: `${transaction.quoteCurrency.symbol} ${transaction.commission}`,
       "Total Earnings": `${transaction.quoteCurrency.symbol} ${transaction.totalEarnings}`,
-      "Agent Name": transaction.Agent.name,
       "Supplier Name": transaction.Supplier.name,
-      "Agent Payment Status": transaction.agentPaymentStatus,
       "Supplier Payment Status": transaction.supplierPaymentStatus,
-      "Amount Received From Agent": transaction.amountReceivedFromAgent,
-      "Remaining Amount From Agent": transaction.remainingAmountFromAgent,
       "Amount Paid To Supplier": transaction.amountPaidToSupplier,
       "Remaining Amount To Pay To Supplier":
         transaction.remainingAmountToPayToSupplier,
@@ -243,11 +179,6 @@ const TransactionTable = ({
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setOpen(true);
-  };
-
-  const handleDirectAgentPayment = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setDirectAgentPaymentOpen(true);
   };
 
   const handleDirectSupplierPayment = (transaction: Transaction) => {
@@ -273,38 +204,6 @@ const TransactionTable = ({
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-4 items-center md:flex-nowrap">
-        {supplierList && (
-          <Select onValueChange={(value) => setSupplierId(parseInt(value))}>
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Supplier" />
-            </SelectTrigger>
-            <SelectContent>
-              {supplierList?.length > 0 &&
-                supplierList?.map((supplier) => (
-                  <SelectItem key={supplier.id} value={supplier.id.toString()}>
-                    {supplier.name}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {agentList && (
-          <Select onValueChange={(value) => setAgentId(parseInt(value))}>
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Agent" />
-            </SelectTrigger>
-            <SelectContent>
-              {agentList?.length > 0 &&
-                agentList?.map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id.toString()}>
-                    {agent.name}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        )}
-
         {transactionTypeList && (
           <Select
             onValueChange={(value) =>
@@ -333,29 +232,6 @@ const TransactionTable = ({
           </Select>
         )}
 
-        {agentPaymentStatusList && (
-          <Select
-            onValueChange={(value: PaymentStatus) =>
-              setAgentPaymentStatus([value])
-            }
-          >
-            <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Customer Payment Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {agentPaymentStatusList?.length > 0 &&
-                agentPaymentStatusList?.map((agentPaymentStatus) => (
-                  <SelectItem
-                    key={agentPaymentStatus}
-                    value={agentPaymentStatus}
-                  >
-                    {agentPaymentStatus}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        )}
-
         {supplierPaymentStatusList && (
           <Select
             onValueChange={(value: PaymentStatus) =>
@@ -363,7 +239,7 @@ const TransactionTable = ({
             }
           >
             <SelectTrigger className="w-full md:w-[200px] h-9 text-xs truncate">
-              <SelectValue placeholder="Select Supplier Payment Status" />
+              <SelectValue placeholder="Select Payment Status" />
             </SelectTrigger>
             <SelectContent>
               {supplierPaymentStatusList?.length > 0 &&
@@ -486,18 +362,16 @@ const TransactionTable = ({
             <TableHead>ID</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Customer</TableHead>
-            <TableHead>Supplier</TableHead>
             <TableHead>Amount(From)</TableHead>
             <TableHead>Amount(To)</TableHead>
-            <TableHead>Profit</TableHead>
-            <TableHead>Commission</TableHead>
-            <TableHead>TotalEarnings</TableHead>
+            <TableHead>Amount Paid</TableHead>
+            <TableHead>Amount Due</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         {isLoading ? (
-          <TransactionSkeletonTable />
+          <TableSkeletons columns={8} />
         ) : (
           <TableBody>
             {transactions.map((transaction) => (
@@ -510,37 +384,25 @@ const TransactionTable = ({
                   {transaction.quoteCurrency.name}-{transaction.id}
                 </TableCell>
                 <TableCell>
-                  {new Date(transaction.transactionDate).toLocaleDateString()}
+                  {new Date(transaction.transactionDate).toLocaleString()}
                 </TableCell>
                 <TableCell>{transaction.Agent.name}</TableCell>
-                <TableCell>{transaction.Supplier.name}</TableCell>
                 <TableCell>
                   {transaction.baseCurrency.symbol}
                   {transaction.baseAmount}
                 </TableCell>
                 <TableCell>
                   {transaction.quoteCurrency.symbol}
-                  {transaction.quoteAmountSell}{" "}
-                  <span>({transaction.sellRate})</span>
+                  {transaction.quoteAmountBuy}{" "}
+                  <span>({transaction.buyRate})</span>
                 </TableCell>
                 <TableCell>
                   {transaction.quoteCurrency.symbol}
-                  {transaction.profit}
+                  {transaction.amountPaidToSupplier}
                 </TableCell>
                 <TableCell>
                   {transaction.quoteCurrency.symbol}
-                  {transaction.commission}
-                </TableCell>
-                <TableCell>
-                  {transaction.quoteCurrency.symbol}
-                  {transaction.totalEarnings}
-                  {transaction.TransactionProfit?.map((profit) => {
-                    return (
-                      <p className="text-blue-500" key={profit.id}>
-                        {profit.profitAmount}({profit.Currency.symbol})
-                      </p>
-                    );
-                  })}
+                  {transaction.remainingAmountToPayToSupplier}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-0">
@@ -580,17 +442,6 @@ const TransactionTable = ({
                       onConfirm={() => handleDelete(transaction.id)}
                     />
 
-                    {transaction.agentPaymentStatus !== "PAID" && (
-                      <Button
-                        size={null}
-                        variant="ghost"
-                        className="w-5 h-5 p-0 min-w-0 cursor-pointer"
-                        onClick={() => handleDirectAgentPayment(transaction)}
-                      >
-                        <CheckCircle className="w-3 h-3" />
-                      </Button>
-                    )}
-
                     {transaction.supplierPaymentStatus !== "PAID" && (
                       <Button
                         size={null}
@@ -618,17 +469,6 @@ const TransactionTable = ({
       )}
 
       {selectedTransaction && (
-        <AddDirectAgentPayment
-          transaction={selectedTransaction}
-          onSuccess={() => {
-            setDirectAgentPaymentOpen(false);
-          }}
-          isOpen={directAgentPaymentOpen}
-          setIsOpen={setDirectAgentPaymentOpen}
-        />
-      )}
-
-      {selectedTransaction && (
         <AddDirectSupplierPayment
           transaction={selectedTransaction}
           onSuccess={() => {
@@ -639,20 +479,22 @@ const TransactionTable = ({
         />
       )}
 
-      <div className="flex justify-between items-center mt-4">
-        <p className="text-xs">
-          Total Transactions:{" "}
-          <span className="font-semibold">{meta.totalItems}</span>
-        </p>
+      {meta && (
+        <div className="flex justify-between items-center mt-4">
+          <p className="text-xs">
+            Total Transactions:{" "}
+            <span className="font-semibold">{meta.totalItems}</span>
+          </p>
 
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={meta.totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={meta.totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default TransactionTable;
+export default SupplierTransactionTable;

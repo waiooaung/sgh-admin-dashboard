@@ -8,11 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
 
 import useDataContext from "@/hooks/useDataContext";
-import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 import { AddSupplierPayment } from "@/components/dialogs/add-supplier-payment";
 import { SupplierOverviewCard } from "@/components/cards/supplier-overview-card";
 import { SupplierBalanceCard } from "@/components/cards/supplier-balance-card";
+import SupplierTransactionTable from "@/components/tables/supplier-transaction-table";
 
 const SupplierDetailContainer = () => {
   const { supplier } = useDataContext();
@@ -114,7 +114,10 @@ const SupplierDetailContainer = () => {
       </div>
 
       <div className="grid grid-cols-1">
-        <SupplierOverviewCard tenantId={supplier.tenantId} supplierId={supplier.id} />
+        <SupplierOverviewCard
+          tenantId={supplier.tenantId}
+          supplierId={supplier.id}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -123,7 +126,7 @@ const SupplierDetailContainer = () => {
             <CardTitle>Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionTable defaultSupplierId={supplierId} />
+            <SupplierTransactionTable defaultSupplierId={supplierId} />
           </CardContent>
         </Card>
       </div>

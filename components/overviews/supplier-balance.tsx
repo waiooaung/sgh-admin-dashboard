@@ -10,7 +10,8 @@ const SupplierBalances = ({ supplierId }: { supplierId: number }) => {
         <Card key={supplierBalance.id}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium truncate">
-              {supplierBalance.currency.name} ({supplierBalance.currency.symbol})
+              {supplierBalance.currency.name} ({supplierBalance.currency.symbol}
+              )
             </CardTitle>
           </CardHeader>
           <CardContent>
