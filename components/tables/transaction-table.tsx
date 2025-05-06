@@ -1,6 +1,4 @@
-import useSWR from "swr";
 import { useState, useEffect } from "react";
-import fetcher from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -37,7 +35,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
 import { Transaction } from "@/types/transaction";
-import { MetaData } from "@/types/meta-data";
 import TransactionSkeletonTable from "./transaction-skeleton-table";
 import EditTransaction from "@/components/dialogs/edit-transaction";
 import useDeleteTransaction from "@/hooks/useDeleteTransaction";
@@ -52,14 +49,7 @@ import { AddDirectSupplierPayment } from "../dialogs/add-direct-supplier-payment
 import { Currency } from "@/types/currency";
 import { useSearchParams } from "next/navigation";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
-
-interface ApiResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: Transaction[];
-  meta: MetaData;
-}
+import { useTransactions } from "@/hooks/useTransactions";
 
 type PaymentStatus = "PENDING" | "PARTIALLY_PAID" | "PAID";
 
@@ -186,15 +176,7 @@ const TransactionTable = ({
     setSupplierId(supplierIdParma ? parseInt(supplierIdParma) : undefined);
   }, [searchParams]);
 
-  const { data, error, mutate, isLoading } = useSWR<ApiResponse>(
-    `/transactions?${queryParams.toString()}`,
-    fetcher,
-  );
-  if (error)
-    return <p className="text-red-500">Failed to load transactions.</p>;
-
-  const transactions = data?.data || [];
-  const meta = data?.meta || { totalItems: 0, totalPages: 0, currentPage: 1 };
+  const { transactionsData: transactions, metaData: meta, mutate, isLoading } = useTransactions(queryParams);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -639,18 +621,20 @@ const TransactionTable = ({
         />
       )}
 
-      <div className="flex justify-between items-center mt-4">
-        <p className="text-xs">
-          Total Transactions:{" "}
-          <span className="font-semibold">{meta.totalItems}</span>
-        </p>
+      { meta &&       
+        <div className="flex justify-between items-center mt-4">
+          <p className="text-xs">
+            Total Transactions:{" "}
+            <span className="font-semibold">{meta.totalItems}</span>
+          </p>
 
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={meta.totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={meta.totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      }
     </div>
   );
 };

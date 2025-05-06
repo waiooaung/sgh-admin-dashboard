@@ -41,7 +41,7 @@ import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Agent } from "@/types/agent";
 import AgentOverview from "../overviews/agent-overview";
-import TransactionTable from "../tables/transaction-table";
+import AgentTransactionTable from "../tables/agent-transaction-table";
 
 interface AddAgentPaymentProps {
   defaultAgent?: Agent;
@@ -242,7 +242,7 @@ export function AddAgentPayment({
                   <CardTitle>Open Transactions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TransactionTable
+                  <AgentTransactionTable
                     defaultAgentId={agentId}
                     defaultAgentPaymentStatus={["PARTIALLY_PAID", "PENDING"]}
                   />
