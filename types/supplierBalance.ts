@@ -1,3 +1,5 @@
+import { Currency } from "./currency";
+
 export type SupplierBalance = {
   id: number;
   agentId: number;
@@ -5,6 +7,7 @@ export type SupplierBalance = {
   paidAmount: number;
   createdAt: Date;
   updatedAt: Date;
+  currency: Currency;
 };
 
 export type SupplierBalanceApiResponse = {

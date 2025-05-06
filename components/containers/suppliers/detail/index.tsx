@@ -8,10 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, XCircle } from "lucide-react";
 
 import useDataContext from "@/hooks/useDataContext";
-import SupplierOverview from "@/components/overviews/supplier-overview";
 import TransactionTable from "@/components/tables/transaction-table";
 import ContactButton from "@/components/contact-button";
 import { AddSupplierPayment } from "@/components/dialogs/add-supplier-payment";
+import { SupplierOverviewCard } from "@/components/cards/supplier-overview-card";
+import { SupplierBalanceCard } from "@/components/cards/supplier-balance-card";
 
 const SupplierDetailContainer = () => {
   const { supplier } = useDataContext();
@@ -46,8 +47,7 @@ const SupplierDetailContainer = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {/* Header Section */}
-        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-md">
+        <div className="flex items-center justify-between gap-6 p-6 border rounded-2xl shadow-sm">
           <div className="flex items-center gap-6">
             <Avatar className="h-20 w-20">
               <AvatarImage alt={supplier.name} />
@@ -71,13 +71,14 @@ const SupplierDetailContainer = () => {
             onSuccess={() => console.log("Payment added.")}
           />
         </div>
+      </div>
 
-        {/* Supplier Details */}
+      <div className="grid grid-cols-1">
         <Card>
           <CardHeader>
-            <CardTitle>Supplier Information</CardTitle>
+            <CardTitle>Information</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-2 gap-4 text-sm">
             <p>
               <strong>Name:</strong> {supplier.name || "N/A"}
             </p>
@@ -107,12 +108,15 @@ const SupplierDetailContainer = () => {
           </CardContent>
         </Card>
       </div>
+
       <div className="grid grid-cols-1">
-        <SupplierOverview
-          tenantId={supplier.tenantId}
-          supplierId={supplier.id}
-        />
+        <SupplierBalanceCard supplierId={supplierId} />
       </div>
+
+      <div className="grid grid-cols-1">
+        <SupplierOverviewCard tenantId={supplier.tenantId} supplierId={supplier.id} />
+      </div>
+
       <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader>
