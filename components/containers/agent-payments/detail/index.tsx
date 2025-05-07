@@ -107,7 +107,12 @@ const AgentDetailContainer = () => {
                     {amountPaid}
                   </strong>{" "}
                   paid for transaction No.{" "}
-                  <strong>TNX-{transaction.AgentTransaction.baseCurrency.name}-{transaction.AgentTransaction.quoteCurrency.name}-{transaction.transactionId}</strong>.
+                  <strong>
+                    TNX-{transaction.AgentTransaction.baseCurrency.name}-
+                    {transaction.AgentTransaction.quoteCurrency.name}-
+                    {transaction.transactionId}
+                  </strong>
+                  .
                 </p>
               );
             })}

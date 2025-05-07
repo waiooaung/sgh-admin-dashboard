@@ -109,7 +109,12 @@ const SupplierDetailContainer = () => {
                     {amountPaid}
                   </strong>{" "}
                   paid for transaction No.{" "}
-                  <strong>TNX-{transaction.SupplierTransaction.baseCurrency.name}-{transaction.SupplierTransaction.quoteCurrency.name}-{transaction.transactionId}</strong>.
+                  <strong>
+                    TNX-{transaction.SupplierTransaction.baseCurrency.name}-
+                    {transaction.SupplierTransaction.quoteCurrency.name}-
+                    {transaction.transactionId}
+                  </strong>
+                  .
                 </p>
               );
             })}
