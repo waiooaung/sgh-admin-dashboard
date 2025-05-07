@@ -212,15 +212,32 @@ export function AddDirectSupplierPayment({
                 <FormField
                   control={form.control}
                   name="exchangeRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Exchange Rate</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const baseCurrency = currencies.find(
+                      (c) => c.id === transaction.quoteCurrencyId,
+                    );
+                    const selected = currencies.find(
+                      (c) => c.id === Number(selectedCurrency),
+                    );
+                    return (
+                      <FormItem>
+                        <FormLabel>Exchange Rate</FormLabel>
+                        {baseCurrency && selected && (
+                          <small className="text-muted-foreground">
+                            1 {selected.symbol} = {field.value || "?"}{" "}
+                            {baseCurrency.symbol}
+                          </small>
+                        )}
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g. 1 USD = 3.65 AED"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               )}
 
