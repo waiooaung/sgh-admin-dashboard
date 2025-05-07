@@ -2,14 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Table,
-  TableHeader,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
 import useDataContext from "@/hooks/useDataContext";
 
 const AgentDetailContainer = () => {
@@ -25,6 +17,9 @@ const AgentDetailContainer = () => {
   const agent = agentPayment.Agent;
   const appliedTransactions = agentPayment.appliedTransactions;
   const currency = agentPayment.Currency;
+
+  let remainingAmount = agentPayment.amountPaid;
+  console.log(agentPayment);
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
@@ -99,43 +94,40 @@ const AgentDetailContainer = () => {
       <div className="grid grid-cols-1 gap-4">
         <Card className="border shadow-md rounded-xl">
           <CardHeader>
-            <CardTitle className="text-lg">Applied Transactions</CardTitle>
+            <CardTitle className="text-lg">Agent Payment Logs</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table className="min-w-full shadow-md rounded-lg overflow-hidden">
-              <TableHeader className="text-sm font-semibold">
-                <TableRow>
-                  <TableHead className="text-left truncate">
-                    Transaction Id
-                  </TableHead>
-                  <TableHead className="text-left truncate">
-                    Transaction Status
-                  </TableHead>
-                  <TableHead className="text-left truncate">
-                    Amount Applied ({currency.name})
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {appliedTransactions?.map((transaction) => (
-                  <TableRow
-                    key={transaction.id}
-                    className="hover:bg-blend-color transition-colors"
-                  >
-                    <TableCell className="w-15 truncate">
-                      TNX-{transaction.transactionId}
-                    </TableCell>
-                    <TableCell className="truncate">
-                      {transaction.AgentTransaction.agentPaymentStatus}
-                    </TableCell>
-                    <TableCell className="truncate">
-                      {currency.symbol}
-                      {transaction.amountApplied}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <CardContent className="text-sm">
+            {appliedTransactions?.map((transaction) => {
+              const amountPaid = transaction.amountApplied;
+              remainingAmount -= amountPaid;
+
+              return (
+                <p key={transaction.id} className="mb-2">
+                  <strong>
+                    {currency.symbol}
+                    {amountPaid}
+                  </strong>{" "}
+                  paid for transaction No.{" "}
+                  <strong>
+                    {/* TNX-{transaction}-
+                    {transaction.AgentTransaction.quoteCurrency.name}- */}
+                    {transaction.transactionId}
+                  </strong>
+                  .
+                </p>
+              );
+            })}
+
+            {/* Only show remaining credit if there's leftover after all transactions */}
+            {remainingAmount > 0 && (
+              <p>
+                <strong>
+                  {currency.symbol}
+                  {remainingAmount.toFixed(2)}
+                </strong>{" "}
+                added to credit balance.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
