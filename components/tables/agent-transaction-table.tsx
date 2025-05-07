@@ -363,6 +363,7 @@ const AgentTransactionTable = ({
             <TableHead>Supplier</TableHead>
             <TableHead>Amount(From)</TableHead>
             <TableHead>Amount(To)</TableHead>
+            <TableHead>Commission</TableHead>
             <TableHead>Amount Received</TableHead>
             <TableHead>Amount Due</TableHead>
             <TableHead>Status</TableHead>
@@ -395,6 +396,10 @@ const AgentTransactionTable = ({
                   {transaction.quoteCurrency.symbol}
                   {transaction.quoteAmountSell}{" "}
                   <span>({transaction.sellRate})</span>
+                </TableCell>
+                <TableCell>
+                  {transaction.quoteCurrency.symbol}
+                  {transaction.commission}
                 </TableCell>
                 <TableCell>
                   {transaction.quoteCurrency.symbol}
