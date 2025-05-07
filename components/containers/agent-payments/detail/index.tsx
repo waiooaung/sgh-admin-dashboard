@@ -19,7 +19,6 @@ const AgentDetailContainer = () => {
   const currency = agentPayment.Currency;
 
   let remainingAmount = agentPayment.amountPaid;
-  console.log(agentPayment);
 
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
@@ -108,17 +107,11 @@ const AgentDetailContainer = () => {
                     {amountPaid}
                   </strong>{" "}
                   paid for transaction No.{" "}
-                  <strong>
-                    {/* TNX-{transaction}-
-                    {transaction.AgentTransaction.quoteCurrency.name}- */}
-                    {transaction.transactionId}
-                  </strong>
-                  .
+                  <strong>{transaction.transactionId}</strong>.
                 </p>
               );
             })}
 
-            {/* Only show remaining credit if there's leftover after all transactions */}
             {remainingAmount > 0 && (
               <p>
                 <strong>
