@@ -42,6 +42,7 @@ export type Transaction = {
   amountPaidToSupplier: number;
   remainingAmountToPayToSupplier: number;
   supplierPaymentStatus: string;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   TransactionProfit: TransactionProfit[];

@@ -51,6 +51,7 @@ import { Currency } from "@/types/currency";
 import { useSearchParams } from "next/navigation";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { useTransactions } from "@/hooks/useTransactions";
+import useDataContext from "@/hooks/useDataContext";
 
 type PaymentStatus = "PENDING" | "PARTIALLY_PAID" | "PAID";
 
@@ -94,7 +95,7 @@ const TransactionTable = ({
   const { user } = useAuth();
   const tenantId = user ? user.tenantId : 0;
   const { trigger: deleteTransaction } = useDeleteTransaction();
-
+  const { setTransaction } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [open, setOpen] = useState<boolean>(false);
@@ -256,6 +257,11 @@ const TransactionTable = ({
     } catch {
       toast.error(`Failed to delete Transaction.`);
     }
+  };
+
+  const handleRedirect = (transaction: Transaction) => {
+    setTransaction(transaction);
+    router.push("transactions/detail");
   };
 
   return (
@@ -536,9 +542,9 @@ const TransactionTable = ({
                       size={null}
                       variant="ghost"
                       className="w-5 h-5 p-0 min-w-0 cursor-pointer"
-                      onClick={() =>
-                        router.push(`/dashboard/transactions/${transaction.id}`)
-                      }
+                      onClick={() => {
+                        handleRedirect(transaction);
+                      }}
                     >
                       <View className="w-3 h-3" />
                     </Button>
