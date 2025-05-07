@@ -95,7 +95,7 @@ const SupplierDetailContainer = () => {
       <div className="grid grid-cols-1 gap-4">
         <Card className="border shadow-md rounded-xl">
           <CardHeader>
-            <CardTitle className="text-lg">Agent Payment Logs</CardTitle>
+            <CardTitle className="text-lg">Payment Logs</CardTitle>
           </CardHeader>
           <CardContent className="text-sm">
             {appliedTransactions?.map((transaction) => {
