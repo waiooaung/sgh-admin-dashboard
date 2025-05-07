@@ -50,7 +50,7 @@ export default function DashboardChart() {
   );
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
       {Object.entries(groupedByPair).map(([pair, pairData]) => (
         <Card key={pair} className="shadow-md border">
           <CardHeader>

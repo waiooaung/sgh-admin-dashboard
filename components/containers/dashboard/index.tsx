@@ -34,9 +34,6 @@ export default function DashboardContainer() {
           defaultDateTo={new Date()}
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-        <DashboardChart />
-      </div>
 
       <div className="grid grid-cols-1 gap-4">
         <Card>
@@ -52,6 +49,10 @@ export default function DashboardContainer() {
             />
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <DashboardChart />
       </div>
     </div>
   );
