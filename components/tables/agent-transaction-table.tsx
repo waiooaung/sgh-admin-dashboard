@@ -30,7 +30,7 @@ import {
   View,
   Pencil,
   Trash,
-  CheckCircle,
+  ArrowDownCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "./pagination-controls";
@@ -450,7 +450,7 @@ const AgentTransactionTable = ({
                         className="w-5 h-5 p-0 min-w-0 cursor-pointer"
                         onClick={() => handleDirectAgentPayment(transaction)}
                       >
-                        <CheckCircle className="w-3 h-3" />
+                        <ArrowDownCircle className="w-3 h-3" />
                       </Button>
                     )}
                   </div>

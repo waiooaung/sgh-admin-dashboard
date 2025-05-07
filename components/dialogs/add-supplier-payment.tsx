@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardContent, CardTitle } from "../ui/card";
 
 import useSWRMutation from "swr/mutation";
 import axiosInstance from "@/lib/axios-instance";
@@ -39,6 +40,8 @@ import { useAuth } from "@/context/authContext";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Supplier } from "@/types/supplier";
+import SupplierOwedOverview from "../overviews/supplier-owed-overview";
+import SupplierTransactionTable from "../tables/supplier-transaction-table";
 
 interface AddSupplierPaymentProps {
   defaultSupplier?: Supplier;
@@ -109,12 +112,14 @@ export function AddSupplierPayment({
     }
   };
 
+  const supplierId = form.watch("supplierId");
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>Add Payment</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-10/12 w-full max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Payment</DialogTitle>
         </DialogHeader>
@@ -122,7 +127,7 @@ export function AddSupplierPayment({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
             >
               {/* Supplier */}
               {!defaultSupplier && (
@@ -207,23 +212,47 @@ export function AddSupplierPayment({
                 name="paymentType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Payment Type</FormLabel>
+                    <FormLabel>Payment Note</FormLabel>
                     <FormControl>
-                      <Textarea className="resize-none" {...field} />
+                      <Textarea
+                        className="resize-none min-h-[40px]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter className="mt-4">
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : "Save"}{" "}
-                  {/* Button text based on loading */}
-                </Button>
-              </DialogFooter>
+              <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-end">
+                <DialogFooter className="p-0">
+                  <Button type="submit" disabled={loading}>
+                    {loading ? "Saving..." : "Save"}
+                  </Button>
+                </DialogFooter>
+              </div>
             </form>
           </Form>
+
+          {tenantId && supplierId && (
+            <SupplierOwedOverview tenantId={tenantId} supplierId={supplierId} />
+          )}
+
+          {tenantId && supplierId && (
+            <div className="grid grid-cols-1 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Open Transactions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SupplierTransactionTable
+                    defaultSupplierId={supplierId}
+                    defaultSupplierPaymentStatus={["PARTIALLY_PAID", "PENDING"]}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

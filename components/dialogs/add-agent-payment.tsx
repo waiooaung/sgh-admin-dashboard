@@ -40,8 +40,8 @@ import { useAuth } from "@/context/authContext";
 import { useAgents } from "@/hooks/useAgents";
 import { useCurrencies } from "@/hooks/useCurrencies";
 import { Agent } from "@/types/agent";
-import AgentOverview from "../overviews/agent-overview";
 import AgentTransactionTable from "../tables/agent-transaction-table";
+import AgentDueOverview from "../overviews/agent-due-overview";
 
 interface AddAgentPaymentProps {
   defaultAgent?: Agent;
@@ -123,9 +123,6 @@ export function AddAgentPayment({
           <DialogTitle>Add Payment</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 grid-cols-1">
-          {tenantId && agentId && (
-            <AgentOverview tenantId={tenantId} agentId={agentId} />
-          )}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
@@ -234,6 +231,10 @@ export function AddAgentPayment({
               </div>
             </form>
           </Form>
+
+          {tenantId && agentId && (
+            <AgentDueOverview tenantId={tenantId} agentId={agentId} />
+          )}
 
           {tenantId && agentId && (
             <div className="grid grid-cols-1 gap-4">

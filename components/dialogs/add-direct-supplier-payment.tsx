@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -53,7 +53,6 @@ const formSchema = z.object({
   supplierId: z.coerce.number(),
   currencyId: z.coerce.number(),
   amountPaid: z.coerce.number(),
-  transactionCurrencyId: z.coerce.number(),
   exchangeRate: z.coerce.number(),
   paymentType: z.string().min(5),
 });
@@ -71,10 +70,6 @@ export function AddDirectSupplierPayment({
   const defaultSupplier = transaction.Supplier;
   const defaultCurrency = transaction.quoteCurrency;
   const defaultAmount = transaction.remainingAmountToPayToSupplier;
-  const transactionCurrencies = [
-    transaction.baseCurrency,
-    transaction.quoteCurrency,
-  ];
 
   const form = useForm<DirectSupplierPaymentFormData>({
     resolver: zodResolver(formSchema),
@@ -84,10 +79,14 @@ export function AddDirectSupplierPayment({
       supplierId: defaultSupplier.id,
       currencyId: defaultCurrency.id,
       amountPaid: defaultAmount,
-      transactionCurrencyId: undefined,
       exchangeRate: undefined,
       paymentType: "",
     },
+  });
+
+  const selectedCurrency = useWatch({
+    control: form.control,
+    name: "currencyId",
   });
 
   const { trigger } = useSWRMutation(
@@ -131,10 +130,15 @@ export function AddDirectSupplierPayment({
       supplierId: transaction.Supplier?.id,
       currencyId: transaction.quoteCurrency.id,
       amountPaid: transaction.remainingAmountToPayToSupplier,
-      transactionCurrencyId: undefined,
       paymentType: "",
     });
   }, [transaction, tenantId, form, transactionId]);
+
+  useEffect(() => {
+    if (transaction.quoteCurrencyId === selectedCurrency) {
+      form.setValue("exchangeRate", 1);
+    }
+  }, [selectedCurrency, transaction.quoteCurrencyId, form]);
 
   return (
     <Dialog
@@ -204,53 +208,21 @@ export function AddDirectSupplierPayment({
                 )}
               />
 
-              {/* Currency Id */}
-              <FormField
-                control={form.control}
-                name="transactionCurrencyId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value?.toString()}
-                    >
+              {transaction.quoteCurrencyId !== Number(selectedCurrency) && (
+                <FormField
+                  control={form.control}
+                  name="exchangeRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exchange Rate</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select currency..." />
-                        </SelectTrigger>
+                        <Input {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {transactionCurrencies.length > 0 &&
-                          transactionCurrencies.map((currency) => (
-                            <SelectItem
-                              key={currency.id}
-                              value={currency.id.toString()}
-                            >
-                              {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Exchange Rate */}
-              <FormField
-                control={form.control}
-                name="exchangeRate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Exchange Rate</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Payment Type */}
               <FormField
