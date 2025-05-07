@@ -1,13 +1,5 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DollarSign, User, Banknote, Globe } from "lucide-react";
@@ -28,13 +20,16 @@ const TransactionDetailContainer = () => {
   return (
     <div className="flex flex-1 flex-col space-y-4 p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
-        <p className="text-lg font-semibold tracking-tight">Transaction Detail</p>
+        <p className="text-lg font-semibold tracking-tight">
+          Transaction Detail
+        </p>
       </div>
       <Card className="w-full shadow-lg">
         <CardHeader className="border-b">
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            Transaction - TNX-{transaction.baseCurrency.name}-{transaction.quoteCurrency.name}-{transaction.id}
+            Transaction - TNX-{transaction.baseCurrency.name}-
+            {transaction.quoteCurrency.name}-{transaction.id}
           </CardTitle>
           <p className="text-muted-foreground text-sm mt-1">
             {new Date(transaction.transactionDate).toLocaleString()}
