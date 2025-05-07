@@ -5,7 +5,7 @@ export const SupplierBalanceCard = ({ supplierId }: { supplierId: number }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Credit Balances</CardTitle>
+        <CardTitle>Amount Credit</CardTitle>
       </CardHeader>
       <CardContent>
         <SupplierBalances supplierId={supplierId} />

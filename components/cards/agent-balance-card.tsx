@@ -5,7 +5,7 @@ export const AgentBalanceCard = ({ agentId }: { agentId: number }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Credit Balances</CardTitle>
+        <CardTitle>Amount Credit</CardTitle>
       </CardHeader>
       <CardContent>
         <AgentBalances agentId={agentId} />
